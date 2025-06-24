@@ -1,0 +1,51 @@
+{% set title = "Đăng ký tài khoản | UnlimitMail.com - Hệ thống Email Tự Động" %}
+{% set description = "Tạo tài khoản mới trên UnlimitMail.com – hệ thống email tự động, bảo mật cao, chuyên cho MMO và doanh nghiệp." %}
+{% set keywords = "UnlimitMail, đăng ký email, hệ thống email tự động, MMO" %}
+{% set canonical = "https://unlimitmail.com/register" %}
+{% set og_image = "https://unlimitmail.com/logo.png" %}
+{% include "head-meta.njk" %}
+
+<body class="bg-light">
+  {% include "head.njk" %}
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h2 class="mb-3 text-center">Đăng ký tài khoản</h2>
+            <form id="registerForm" autocomplete="off">
+              <div class="mb-3">
+                <label for="fullname" class="form-label">Họ và tên</label>
+                <input type="text" class="form-control" id="fullname" name="fullname" required>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email đăng ký</label>
+                <input type="email" class="form-control" id="email" name="email" required autocomplete="email">
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Mật khẩu</label>
+                <input type="password" class="form-control" id="password" name="password" minlength="8" required autocomplete="new-password">
+              </div>
+              <div class="mb-3">
+                <label for="phone" class="form-label">Số điện thoại</label>
+                <input type="text" class="form-control" id="phone" name="phone" required>
+              </div>
+              <div class="mb-3">
+                <label for="pin" class="form-label">Mã PIN (6 số)</label>
+                <input type="text" class="form-control" id="pin" name="pin" required maxlength="6" pattern="\d{6}">
+              </div>
+              <div id="regAlert" class="alert alert-danger d-none py-2" role="alert"></div>
+              <button type="submit" class="btn btn-primary w-100">Tạo tài khoản</button>
+            </form>
+            <div class="mt-3 text-center">
+              Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include "footer.njk" %}
+
+  <script src="/assets/register.js"></script>
+</body>
