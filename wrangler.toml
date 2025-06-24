@@ -1,0 +1,11 @@
+name = "khoai"
+main = "dist/index.js"
+compatibility_date = "2024-06-24"
+
+kv_namespaces = [
+  { binding = "KHOAI_KV_USER", id = "77a8867cc9374bbaa9846d78875efbf0" }
+]
+[triggers]
+routes = [
+  "https://gem.id.vn/api/*"
+]
