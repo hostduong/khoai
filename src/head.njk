@@ -1,95 +1,72 @@
-<!-- src/head.njk -->
-<nav class="layout-navbar shadow-none py-0">
-  <div class="container">
-    <div class="navbar navbar-expand-lg landing-navbar px-3 px-md-8">
-      <!-- Menu logo wrapper: Start -->
-      <div class="navbar-brand app-brand demo d-flex py-0 py-lg-2 me-4 me-xl-8">
-        <!-- Mobile menu toggle: Start-->
-        <button class="navbar-toggler border-0 px-0 me-4" type="button" data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-          aria-expanded="false" aria-label="Toggle navigation">
-          <i class="ti ti-menu-2 ti-lg align-middle text-heading fw-medium"></i>
-        </button>
-        <!-- Mobile menu toggle: End-->
-        <a href="/" class="app-brand-link">
-          <img src="/img/logo2.png" alt="UnlimitMail" class="app-brand-logo demo" style="width: 50px; height: 50px">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-lg rounded-3 py-3 px-4 mb-4" style="margin-top: 32px;">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <img src="/img/logo2.png" alt="UnlimitMail" style="width: 50px; height: 50px;">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item mx-2">
+          <a class="nav-link fw-medium d-flex align-items-center" href="/">
+            <i class="ti ti-home ti-lg me-2"></i>Trang chủ
+          </a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link fw-medium d-flex align-items-center" href="/order-history">
+            <i class="ti ti-mail ti-lg me-2"></i>LS Đơn Hàng
+          </a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link fw-medium d-flex align-items-center" href="/email-domain">
+            <i class="ti ti-mail ti-lg me-2"></i>Mail Domain
+          </a>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link fw-medium d-flex align-items-center" href="/otp-gmail">
+            <i class="ti ti-mail ti-lg me-2"></i>OTP Gmail
+          </a>
+        </li>
+        <li class="nav-item mx-2 dropdown">
+          <a class="nav-link dropdown-toggle fw-medium d-flex align-items-center" href="#" id="napTienDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ti ti-receipt-2 ti-lg me-2"></i>Nạp tiền
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="napTienDropdown">
+            <li><a class="dropdown-item" href="/nap-tien">Nạp tiền</a></li>
+            <li><a class="dropdown-item" href="/lich-su-nap-tien">Lịch sử nạp tiền</a></li>
+          </ul>
+        </li>
+        <li class="nav-item mx-2">
+          <a class="nav-link fw-medium d-flex align-items-center" href="/affiliates">
+            <i class="ti ti-gift ti-lg me-2"></i>Affiliate
+          </a>
+        </li>
+        <li class="nav-item mx-2 dropdown">
+          <a class="nav-link dropdown-toggle fw-medium d-flex align-items-center" href="#" id="getCodeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="ti ti-eye ti-lg me-2"></i>Get Code
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="getCodeDropdown">
+            <li><a class="dropdown-item" href="/email/read-email-content">Đọc Mail</a></li>
+            <li><a class="dropdown-item" href="/email/read-email-code">Đọc Code Hotmail</a></li>
+          </ul>
+        </li>
+        <li class="nav-item mx-2 dropdown">
+          <a class="nav-link dropdown-toggle fw-medium d-flex align-items-center" href="#" id="apiDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span style="font-weight: bold;">API</span> Doc
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="apiDropdown">
+            <li><a class="dropdown-item" href="/api/documentation" target="_blank">Api Doc</a></li>
+            <li><a class="dropdown-item" href="https://tool.unlimitmail.com/swagger/index.html" target="_blank">Api Doc Read Hotmail</a></li>
+          </ul>
+        </li>
+      </ul>
+      <div class="d-flex align-items-center">
+        <a href="/login" class="btn btn-success d-flex align-items-center px-4 py-2 fw-bold" style="font-size: 18px;">
+          <i class="ti ti-login me-2"></i>Login
         </a>
       </div>
-      <!-- Menu logo wrapper: End -->
-      <!-- Menu wrapper: Start -->
-      <div class="collapse navbar-collapse landing-nav-menu" id="navbarSupportedContent">
-        <button class="navbar-toggler border-0 text-heading position-absolute end-0 top-0 scaleX-n1-rtl"
-          type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="ti ti-x ti-lg"></i>
-        </button>
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link fw-medium" aria-current="page" href="/">
-              <!-- Home SVG icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-home">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
-                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
-                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
-              </svg>
-              Trang chủ
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link btn btn-text-secondary" href="/hotmail/history">
-              <!-- LS Đơn Hàng SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/>
-                <path d="M3 7l9 6l9 -6"/>
-              </svg>
-              LS Đơn Hàng
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link btn btn-text-secondary" href="/email">
-              <!-- Mail Domain SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/>
-                <path d="M3 7l9 6l9 -6"/>
-              </svg>
-              Mail Domain
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link btn btn-text-secondary" href="/otp-service">
-              <!-- OTP Gmail SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/>
-                <path d="M3 7l9 6l9 -6"/>
-              </svg>
-              OTP Gmail
-            </a>
-          </li>
-          <!-- ... Các menu dropdown và icon SVG khác giống như UnlimitMail ... -->
-          <!-- Bạn cần copy tiếp từ UnlimitMail nếu muốn đủ menu như gốc -->
-        </ul>
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-          <li class="nav-item">
-            <a href="/login" class="btn btn-primary">
-              <span class="tf-icons ti ti-login scaleX-n1-rtl me-md-1"></span>
-              <span class="d-none d-md-block">Login</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div class="landing-menu-overlay d-lg-none"></div>
     </div>
   </div>
 </nav>
