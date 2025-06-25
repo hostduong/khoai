@@ -94,5 +94,12 @@
     });
   </script>
     <script src="{{ domain }}/build/js/jquery.min.js"></script>
+ <script>
+   // Lấy style theme đã lưu, nếu chưa có thì trả về 'system' (hoặc 'light')
+   const mode = localStorage.getItem('templateCustomizer-vertical-menu-theme-default-light--Style') || 'system';
+   // Gán class cho <html> hoặc đổi data-style
+   document.documentElement.setAttribute('data-style', mode);
+ </script>
+
 
 </head>
