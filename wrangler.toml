@@ -12,6 +12,3 @@ kv_namespaces = [
 routes = [
   "https://gem.id.vn/api/*"
 ]
-
-[vars]
-CF_TURNSTILE_SECRET = "0x4AAAAAABiYUux96DvoHqPKiH1tnc_iUFs"
