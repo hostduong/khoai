@@ -1,51 +1,148 @@
-{% set title = "Đăng ký tài khoản | UnlimitMail.com - Hệ thống Email Tự Động" %}
-{% set description = "Tạo tài khoản mới trên UnlimitMail.com – hệ thống email tự động, bảo mật cao, chuyên cho MMO và doanh nghiệp." %}
-{% set keywords = "UnlimitMail, đăng ký email, hệ thống email tự động, MMO" %}
-{% set canonical = "https://unlimitmail.com/register" %}
-{% set og_image = "https://unlimitmail.com/logo.png" %}
-{% include "head-meta.njk" %}
-
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+  <meta name="csrf-token" content="">
+  <title>Đăng ký tài khoản | UnlimitMail.com - Hệ thống Email Tự Động</title>
+  <meta name="description" content="Tạo tài khoản mới trên UnlimitMail.com – hệ thống email tự động, bảo mật cao, chuyên cho MMO và doanh nghiệp.">
+  <meta name="keywords" content="UnlimitMail, đăng ký email, hệ thống email tự động, MMO">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="UnlimitMail.com">
+  <meta name="canonical" content="https://unlimitmail.com/register">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Đăng ký tài khoản | UnlimitMail.com - Hệ thống Email Tự Động">
+  <meta property="og:description" content="Tạo tài khoản mới trên UnlimitMail.com – hệ thống email tự động, bảo mật cao, chuyên cho MMO và doanh nghiệp.">
+  <meta property="og:image" content="https://unlimitmail.com/logo.png">
+  <meta property="og:url" content="https://unlimitmail.com/register">
+  <meta property="og:type" content="website">
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Đăng ký tài khoản | UnlimitMail.com - Hệ thống Email Tự Động">
+  <meta name="twitter:description" content="Tạo tài khoản mới trên UnlimitMail.com – hệ thống email tự động, bảo mật cao, chuyên cho MMO và doanh nghiệp.">
+  <meta name="twitter:image" content="https://unlimitmail.com/logo.png">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/assets/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+  <!-- Fonts & CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/theme-default2.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/sweetalert2.css">
+  <link rel="stylesheet" href="/css/toastr.css">
+  <style>
+    body.bg-light {background-color: #f5f5f9;}
+    .card {border-radius: 16px;}
+  </style>
+</head>
 <body class="bg-light">
-  {% include "head.njk" %}
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm border-0">
-          <div class="card-body p-4">
-            <h2 class="mb-3 text-center">Đăng ký tài khoản</h2>
-            <form id="registerForm" autocomplete="off">
-              <div class="mb-3">
-                <label for="fullname" class="form-label">Họ và tên</label>
-                <input type="text" class="form-control" id="fullname" name="fullname" required>
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email đăng ký</label>
-                <input type="email" class="form-control" id="email" name="email" required autocomplete="email">
-              </div>
-              <div class="mb-3">
-                <label for="password" class="form-label">Mật khẩu</label>
-                <input type="password" class="form-control" id="password" name="password" minlength="8" required autocomplete="new-password">
-              </div>
-              <div class="mb-3">
-                <label for="phone" class="form-label">Số điện thoại</label>
-                <input type="text" class="form-control" id="phone" name="phone" required>
-              </div>
-              <div class="mb-3">
-                <label for="pin" class="form-label">Mã PIN (6 số)</label>
-                <input type="text" class="form-control" id="pin" name="pin" required maxlength="6" pattern="\d{6}">
-              </div>
-              <div id="regAlert" class="alert alert-danger d-none py-2" role="alert"></div>
-              <button type="submit" class="btn btn-primary w-100">Tạo tài khoản</button>
-            </form>
-            <div class="mt-3 text-center">
-              Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+
+<!-- HEADER -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <img src="/assets/logo.svg" alt="UnlimitMail" height="38"/>
+    </a>
+    <!-- Các mục menu khác nếu cần -->
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h2 class="mb-3 text-center">Đăng ký tài khoản</h2>
+          <form id="registerForm" autocomplete="off">
+            <div class="mb-3">
+              <label for="fullname" class="form-label">Họ và tên</label>
+              <input type="text" class="form-control" id="fullname" name="fullname" required>
             </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email đăng ký</label>
+              <input type="email" class="form-control" id="email" name="email" required autocomplete="email">
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Mật khẩu</label>
+              <input type="password" class="form-control" id="password" name="password" minlength="8" required autocomplete="new-password">
+            </div>
+            <div class="mb-3">
+              <label for="phone" class="form-label">Số điện thoại</label>
+              <input type="text" class="form-control" id="phone" name="phone" required>
+            </div>
+            <div class="mb-3">
+              <label for="pin" class="form-label">Mã PIN (6 số)</label>
+              <input type="text" class="form-control" id="pin" name="pin" required maxlength="6" pattern="\d{6}">
+            </div>
+            <div id="regAlert" class="alert alert-danger d-none py-2" role="alert"></div>
+            <button type="submit" class="btn btn-primary w-100">Tạo tài khoản</button>
+          </form>
+          <div class="mt-3 text-center">
+            Đã có tài khoản? <a href="/login.html">Đăng nhập ngay</a>
           </div>
         </div>
       </div>
     </div>
   </div>
-  {% include "footer.njk" %}
+</div>
 
-  <script src="/assets/register.js"></script>
+<!-- FOOTER -->
+<footer class="footer bg-white border-top mt-5 py-3">
+  <div class="container text-center">
+    &copy; 2024 UnlimitMail.com - All Rights Reserved.
+  </div>
+</footer>
+
+<!-- JS -->
+<script>
+const regForm = document.getElementById('registerForm');
+const regAlert = document.getElementById('regAlert');
+regForm.onsubmit = async function(e) {
+  e.preventDefault();
+  regAlert.classList.add('d-none');
+  regAlert.innerText = '';
+  const data = {
+    fullname: regForm.fullname.value.trim(),
+    email: regForm.email.value.trim(),
+    password: regForm.password.value,
+    phone: regForm.phone.value.trim(),
+    pin: regForm.pin.value.trim()
+  };
+  if(!/^\d{6}$/.test(data.pin)) {
+    regAlert.innerText = "Mã PIN phải gồm đúng 6 số.";
+    regAlert.classList.remove('d-none');
+    return;
+  }
+  if(data.password.length < 8) {
+    regAlert.innerText = "Mật khẩu tối thiểu 8 ký tự.";
+    regAlert.classList.remove('d-none');
+    return;
+  }
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if(result.ok) {
+      regAlert.classList.remove('alert-danger');
+      regAlert.classList.add('alert-success');
+      regAlert.innerText = "Tạo tài khoản thành công! Bạn sẽ được chuyển tới trang đăng nhập...";
+      regAlert.classList.remove('d-none');
+      setTimeout(() => window.location.href = '/login.html', 2000);
+    } else {
+      regAlert.innerText = result.message || 'Có lỗi xảy ra, thử lại sau!';
+      regAlert.classList.remove('d-none');
+      regAlert.classList.add('alert-danger');
+    }
+  } catch(err) {
+    regAlert.innerText = "Không kết nối được máy chủ. Vui lòng thử lại.";
+    regAlert.classList.remove('d-none');
+  }
+}
+</script>
 </body>
+</html>
