@@ -18,8 +18,10 @@ export async function onRequestPost(context) {
   });
   const result = await verify.json();
   if (!result.success) {
-    return Response.json({ success: false, message: "Captcha không hợp lệ!" }, { status: 400 });
-  }
+  // Log mọi thứ (xem trên log hoặc gửi ra frontend debug)
+  return Response.json({ success: false, message: "Captcha không hợp lệ!", error: result }, { status: 400 });
+ }
+
 
   // 2. VALIDATE INPUT (tối ưu, kiểm tra lại ở backend)
   const { username, fullname, email, password, confirm_password, phone, pin } = data;
