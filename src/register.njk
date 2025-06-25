@@ -139,6 +139,36 @@ function togglePassword(id) {
 }
 </script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+let captchaOk = false;
+function onCaptchaSuccess(token) {
+  captchaOk = true;
+  updateRegisterBtn();
+}
+function onCaptchaExpired() {
+  captchaOk = false;
+  updateRegisterBtn();
+}
+function updateRegisterBtn() {
+  const form = document.getElementById('formAuthentication');
+  let valid = true;
+  // Validate từng trường – có thể viết chi tiết hơn nếu muốn UX mạnh hơn
+  if (!form.username.value.match(/^[a-z0-9_.]{6,30}$/)) valid = false;
+  if (form.fullname.value.length < 6 || form.fullname.value.length > 50) valid = false;
+  if (!form.email.value.match(/^[^@]+@[^@]+\.[^@]+$/)) valid = false;
+  if (!form.password.value.match(/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/)) valid = false;
+  if (form.password.value !== form.confirm_password.value) valid = false;
+  if (!form.phone.value.match(/^[0-9]{10,15}$/)) valid = false;
+  if (!form.pin.value.match(/^[0-9]{8}$/)) valid = false;
+  if (!form["terms-conditions"].checked) valid = false;
+  if (!captchaOk) valid = false;
+  document.getElementById('register-btn').disabled = !valid;
+}
+document.getElementById('formAuthentication').addEventListener('input', updateRegisterBtn);
+// Captcha callback đã đúng rồi!
+// Đừng quên để: data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpired" trong div cf-turnstile
+</script>
+
 
 {% include "footer.njk" %}
   </body>
