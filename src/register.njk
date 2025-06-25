@@ -85,15 +85,21 @@
                   <div class="invalid-feedback" id="error-phone"></div>
                 </div>
                 <!-- PIN (8 số) -->
-                <div class="mb-6">
-                  <label for="pin" class="form-label">PIN (8 số)</label>
-                  <input type="password" class="form-control"
-                         id="pin" name="pin"
-                         pattern="^[0-9]{8}$"
-                         minlength="8" maxlength="8"
-                         placeholder="Nhập PIN 8 số" inputmode="numeric" required>
-                  <div class="invalid-feedback" id="error-pin"></div>
-                </div>
+                <div class="mb-6 form-password-toggle">
+                <label for="pin" class="form-label">PIN (8 số)</label>
+                <div class="input-group input-group-merge">
+                <input type="password" class="form-control"
+                 id="pin" name="pin"
+                 pattern="^[0-9]{8}$"
+                 minlength="8" maxlength="8"
+                    placeholder="Nhập PIN 8 số" inputmode="numeric" required>
+    <span class="input-group-text cursor-pointer" onclick="togglePassword('pin')">
+      <i class="ti ti-eye-off"></i>
+    </span>
+  </div>
+  <div class="invalid-feedback" id="error-pin"></div>
+</div>
+
                 <!-- Điều khoản -->
                 <div class="mb-6 mt-8">
                   <div class="form-check mb-8 ms-2">
