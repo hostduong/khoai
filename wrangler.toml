@@ -9,3 +9,10 @@ kv_namespaces = [
 routes = [
   "https://gem.id.vn/api/*"
 ]
+kv_namespaces = [
+  { binding = "KHOAI_KV_USER", id = "77a8867cc9374bbaa9846d78875efbf0" },
+  { binding = "KHOAI_KV_TOKEN", id = "f6f5eef5735443e685d45c500f06df83" },
+  { binding = "KHOAI_KV_COOKIE", id = "9e0fee27605645ae9b60157f6e75e4e7" }
+]
+[vars]
+CF_TURNSTILE_SECRET = "0x4AAAAAABiYUux96DvoHqPKiH1tnc_iUFs"
