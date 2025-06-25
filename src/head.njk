@@ -11,8 +11,8 @@
                     <i class="ti ti-menu-2 ti-lg align-middle text-heading fw-medium"></i>
                 </button>
                 <!-- Mobile menu toggle: End-->
-                <a href="https://unlimitmail.com" class="app-brand-link">
-                    <img src="https://unlimitmail.com/build/images/logounlimit2.png" alt="OmoCaptcha" class="app-brand-logo demo"
+                <a href="{{ domain }}" class="app-brand-link">
+                    <img src="{{ domain }}/build/images/logo2.png" alt="logo" class="app-brand-logo demo"
                          style="width: 50px; height: 50px">
                 </a>
             </div>
@@ -27,7 +27,7 @@
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link fw-medium" aria-current="page"
-                           href="https://unlimitmail.com/overview">
+                           href="{{ domain }}/overview">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                  stroke-linejoin="round"
@@ -44,7 +44,7 @@
                     
                     <li class="nav-item">
                         <a class="nav-link btn btn-text-secondary"
-                           href="https://unlimitmail.com/hotmail/history">
+                           href="{{ domain }}/hotmail/history">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                  stroke-linejoin="round"
@@ -62,7 +62,7 @@
                     
                     <li class="nav-item">
                         <a class="nav-link btn btn-text-secondary"
-                           href="https://unlimitmail.com/email">
+                           href="{{ domain }}/email">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                  stroke-linejoin="round"
@@ -78,7 +78,7 @@
 
                     <li class="nav-item">
                         <a class="nav-link btn btn-text-secondary"
-                           href="https://unlimitmail.com/otp-service">
+                           href="{{ domain }}/otp-service">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                  stroke-linejoin="round"
@@ -114,14 +114,14 @@
                             </svg>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
-                            <a href="https://unlimitmail.com/money/loaded" class="dropdown-item">Nạp tiền</a>
-                            <a href="https://unlimitmail.com/money/history" class="dropdown-item">Lịch sử nạp tiền</a>
+                            <a href="{{ domain }}/money/loaded" class="dropdown-item">Nạp tiền</a>
+                            <a href="{{ domain }}/money/history" class="dropdown-item">Lịch sử nạp tiền</a>
                         </ul>
                     </li>
 
                     <li class="nav-item">
                         <a class="nav-link btn btn-text-secondary"
-                           href="https://unlimitmail.com/affiliates">
+                           href="{{ domain }}/affiliates">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                  stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-gift">
@@ -158,8 +158,8 @@
                             </svg>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
-                            <a href="https://unlimitmail.com/email/read-email-content" class="dropdown-item">Đọc Mail</a>
-                            <a href="https://unlimitmail.com/email/read-email-code" class="dropdown-item"> Đọc Code Hotmail</a>
+                            <a href="{{ domain }}/email/read-email-content" class="dropdown-item">Đọc Mail</a>
+                            <a href="{{ domain }}/email/read-email-code" class="dropdown-item"> Đọc Code Hotmail</a>
                         </ul>
                     </li>
 
@@ -185,8 +185,8 @@
                             </svg>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
-                            <a target="_blank" href="https://unlimitmail.com/api/documentation" class="dropdown-item">Api Doc</a>
-                            <a target="_blank" href="https://tool.unlimitmail.com/swagger/index.html"
+                            <a target="_blank" href="{{ domain }}/api/documentation" class="dropdown-item">Api Doc</a>
+                            <a target="_blank" href="https://tool.{{ domain }}/swagger/index.html"
                                class="dropdown-item">Api Doc Read Hotmail</a>
                         </ul>
                     </li>
@@ -199,32 +199,12 @@
             <ul class="navbar-nav flex-row align-items-center ms-auto">
                                     <!-- Style Switcher -->
                     
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+ 
                     
                     <!-- / Style Switcher-->
                                 <!-- navbar button: Start -->
                                     <li class="nav-item">
-                        <a href="https://unlimitmail.com/login" class="btn btn-primary"><span
+                        <a href="{{ domain }}/login" class="btn btn-primary"><span
                                 class="tf-icons ti ti-login scaleX-n1-rtl me-md-1"></span><span
                                 class="d-none d-md-block">Login</span></a>
                     </li>
