@@ -1,74 +1,219 @@
+    <!-- Navbar: Start -->
 <nav class="layout-navbar shadow-none py-0">
-  <div class="container">
-    <div class="navbar navbar-expand-lg landing-navbar px-3 px-md-8">
-      <!-- Logo -->
-      <div class="navbar-brand app-brand demo d-flex py-0 py-lg-2 me-4 me-xl-8">
-        <a href="/" class="app-brand-link">
-          <img src="/img/logo2.png" alt="UnlimitMail" class="app-brand-logo demo" style="width:50px;height:50px;">
-        </a>
-      </div>
-      <!-- Menu -->
-      <div class="collapse navbar-collapse landing-nav-menu" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="/">
-              <!-- Home SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-home"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></svg>
-              Trang chủ
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="/order-history">
-              <!-- Mail SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/><path d="M3 7l9 6l9 -6"/></svg>
-              LS Đơn Hàng
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="/email-domain">
-              <!-- Mail SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/><path d="M3 7l9 6l9 -6"/></svg>
-              Mail Domain
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="/otp-gmail">
-              <!-- Mail SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-mail"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/><path d="M3 7l9 6l9 -6"/></svg>
-              OTP Gmail
-            </a>
-          </li>
-          <!-- Nạp tiền Dropdown -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle fw-medium" href="#" id="napTienDropdown" data-bs-toggle="dropdown">
-              <!-- Receipt SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-receipt-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2"/><path d="M14 8h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5m2 0v1.5m0 -9v1.5"/></svg>
-              Nạp tiền
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-caret-down"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 10l6 6l6 -6h-12"/></svg>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/nap-tien">Nạp tiền</a></li>
-              <li><a class="dropdown-item" href="/lich-su-nap-tien">Lịch sử nạp tiền</a></li>
+    <div class="container">
+        <div class="navbar navbar-expand-lg landing-navbar px-3 px-md-8">
+            <!-- Menu logo wrapper: Start -->
+            <div class="navbar-brand app-brand demo d-flex py-0 py-lg-2 me-4 me-xl-8">
+                <!-- Mobile menu toggle: Start-->
+                <button class="navbar-toggler border-0 px-0 me-4" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="ti ti-menu-2 ti-lg align-middle text-heading fw-medium"></i>
+                </button>
+                <!-- Mobile menu toggle: End-->
+                <a href="/" class="app-brand-link">
+                    <img src="/img/logo2.png" alt="OmoCaptcha" class="app-brand-logo demo"
+                         style="width: 50px; height: 50px">
+                </a>
+            </div>
+            <!-- Menu logo wrapper: End -->
+            <!-- Menu wrapper: Start -->
+            <div class="collapse navbar-collapse landing-nav-menu" id="navbarSupportedContent">
+                <button class="navbar-toggler border-0 text-heading position-absolute end-0 top-0 scaleX-n1-rtl"
+                        type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="ti ti-x ti-lg"></i>
+                </button>
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium" aria-current="page"
+                           href="/overview">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-home">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M5 12l-2 0l9 -9l9 9l-2 0"/>
+                                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/>
+                                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/>
+                            </svg>
+                            Trang chủ
+                        </a>
+                    </li>
+
+                    
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-text-secondary"
+                           href="/history">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path
+                                    d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/>
+                                <path d="M3 7l9 6l9 -6"/>
+                            </svg>
+                            LS Đơn Hàng
+                        </a>
+                    </li>
+
+
+                    
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-text-secondary"
+                           href="https://unlimitmail.com/email">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path
+                                    d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/>
+                                <path d="M3 7l9 6l9 -6"/>
+                            </svg>
+                            Mail Domain
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-text-secondary"
+                           href="/otp-service">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path
+                                    d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z"/>
+                                <path d="M3 7l9 6l9 -6"/>
+                            </svg>
+                            OTP Gmail
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown-language dropdown">
+                        <a class="nav-link btn btn-text-secondary dropdown-toggle hide-arrow waves-effect waves-light"
+                           href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-receipt-2">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path
+                                    d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2"/>
+                                <path d="M14 8h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5m2 0v1.5m0 -9v1.5"/>
+                            </svg>
+                            Nạp tiền
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-caret-down">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M6 10l6 6l6 -6h-12"></path>
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
+                            <a href="https://unlimitmail.com/money/loaded" class="dropdown-item">Nạp tiền</a>
+                            <a href="https://unlimitmail.com/money/history" class="dropdown-item">Lịch sử nạp tiền</a>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-text-secondary"
+                           href="https://unlimitmail.com/affiliates">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-gift">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path
+                                    d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z"/>
+                                <path d="M12 8l0 13"/>
+                                <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7"/>
+                                <path
+                                    d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"/>
+                            </svg>
+                            Affiliate
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown-language dropdown">
+                        <a class="nav-link btn btn-text-secondary dropdown-toggle hide-arrow waves-effect waves-light"
+                           href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/>
+                                <path
+                                    d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/>
+                            </svg>
+                            Get Code
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-caret-down">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M6 10l6 6l6 -6h-12"></path>
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
+                            <a href="https://unlimitmail.com/email/read-email-content" class="dropdown-item">Đọc Mail</a>
+                            <a href="https://unlimitmail.com/email/read-email-code" class="dropdown-item"> Đọc Code Hotmail</a>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown-language dropdown">
+                        <a class="nav-link btn btn-text-secondary dropdown-toggle hide-arrow waves-effect waves-light"
+                           href="javascript:void(0);" data-bs-toggle="dropdown" aria-expanded="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-api">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M4 13h5"/>
+                                <path d="M12 16v-8h3a2 2 0 0 1 2 2v1a2 2 0 0 1 -2 2h-3"/>
+                                <path d="M20 8v8"/>
+                                <path d="M9 16v-5.5a2.5 2.5 0 0 0 -5 0v5.5"/>
+                            </svg>
+                            Doc
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 class="icon icon-tabler icons-tabler-outline icon-tabler-caret-down">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                <path d="M6 10l6 6l6 -6h-12"></path>
+                            </svg>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
+                            <a target="_blank" href="https://unlimitmail.com/api/documentation" class="dropdown-item">Api Doc</a>
+                            <a target="_blank" href="https://tool.unlimitmail.com/swagger/index.html"
+                               class="dropdown-item">Api Doc Read Hotmail</a>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="landing-menu-overlay d-lg-none"></div>
+            <!-- Menu wrapper: End -->
+            <!-- Toolbar: Start -->
+            <ul class="navbar-nav flex-row align-items-center ms-auto">
+                                    <!-- Style Switcher -->
+                    
+                    
+
+                
+                    
+                    <!-- / Style Switcher-->
+                                <!-- navbar button: Start -->
+                                    <li class="nav-item">
+                        <a href="https://unlimitmail.com/login" class="btn btn-primary"><span
+                                class="tf-icons ti ti-login scaleX-n1-rtl me-md-1"></span><span
+                                class="d-none d-md-block">Login</span></a>
+                    </li>
+                                                <!-- navbar button: End -->
             </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="/affiliates">
-              <!-- Gift SVG -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-gift"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 8m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z"/><path d="M12 8l0 13"/><path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5"/></svg>
-              Affiliate
-            </a>
-          </li>
-          <!-- Các dropdown tiếp theo ... giống họ -->
-          <!-- ... (copy tiếp code SVG inline các mục GetCode, Doc) ... -->
-        </ul>
-        <div class="d-flex align-items-center">
-          <a href="/login" class="btn btn-primary px-4">
-            <!-- Login SVG -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-login-2 me-2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12v-7a1 1 0 0 1 1 -1h8a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-7"/><path d="M15 12h-12l3 -3"/><path d="M6 9l-3 3l3 3"/></svg>
-            Login
-          </a>
+            <!-- Toolbar: End -->
         </div>
-      </div>
     </div>
-  </div>
 </nav>
+<!-- Navbar: End -->
