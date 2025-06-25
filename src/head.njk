@@ -1,25 +1,48 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <img src="/public/img/logo.png" alt="Gem.id.vnl" height="38" class="me-2" loading="lazy"/>
-      <span class="fw-bold">Gem.id.vn</span>
+<nav class="navbar navbar-expand-lg navbar-white bg-white shadow-sm rounded-4 mt-4 mx-auto" style="max-width: 1440px;">
+  <div class="container-fluid align-items-center">
+    <a class="navbar-brand py-0 d-flex align-items-center" href="/">
+      <img src="/public/img/logo2.png" alt="UnlimitMail" height="50" class="me-3" />
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mainNavbar">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Trang chủ</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/register.html">Đăng ký</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/login.html">Đăng nhập</a>
-        </li>
-        <!-- Có thể bổ sung dropdown/account nếu đã login -->
-      </ul>
-    </div>
+    <ul class="navbar-nav mx-auto flex-row gap-4">
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-1" href="/"><i class="ti ti-home"></i> Trang chủ</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-1" href="/orders"><i class="ti ti-mail"></i> LS Đơn Hàng</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-1" href="/domain"><i class="ti ti-mail"></i> Mail Domain</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-1" href="/otp-gmail"><i class="ti ti-mail"></i> OTP Gmail</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" data-bs-toggle="dropdown"><i class="ti ti-receipt"></i> Nạp tiền</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/topup">Nạp trực tuyến</a></li>
+          <li><a class="dropdown-item" href="/bank">Nạp qua Bank</a></li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-1" href="/affiliate"><i class="ti ti-gift"></i> Affiliate</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" data-bs-toggle="dropdown"><i class="ti ti-eye"></i> Get Code</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/code/facebook">Get Facebook</a></li>
+          <li><a class="dropdown-item" href="/code/google">Get Google</a></li>
+        </ul>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#" data-bs-toggle="dropdown"><span class="fw-bold text-muted small" style="letter-spacing:1px">API</span> Doc</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/docs">Tài liệu API</a></li>
+          <li><a class="dropdown-item" href="/docs/v2">API V2</a></li>
+        </ul>
+      </li>
+    </ul>
+    <a href="/login" class="btn btn-success px-4 d-flex align-items-center gap-2">
+      <i class="ti ti-login"></i> Login
+    </a>
   </div>
 </nav>
