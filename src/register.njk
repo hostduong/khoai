@@ -110,7 +110,10 @@
                   <div class="input-group mb-4 input-section w-100">
                     <div class="cf-turnstile w-100"
                          data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR"
-                         data-size="flexible" data-theme="light"></div>
+                         data-size="flexible" data-theme="light"
+                         data-callback="onCaptchaSuccess"
+                         data-expired-callback="onCaptchaExpired"
+                         data-error-callback="onCaptchaExpired"></div>
                   </div>
                   <div class="invalid-feedback" id="error-captcha"></div>
                 </div>
