@@ -1,20 +1,19 @@
 // src/js/register.js
 
 document.addEventListener("DOMContentLoaded", function () {
-  const fields = [
-    "username", "fullname", "email", "password",
-    "confirm_password", "phone", "pin"
-  ];
   const form = document.getElementById('formAuthentication');
   const registerBtn = document.getElementById('register-btn');
+  const fields = [
+    "username", "fullname", "email", "password", "confirm_password", "phone", "pin"
+  ];
   const touched = {};
 
-  // Khởi tạo trạng thái chưa từng nhập
+  // Ban đầu tất cả là false (chưa nhập)
   fields.forEach(f => touched[f] = false);
 
-  // Validate từng trường
+  // Hàm validate từng trường
   function validateField(field, value) {
-    if (!value) return ""; // Không báo lỗi nếu rỗng
+    if (!value) return ""; // Không có value, không báo lỗi
     switch (field) {
       case "username":
         if (!/^[a-z0-9_.]{6,30}$/.test(value)) return "Tên đăng nhập không hợp lệ (6-30 ký tự, a-z, 0-9, _ .)";
@@ -41,13 +40,12 @@ document.addEventListener("DOMContentLoaded", function () {
     return "";
   }
 
-  // Set error cho từng trường, chỉ hiện khi đã nhập/touched và value sai
   function setError(field) {
     const el = form[field];
     const errEl = document.getElementById("error-" + field.replace("_", "-"));
     const value = el.value.trim();
     const error = validateField(field, value);
-
+    // Chỉ báo lỗi khi đã nhập và có lỗi, hoặc đã blur rồi (người dùng từng "đụng" vào)
     if (touched[field] && value && error) {
       el.classList.add("is-invalid");
       errEl.innerText = error;
@@ -59,16 +57,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Gán sự kiện cho tất cả trường
+  // Khi thay đổi input thì đánh dấu đã chạm
   fields.forEach(field => {
     form[field].addEventListener("input", function () {
-      touched[field] = true;
+      if (form[field].value) touched[field] = true;
       setError(field);
       if (field === "password" || field === "confirm_password") setError("confirm_password");
       updateRegisterBtn();
     });
+    // Khi blur cũng đánh dấu đã nhập, giúp validate khi người dùng rời trường
     form[field].addEventListener("blur", function () {
-      touched[field] = true;
+      if (form[field].value) touched[field] = true;
       setError(field);
       if (field === "password" || field === "confirm_password") setError("confirm_password");
       updateRegisterBtn();
@@ -86,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateRegisterBtn();
   }
 
-  // Chỉ khi tất cả hợp lệ mới enable Đăng ký
+  // Chỉ enable nếu mọi thứ hợp lệ
   function updateRegisterBtn() {
     let allValid = true;
     for (const field of fields) {
@@ -98,15 +97,11 @@ document.addEventListener("DOMContentLoaded", function () {
     registerBtn.disabled = !allValid;
   }
 
-  // KHÔNG tự động hiện lỗi khi vừa load
-  updateRegisterBtn();
-
-  // --- Submit AJAX giữ nguyên như cũ ---
+  // Submit AJAX giữ nguyên
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
     registerBtn.disabled = true;
     document.getElementById('form-message').innerText = "Đang xử lý...";
-
     // Lấy token captcha
     const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
 
@@ -140,4 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
       registerBtn.disabled = false;
     }
   });
+
+  // Không hiện đỏ ngay khi load
+  updateRegisterBtn();
 });
