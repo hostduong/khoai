@@ -1,4 +1,3 @@
-// === Toggle password fields (giữ nguyên nếu đã có) ===
 function togglePassword(id) {
   const input = document.getElementById(id);
   input.type = input.type === "password" ? "text" : "password";
@@ -8,7 +7,7 @@ function togglePassword(id) {
 function validateField(field, value) {
   switch (field) {
     case "username":
-      if (!value) return ""; // Không lỗi nếu rỗng
+      if (!value) return "";
       if (!/^[a-z0-9_.]{6,30}$/.test(value)) return "Tên đăng nhập không hợp lệ (6-30 ký tự, a-z, 0-9, _ .)";
       return "";
     case "fullname":
@@ -24,8 +23,8 @@ function validateField(field, value) {
       if (!/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/.test(value)) return "Mật khẩu không hợp lệ (8-30 ký tự)";
       return "";
     case "confirm_password":
-      const pw = document.getElementById("password").value;
       if (!value) return "";
+      const pw = document.getElementById("password").value;
       if (value !== pw) return "Mật khẩu nhập lại không khớp!";
       return "";
     case "phone":
@@ -46,18 +45,23 @@ function validateField(field, value) {
   const input = document.getElementById(field);
   if (!input) return;
   input.addEventListener("input", function () {
-    const error = validateField(field, this.value);
-    const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
-    if (this.value && error) {
-      input.classList.add("is-invalid");
-      feedback.textContent = error;
-    } else {
-      input.classList.remove("is-invalid");
-      feedback.textContent = "";
-    }
+    showError(field, this.value);
     updateRegisterBtn();
   });
 });
+
+function showError(field, value) {
+  const error = validateField(field, value);
+  const input = document.getElementById(field);
+  const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
+  if (value && error) {
+    input.classList.add("is-invalid");
+    feedback.textContent = error;
+  } else {
+    input.classList.remove("is-invalid");
+    feedback.textContent = "";
+  }
+}
 
 // Điều khoản và Captcha
 document.getElementById('terms-conditions').addEventListener('change', updateRegisterBtn);
@@ -85,7 +89,7 @@ function updateRegisterBtn() {
   document.getElementById('register-btn').disabled = !valid;
 }
 
-// Submit giữ nguyên, KHÔNG đổi logic submit AJAX của bạn! Nếu chưa có, chèn lại như sau:
+// Giữ nguyên logic submit AJAX
 document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
   e.preventDefault();
   document.getElementById('register-btn').disabled = true;
@@ -133,3 +137,4 @@ document.getElementById('formAuthentication').addEventListener('submit', async f
 });
 
 window.addEventListener('DOMContentLoaded', updateRegisterBtn);
+
