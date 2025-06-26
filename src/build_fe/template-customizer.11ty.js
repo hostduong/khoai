@@ -1,3 +1,17 @@
+module.exports = function (data) {
+  const domain = data.domain || "https://example.com";
+
+  return `document.addEventListener("DOMContentLoaded", function () {
+    console.log("Domain is: ${domain}");
+  });`;
+};
+
+module.exports.data = {
+  permalink: "build_fe/template-customizer.js",  // tên file đầu ra đúng như ban đầu
+  eleventyExcludeFromCollections: true
+};
+
+
 const z=`<div id="template-customizer" class="bg-card">
   <a href="javascript:void(0)" class="template-customizer-open-btn" tabindex="-1"></a>
 
