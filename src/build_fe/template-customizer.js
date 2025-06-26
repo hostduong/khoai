@@ -103,7 +103,7 @@ const z=`<div id="template-customizer" class="bg-card">
       <div class="form-check custom-option custom-option-icon">
         <label class="form-check-label custom-option-content p-0" for="${g}${a}">
           <span class="custom-option-body mb-0">
-            <img src="/assets/img/customizer/${w}${k?"-dark":""}.svg" alt="${u}" class="img-fluid scaleX-n1-rtl" />
+            <img src="{{ domain }}/assets/img/customizer/${w}${k?"-dark":""}.svg" alt="${u}" class="img-fluid scaleX-n1-rtl" />
           </span>
           <input
             name="${g}"
