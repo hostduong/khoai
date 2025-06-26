@@ -1,14 +1,60 @@
-// === Toggle password fields (giữ nguyên nếu đã có) ===
-function togglePassword(id) {
-  const input = document.getElementById(id);
-  input.type = input.type === "password" ? "text" : "password";
-}
-
-// === Lưu trạng thái đã nhập chưa ===
+// Biến lưu trạng thái đã nhập từng trường
 const isTouched = {};
 ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(f => isTouched[f] = false);
 
-// === Validate từng trường chỉ khi có value ===
+// Validate chỉ báo lỗi khi đã nhập giá trị và đã "chạm"
+function showErrorField(field, value) {
+  const error = validateField(field, value);
+  const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
+  const input = document.getElementById(field);
+  // Chỉ báo đỏ khi đã từng input/chạm và có lỗi
+  if (isTouched[field] && value && error) {
+    input.classList.add("is-invalid");
+    feedback.textContent = error;
+  } else {
+    input.classList.remove("is-invalid");
+    feedback.textContent = "";
+  }
+}
+
+// Gán sự kiện input cho tất cả trường
+["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(field => {
+  const input = document.getElementById(field);
+  if (!input) return;
+  input.addEventListener("input", function () {
+    isTouched[field] = true;
+    showErrorField(field, this.value);
+    updateRegisterBtn();
+  });
+});
+
+// Chỉ enable nút Đăng ký nếu tất cả hợp lệ
+function updateRegisterBtn() {
+  let valid = true;
+  ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(field => {
+    const input = document.getElementById(field);
+    const value = input.value;
+    const error = validateField(field, value);
+    if (!value || error) valid = false;
+  });
+  if (!document.getElementById('terms-conditions').checked) valid = false;
+  if (!window.captchaOk) valid = false;
+  document.getElementById('register-btn').disabled = !valid;
+}
+
+// Điều khoản và Captcha
+document.getElementById('terms-conditions').addEventListener('change', updateRegisterBtn);
+window.captchaOk = false;
+window.onCaptchaSuccess = function(token) {
+  window.captchaOk = true;
+  updateRegisterBtn(); // Chỉ enable nút, KHÔNG báo lỗi đỏ!
+};
+window.onCaptchaExpired = function() {
+  window.captchaOk = false;
+  updateRegisterBtn();
+};
+
+// Validate từng trường riêng biệt (giữ nguyên logic validateField)
 function validateField(field, value) {
   switch (field) {
     case "username":
@@ -43,57 +89,6 @@ function validateField(field, value) {
     default:
       return "";
   }
-}
-
-// === Lắng nghe input để chỉ báo đỏ khi đã nhập ===
-["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(field => {
-  const input = document.getElementById(field);
-  if (!input) return;
-  input.addEventListener("input", function () {
-    isTouched[field] = true;
-    showErrorField(field, this.value);
-    updateRegisterBtn();
-  });
-});
-
-function showErrorField(field, value) {
-  const error = validateField(field, value);
-  const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
-  const input = document.getElementById(field);
-  if (isTouched[field] && value && error) {
-    input.classList.add("is-invalid");
-    feedback.textContent = error;
-  } else {
-    input.classList.remove("is-invalid");
-    feedback.textContent = "";
-  }
-}
-
-// Điều khoản và Captcha
-document.getElementById('terms-conditions').addEventListener('change', updateRegisterBtn);
-
-window.captchaOk = false;
-window.onCaptchaSuccess = function(token) {
-  window.captchaOk = true;
-  updateRegisterBtn(); // Chỉ enable nút, KHÔNG báo lỗi đỏ tất cả!
-};
-window.onCaptchaExpired = function() {
-  window.captchaOk = false;
-  updateRegisterBtn();
-};
-
-// === ĐK chỉ bật khi mọi trường hợp lệ, đủ tích và captcha ===
-function updateRegisterBtn() {
-  let valid = true;
-  ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(field => {
-    const input = document.getElementById(field);
-    const value = input.value;
-    const error = validateField(field, value);
-    if (!value || error) valid = false;
-  });
-  if (!document.getElementById('terms-conditions').checked) valid = false;
-  if (!window.captchaOk) valid = false;
-  document.getElementById('register-btn').disabled = !valid;
 }
 
 // === Submit AJAX giữ nguyên! ===
