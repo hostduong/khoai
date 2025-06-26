@@ -1,104 +1,95 @@
-// --- Toggle Password ---
-function togglePassword(id) {
-  var input = document.getElementById(id);
-  input.type = input.type === "password" ? "text" : "password";
-}
+// --- Touched state cho từng field ---
+const touched = {};
+const fields = [
+  "username", "fullname", "email", "password", "confirm_password", "phone", "pin"
+];
 
-// --- Validate từng trường ---
-function validateField(field) {
-  let error = "";
-  const value = field.value.trim();
-  switch (field.name) {
-    case "username":
-      if (!/^[a-z0-9_.]{6,30}$/.test(value)) error = "Tên đăng nhập không hợp lệ (6-30 ký tự, a-z, 0-9, _ .)";
-      break;
-    case "fullname":
-      if (value.length < 6 || value.length > 50) error = "Họ và tên phải từ 6-50 ký tự";
-      break;
-    case "email":
-      if (!/^[^@]+@[^@]+\.[^@]+$/.test(value)) error = "Email không hợp lệ!";
-      break;
-    case "password":
-      if (!/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/.test(value)) error = "Mật khẩu không hợp lệ (8-30 ký tự)";
-      break;
-    case "confirm_password":
-      if (value !== document.getElementById("password").value) error = "Mật khẩu nhập lại không khớp!";
-      break;
-    case "phone":
-      if (!/^[0-9]{10,15}$/.test(value)) error = "Số điện thoại phải không đúng!";
-      break;
-    case "pin":
-      if (!/^[0-9]{8}$/.test(value)) error = "PIN phải đúng 8 số!";
-      break;
-  }
-  const errorDiv = document.getElementById("error-" + field.name.replace("_", "-"));
-  if (error) {
-    field.classList.add("is-invalid");
-    if (errorDiv) errorDiv.innerText = error;
-  } else {
-    field.classList.remove("is-invalid");
-    if (errorDiv) errorDiv.innerText = "";
-  }
-  return !error;
-}
-
-// Gán sự kiện validate realtime
-document.querySelectorAll("#formAuthentication input").forEach(input => {
-  input.addEventListener("input", function() {
-    validateField(input);
-    updateRegisterBtn();
+// Gắn sự kiện blur & input để chỉ show lỗi khi user đã từng nhập/truy cập
+fields.forEach(field => {
+  const el = document.getElementById(field);
+  if (!el) return;
+  el.addEventListener("blur", () => {
+    touched[field] = true;
+    validateField(field);
   });
-  input.addEventListener("blur", function() {
-    validateField(input);
+  el.addEventListener("input", () => {
+    if (touched[field]) validateField(field);
   });
 });
 
-// --- Validate tổng thể để bật/tắt nút đăng ký ---
-function updateRegisterBtn() {
-  const form = document.getElementById('formAuthentication');
-  let valid = true;
-  document.querySelectorAll("#formAuthentication input").forEach(input => {
-    if (!validateField(input)) valid = false;
-  });
-  if (!form["terms-conditions"].checked) valid = false;
-  if (!window.captchaOk) valid = false;
-  document.getElementById('register-btn').disabled = !valid;
+function validateField(field) {
+  const el = document.getElementById(field);
+  const val = el.value.trim();
+  let error = "";
+  switch (field) {
+    case "username":
+      if (!/^[a-z0-9_.]{6,30}$/.test(val))
+        error = "Tên đăng nhập không hợp lệ (6-30 ký tự, a-z, 0-9, _ .)";
+      break;
+    case "fullname":
+      if (val.length < 6 || val.length > 50)
+        error = "Họ và tên phải 6-50 ký tự";
+      break;
+    case "email":
+      if (!/^[^@]+@[^@]+\.[^@]+$/.test(val))
+        error = "Email không hợp lệ!";
+      break;
+    case "password":
+      if (!/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/.test(val))
+        error = "Mật khẩu không hợp lệ (8-30 ký tự)";
+      break;
+    case "confirm_password":
+      if (val !== document.getElementById('password').value)
+        error = "Mật khẩu nhập lại không khớp!";
+      break;
+    case "phone":
+      if (!/^[0-9]{10,15}$/.test(val))
+        error = "Số điện thoại phải 10-15 số!";
+      break;
+    case "pin":
+      if (!/^[0-9]{8}$/.test(val))
+        error = "PIN phải đúng 8 số!";
+      break;
+  }
+  setError(field, error);
 }
-document.getElementById('formAuthentication').addEventListener('input', updateRegisterBtn);
 
-// --- Captcha & Validate ---
-window.captchaOk = false;
-function onCaptchaSuccess(token) {
-  window.captchaOk = true;
-  updateRegisterBtn();
-}
-function onCaptchaExpired() {
-  window.captchaOk = false;
-  updateRegisterBtn();
+function setError(field, error) {
+  const el = document.getElementById(field);
+  const errorEl = document.getElementById("error-" + field);
+  if (!el || !errorEl) return;
+  if (error) {
+    el.classList.add("is-invalid");
+    errorEl.innerText = error;
+    errorEl.style.display = "";
+  } else {
+    el.classList.remove("is-invalid");
+    errorEl.innerText = "";
+    errorEl.style.display = "none";
+  }
 }
 
-// --- Reset captcha sau mỗi submit lỗi ---
+// --- Reset Captcha ---
 function resetCaptcha() {
   if (window.turnstile && typeof window.turnstile.reset === "function") {
     const widget = document.querySelector(".cf-turnstile");
     if (widget) window.turnstile.reset(widget);
   }
 }
-window.addEventListener('DOMContentLoaded', resetCaptcha);
 
-// --- Xử lý submit AJAX + báo lỗi đúng trường ---
+// --- Submit Form ---
 document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
   e.preventDefault();
 
-  // Validate toàn bộ lần cuối
-  let valid = true;
-  document.querySelectorAll("#formAuthentication input").forEach(input => {
-    if (!validateField(input)) valid = false;
+  // Validate all, show lỗi nếu có
+  let hasError = false;
+  fields.forEach(field => {
+    touched[field] = true;
+    validateField(field);
+    const el = document.getElementById(field);
+    if (el && el.classList.contains('is-invalid')) hasError = true;
   });
-  if (!valid) {
-    document.getElementById('form-message').innerText = "Vui lòng kiểm tra lại các trường nhập!";
-    return;
-  }
+  if (hasError) return;
 
   document.getElementById('register-btn').disabled = true;
   document.getElementById('form-message').innerText = "Đang xử lý...";
@@ -126,36 +117,16 @@ document.getElementById('formAuthentication').addEventListener('submit', async f
     });
     const data = await res.json();
     if (data.success) {
-      document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
-      setTimeout(() => window.location.href = '/overview', 2000);
+      document.getElementById('form-message').innerText = "🎉 Đăng ký thành công! Đang chuyển hướng...";
+      setTimeout(() => window.location.href = '/overview', 1200);
     } else {
       document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
+      // Nếu lỗi field cụ thể từ backend, highlight field luôn
+      fields.forEach(f => {
+        if (data.message && data.message.toLowerCase().includes(f)) setError(f, data.message);
+      });
       document.getElementById('register-btn').disabled = false;
       resetCaptcha();
-
-      // --- Báo lỗi đúng trường nếu có message ---
-      const mapMsgToField = {
-        "Tên đăng nhập không hợp lệ": "username",
-        "Tên đăng nhập đã tồn tại": "username",
-        "Họ và tên phải 6-50 ký tự": "fullname",
-        "Email không hợp lệ": "email",
-        "Email đã tồn tại": "email",
-        "Mật khẩu không hợp lệ": "password",
-        "Mật khẩu nhập lại không khớp": "confirm_password",
-        "Số điện thoại không đúng": "phone",
-        "PIN phải đúng 8 số": "pin"
-      };
-      for (const msg in mapMsgToField) {
-        if (data.message && data.message.includes(msg)) {
-          const field = document.getElementById(mapMsgToField[msg]);
-          if (field) {
-            field.classList.add("is-invalid");
-            field.focus();
-            document.getElementById("error-" + mapMsgToField[msg].replace("_", "-")).innerText = data.message;
-          }
-          break;
-        }
-      }
     }
   } catch (err) {
     document.getElementById('form-message').innerText = "Không kết nối được server!";
@@ -163,3 +134,12 @@ document.getElementById('formAuthentication').addEventListener('submit', async f
     resetCaptcha();
   }
 });
+
+// --- Toggle password visibility ---
+function togglePassword(id) {
+  var input = document.getElementById(id);
+  input.type = input.type === "password" ? "text" : "password";
+}
+
+// Nếu muốn reset captcha khi reload:
+window.addEventListener('DOMContentLoaded', resetCaptcha);
