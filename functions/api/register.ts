@@ -1,4 +1,4 @@
-import { sha256, randomBase62 } from "../hash";
+import { sha256, randomBase62 } from "../hash.ts";
 // KV binding: env.KHOAI_KV_USER, env.KHOAI_KV_TOKEN, env.KHOAI_KV_COOKIE
 
 export async function onRequestPost(context) {
