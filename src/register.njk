@@ -17,7 +17,7 @@
               <h4 class="mb-1 text-center">Chào mừng đến với GemID! 👋</h4>
               <p class="mb-6 text-center">Vui lòng đăng ký để tiếp tục.</p>
 
-              <form id="formAuthentication" class="mb-6" autocomplete="off">
+              <form id="formAuthentication" class="mb-6" autocomplete="off" novalidate>
                 <!-- Tên đăng nhập -->
                 <div class="mb-6">
                   <label for="username" class="form-label">Tên đăng nhập</label>
@@ -86,19 +86,19 @@
                 </div>
                 <!-- PIN (8 số) -->
                 <div class="mb-6 form-password-toggle">
-                <label for="pin" class="form-label">PIN (8 số)</label>
-                <div class="input-group input-group-merge">
-                <input type="password" class="form-control"
-                 id="pin" name="pin"
-                 pattern="^[0-9]{8}$"
-                 minlength="8" maxlength="8"
-                    placeholder="Nhập PIN 8 số" inputmode="numeric" required>
-    <span class="input-group-text cursor-pointer" onclick="togglePassword('pin')">
-      <i class="ti ti-eye-off"></i>
-    </span>
-  </div>
-  <div class="invalid-feedback" id="error-pin"></div>
-</div>
+                  <label for="pin" class="form-label">PIN (8 số)</label>
+                  <div class="input-group input-group-merge">
+                    <input type="password" class="form-control"
+                           id="pin" name="pin"
+                           pattern="^[0-9]{8}$"
+                           minlength="8" maxlength="8"
+                           placeholder="Nhập PIN 8 số" inputmode="numeric" required>
+                    <span class="input-group-text cursor-pointer" onclick="togglePassword('pin')">
+                      <i class="ti ti-eye-off"></i>
+                    </span>
+                  </div>
+                  <div class="invalid-feedback" id="error-pin"></div>
+                </div>
 
                 <!-- Điều khoản -->
                 <div class="mb-6 mt-8">
@@ -106,7 +106,7 @@
                     <input class="form-check-input" type="checkbox"
                            id="terms-conditions" name="terms" required>
                     <label class="form-check-label" for="terms-conditions">
-                      Tôi đồng ý với <a href="/terms" target="_blank">Điều khoản và điều kiện</a>
+                      Tôi đồng ý với <a href="{{ domain }}/terms" target="_blank">Điều khoản và điều kiện</a>
                     </label>
                     <div class="invalid-feedback" id="error-terms"></div>
                   </div>
@@ -131,7 +131,7 @@
               </form>
               <p class="text-center mt-2">
                 <span>Bạn đã có tài khoản?</span>
-                <a href="/login"><span>Đăng nhập ngay</span></a>
+                <a href="{{ domain }}/login"><span>Đăng nhập ngay</span></a>
               </p>
             </div>
           </div>
@@ -141,130 +141,20 @@
   </div>
 </section>
 
-<script>
-function togglePassword(id) {
-  var input = document.getElementById(id);
-  input.type = input.type === "password" ? "text" : "password";
+<style>
+input.is-invalid, .form-control.is-invalid {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 0.15rem rgba(231,76,60,.1);
 }
-
-// --- Captcha & Validate ---
-let captchaOk = false;
-function onCaptchaSuccess(token) {
-  captchaOk = true;
-  updateRegisterBtn();
+.invalid-feedback {
+  color: #e74c3c;
+  font-size: 90%;
+  display: block;
 }
-function onCaptchaExpired() {
-  captchaOk = false;
-  updateRegisterBtn();
-}
-function updateRegisterBtn() {
-  const form = document.getElementById('formAuthentication');
-  let valid = true;
-  if (!form.username.value.match(/^[a-z0-9_.]{6,30}$/)) valid = false;
-  if (form.fullname.value.length < 6 || form.fullname.value.length > 50) valid = false;
-  if (!form.email.value.match(/^[^@]+@[^@]+\.[^@]+$/)) valid = false;
-  if (!form.password.value.match(/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/)) valid = false;
-  if (form.password.value !== form.confirm_password.value) valid = false;
-  if (!form.phone.value.match(/^[0-9]{10,15}$/)) valid = false;
-  if (!form.pin.value.match(/^[0-9]{8}$/)) valid = false;
-  if (!form["terms-conditions"].checked) valid = false;
-  if (!captchaOk) valid = false;
-  document.getElementById('register-btn').disabled = !valid;
-}
-document.getElementById('formAuthentication').addEventListener('input', updateRegisterBtn);
+</style>
 
-// --- Xử lý submit AJAX ---
-document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  document.getElementById('register-btn').disabled = true;
-  document.getElementById('form-message').innerText = "Đang xử lý...";
-
-  // Lấy token captcha
-  const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
-
-  const form = e.target;
-  const body = {
-    username: form.username.value.trim(),
-    fullname: form.fullname.value.trim(),
-    email: form.email.value.trim(),
-    password: form.password.value,
-    confirm_password: form.confirm_password.value,
-    phone: form.phone.value.trim(),
-    pin: form.pin.value.trim(),
-    "cf-turnstile-response": captchaToken
-  };
-
-  try {
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
-      // Có thể redirect sau vài giây:
-      setTimeout(() => window.location.href = '/login', 2000);
-    } else {
-      document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
-      document.getElementById('register-btn').disabled = false;
-    }
-  } catch (err) {
-    document.getElementById('form-message').innerText = "Không kết nối được server!";
-    document.getElementById('register-btn').disabled = false;
-  }
-});
-</script>
-<script>
-// --- Các hàm cũ như togglePassword, updateRegisterBtn... ---
-
-// Hàm reset captcha sau mỗi submit lỗi
-function resetCaptcha() {
-  if (window.turnstile && typeof window.turnstile.reset === "function") {
-    const widget = document.querySelector(".cf-turnstile");
-    if (widget) window.turnstile.reset(widget);
-  }
-}
-
-// Submit AJAX và reset captcha khi lỗi
-document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  document.getElementById('register-btn').disabled = true;
-  document.getElementById('form-message').innerText = "Đang xử lý...";
-
-  // Lấy token captcha
-  const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
-
-  // ...lấy dữ liệu form như cũ...
-
-  try {
-    const res = await fetch('/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
-      setTimeout(() => window.location.href = '/login', 2000);
-    } else {
-      document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
-      document.getElementById('register-btn').disabled = false;
-      resetCaptcha(); // Reset captcha sau khi submit lỗi
-    }
-  } catch (err) {
-    document.getElementById('form-message').innerText = "Không kết nối được server!";
-    document.getElementById('register-btn').disabled = false;
-    resetCaptcha(); // Reset captcha nếu lỗi mạng/backend
-  }
-});
-
-// Nếu muốn chắc chắn, bạn có thể reset captcha mỗi lần trang vừa load (optional)
-window.addEventListener('DOMContentLoaded', resetCaptcha);
-
-</script>
+<script src="{{ domain }}/js/register.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
 {% include "footer.njk" %}
   </body>
 {% include "footer-meta.njk" %}
