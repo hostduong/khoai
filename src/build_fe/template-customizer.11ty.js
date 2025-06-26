@@ -1,12 +1,11 @@
 module.exports = function (data) {
   const domain = data.domain || "/";
 
-  return `
-    document.addEventListener("DOMContentLoaded", function () {
-      const el = document.querySelector("#app");
-      el.innerText = "Domain is: ${domain}";
-    });
-  `;
+  return `document.addEventListener("DOMContentLoaded", function () {
+    console.log("Domain is: ${domain}");
+    const el = document.getElementById("info");
+    if (el) el.textContent = "Bạn đang xem: ${domain}";
+  });`;
 };
 
 module.exports.data = {
