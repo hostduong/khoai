@@ -1,4 +1,5 @@
-module.exports = function(eleventyConfig) {
+module.exports = function (eleventyConfig) {
+  // --- Copy các thư mục tĩnh từ src → _site ---
   const passthrough = [
     "build",
     "build_fe",
@@ -12,11 +13,28 @@ module.exports = function(eleventyConfig) {
     eleventyConfig.addPassthroughCopy({ [`src/${dir}`]: dir });
   });
 
+  // --- Cho phép Eleventy xử lý file .js.njk → .js ---
+  eleventyConfig.addTemplateFormats("js");
+
+  eleventyConfig.addExtension("js", {
+    outputFileExtension: "js",
+    compile: function (inputContent, inputPath) {
+      if (inputPath && inputPath.endsWith(".js.njk")) {
+        return async function (data) {
+          // Render với Nunjucks (Eleventy sẽ tự xử lý biến {{ domain }}, ...)
+          return this.config.javascriptFunctions.nunjucksRenderString(inputContent, data);
+        };
+      } else {
+        return async () => inputContent;
+      }
+    }
+  });
+
   return {
     dir: {
-      input: "src",
-      includes: ".",    // để đọc head.njk, footer.njk,... trong src
-      output: "_site"
+      input: "src",     // thư mục gốc
+      includes: ".",    // dùng luôn file .njk trong src/
+      output: "_site"   // thư mục xuất
     }
   };
 };
