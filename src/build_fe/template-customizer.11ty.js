@@ -1,15 +1,19 @@
 module.exports = function (data) {
-  const domain = data.domain || "https://example.com";
+  const domain = data.domain || "/";
 
-  return `document.addEventListener("DOMContentLoaded", function () {
-    console.log("Domain is: ${domain}");
-  });`;
+  return `
+    document.addEventListener("DOMContentLoaded", function () {
+      const el = document.querySelector("#app");
+      el.innerText = "Domain is: ${domain}";
+    });
+  `;
 };
 
 module.exports.data = {
-  permalink: "build_fe/template-customizer.js",  // tên file đầu ra đúng như ban đầu
-  eleventyExcludeFromCollections: true
+  permalink: "build_fe/template-customizer.js",
+  eleventyExcludeFromCollections: true,
 };
+
 
 
 const z=`<div id="template-customizer" class="bg-card">
