@@ -40,22 +40,38 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Set error cho từng trường, chỉ hiện khi đã nhập/touched và value sai
-  function setError(field) {
-    const el = form[field];
-    const errEl = document.getElementById("error-" + field.replace("_", "-"));
-    const value = el.value.trim();
-    const error = validateField(field, value);
+function setError(field) {
+  const el = form[field];
+  const errEl = document.getElementById("error-" + field.replace("_", "-"));
+  const value = el.value.trim();
 
-    if (touched[field] && value && error) {
-      el.classList.add("is-invalid");
-      errEl.innerText = error;
-      errEl.style.display = "block";
-    } else {
-      el.classList.remove("is-invalid");
-      errEl.innerText = "";
-      errEl.style.display = "none";
-    }
+  // Nếu chưa touched → không hiển thị lỗi
+  if (!touched[field]) {
+    el.classList.remove("is-invalid");
+    errEl.innerText = "";
+    errEl.style.display = "none";
+    return;
   }
+
+  // Nếu chưa nhập gì (value rỗng) → cũng không báo lỗi
+  if (value === "") {
+    el.classList.remove("is-invalid");
+    errEl.innerText = "";
+    errEl.style.display = "none";
+    return;
+  }
+
+  const error = validateField(field, value);
+  if (error) {
+    el.classList.add("is-invalid");
+    errEl.innerText = error;
+    errEl.style.display = "block";
+  } else {
+    el.classList.remove("is-invalid");
+    errEl.innerText = "";
+    errEl.style.display = "none";
+  }
+}
 
   // Gán sự kiện cho tất cả trường
   fields.forEach(field => {
