@@ -3,7 +3,6 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "build_fe": "build_fe" });
   // Copy assets/img sang assets/img
   eleventyConfig.addPassthroughCopy({ "assets/img": "assets/img" });
-  eleventyConfig.addPassthroughCopy({ "assets/img/favicon": "assets/img/favicon" });
   // Copy build sang build
   eleventyConfig.addPassthroughCopy({ "build": "build" });
   // Copy resources/assets/js sang resources/assets/js
