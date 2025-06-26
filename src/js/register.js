@@ -1,7 +1,12 @@
+// === Toggle password fields (giữ nguyên nếu đã có) ===
 function togglePassword(id) {
   const input = document.getElementById(id);
   input.type = input.type === "password" ? "text" : "password";
 }
+
+// === Lưu trạng thái đã nhập chưa ===
+const isTouched = {};
+["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(f => isTouched[f] = false);
 
 // === Validate từng trường chỉ khi có value ===
 function validateField(field, value) {
@@ -23,8 +28,8 @@ function validateField(field, value) {
       if (!/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/.test(value)) return "Mật khẩu không hợp lệ (8-30 ký tự)";
       return "";
     case "confirm_password":
-      if (!value) return "";
       const pw = document.getElementById("password").value;
+      if (!value) return "";
       if (value !== pw) return "Mật khẩu nhập lại không khớp!";
       return "";
     case "phone":
@@ -40,21 +45,22 @@ function validateField(field, value) {
   }
 }
 
-// === Lắng nghe input để chỉ báo đỏ khi có value và sai ===
+// === Lắng nghe input để chỉ báo đỏ khi đã nhập ===
 ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(field => {
   const input = document.getElementById(field);
   if (!input) return;
   input.addEventListener("input", function () {
-    showError(field, this.value);
+    isTouched[field] = true;
+    showErrorField(field, this.value);
     updateRegisterBtn();
   });
 });
 
-function showError(field, value) {
+function showErrorField(field, value) {
   const error = validateField(field, value);
-  const input = document.getElementById(field);
   const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
-  if (value && error) {
+  const input = document.getElementById(field);
+  if (isTouched[field] && value && error) {
     input.classList.add("is-invalid");
     feedback.textContent = error;
   } else {
@@ -65,10 +71,11 @@ function showError(field, value) {
 
 // Điều khoản và Captcha
 document.getElementById('terms-conditions').addEventListener('change', updateRegisterBtn);
+
 window.captchaOk = false;
 window.onCaptchaSuccess = function(token) {
   window.captchaOk = true;
-  updateRegisterBtn();
+  updateRegisterBtn(); // Chỉ enable nút, KHÔNG báo lỗi đỏ tất cả!
 };
 window.onCaptchaExpired = function() {
   window.captchaOk = false;
@@ -89,13 +96,12 @@ function updateRegisterBtn() {
   document.getElementById('register-btn').disabled = !valid;
 }
 
-// Giữ nguyên logic submit AJAX
+// === Submit AJAX giữ nguyên! ===
 document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
   e.preventDefault();
   document.getElementById('register-btn').disabled = true;
   document.getElementById('form-message').innerText = "Đang xử lý...";
 
-  // Lấy token captcha
   const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
 
   const form = e.target;
@@ -123,18 +129,13 @@ document.getElementById('formAuthentication').addEventListener('submit', async f
     } else {
       document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
       document.getElementById('register-btn').disabled = false;
-      if (window.turnstile && typeof window.turnstile.reset === "function") {
-        window.turnstile.reset();
-      }
+      if (window.turnstile && typeof window.turnstile.reset === "function") window.turnstile.reset();
     }
   } catch (err) {
     document.getElementById('form-message').innerText = "Không kết nối được server!";
     document.getElementById('register-btn').disabled = false;
-    if (window.turnstile && typeof window.turnstile.reset === "function") {
-      window.turnstile.reset();
-    }
+    if (window.turnstile && typeof window.turnstile.reset === "function") window.turnstile.reset();
   }
 });
 
 window.addEventListener('DOMContentLoaded', updateRegisterBtn);
-
