@@ -10,9 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
   const form = document.getElementById('formAuthentication');
   const registerBtn = document.getElementById('register-btn');
-
-  // Đánh dấu đã nhập (touched) cho từng trường
   const touched = {};
+
+  // Khởi tạo trạng thái chưa touched cho tất cả field
   fields.forEach(f => touched[f] = false);
 
   function validateField(field, value) {
@@ -34,10 +34,14 @@ document.addEventListener("DOMContentLoaded", function () {
     return "";
   }
 
-  function setError(field, error) {
+  function setError(field) {
     const el = form[field];
     const errEl = document.getElementById("error-" + field.replace("_", "-"));
-    if (error && touched[field]) {
+    const value = el.value.trim();
+    const error = validateField(field, value);
+
+    // Chỉ hiển thị lỗi khi đã touched và có value
+    if (touched[field] && value && error) {
       el.classList.add("is-invalid");
       errEl.innerText = error;
       errEl.style.display = "block";
@@ -48,29 +52,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Khi nhập/chạm vào trường thì đánh dấu touched
+  // Đánh dấu touched khi người dùng nhập
   fields.forEach(field => {
     form[field].addEventListener("input", function () {
       touched[field] = true;
-      const value = form[field].value.trim();
-      setError(field, validateField(field, value));
+      setError(field);
+      if (field === "password" || field === "confirm_password") {
+        setError("confirm_password");
+      }
       updateRegisterBtn();
     });
     form[field].addEventListener("blur", function () {
       touched[field] = true;
-      const value = form[field].value.trim();
-      setError(field, validateField(field, value));
+      setError(field);
+      if (field === "password" || field === "confirm_password") {
+        setError("confirm_password");
+      }
       updateRegisterBtn();
     });
-  });
-
-  form["password"].addEventListener("input", function () {
-    setError("confirm_password", validateField("confirm_password", form.confirm_password.value));
-    updateRegisterBtn();
-  });
-  form["confirm_password"].addEventListener("input", function () {
-    setError("confirm_password", validateField("confirm_password", form.confirm_password.value));
-    updateRegisterBtn();
   });
 
   let captchaOk = false;
@@ -87,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let allValid = true;
     for (const field of fields) {
       const value = form[field].value.trim();
-      // Nếu có value nhưng lỗi => không hợp lệ
+      // Nếu có value mà validate sai => không hợp lệ
       if (value && validateField(field, value)) allValid = false;
       // Nếu rỗng => không hợp lệ
       if (!value) allValid = false;
