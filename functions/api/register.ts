@@ -1,3 +1,22 @@
+
+export async function onRequestPost(context) {
+  try {
+    // Toàn bộ code gốc ở đây (bên dưới)
+    const { request, env } = context;
+    const data = await request.json();
+
+    // ... Toàn bộ code đăng ký của bạn ở đây ...
+
+  } catch (err) {
+    // Trả thẳng lỗi về cho frontend (debug mode)
+    return new Response(
+      JSON.stringify({ success: false, message: "Lỗi hệ thống (DEBUG)", error: String(err), stack: err?.stack }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}
+
+
 import { sha256, randomBase62 } from "./hash";
 // KV binding: env.KHOAI_KV_USER, env.KHOAI_KV_TOKEN, env.KHOAI_KV_COOKIE
 
