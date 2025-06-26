@@ -134,3 +134,14 @@ document.getElementById('formAuthentication').addEventListener('submit', async f
 });
 
 window.addEventListener('DOMContentLoaded', updateRegisterBtn);
+
+// --- Khi chuyển sang trường khác (blur) thì đánh dấu đã chạm ---
+["username", "fullname", "email", "password", "confirm_password", "phone", "pin"].forEach(field => {
+  const input = document.getElementById(field);
+  if (!input) return;
+  input.addEventListener("blur", function () {
+    isTouched[field] = true;
+    showErrorField(field, this.value);
+  });
+});
+
