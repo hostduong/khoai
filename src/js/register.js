@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // List các trường
   const fields = [
     "username",
     "fullname",
@@ -12,8 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById('formAuthentication');
   const registerBtn = document.getElementById('register-btn');
 
+  // Đánh dấu đã nhập (touched) cho từng trường
+  const touched = {};
+  fields.forEach(f => touched[f] = false);
+
   function validateField(field, value) {
-    if (!value) return "";
+    if (!value) return ""; // Không báo lỗi khi chưa nhập!
     if (field === "username" && !/^[a-z0-9_.]{6,30}$/.test(value))
       return "Tên đăng nhập không hợp lệ (6-30 ký tự, a-z, 0-9, _ .)";
     if (field === "fullname" && (value.length < 6 || value.length > 50))
@@ -34,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function setError(field, error) {
     const el = form[field];
     const errEl = document.getElementById("error-" + field.replace("_", "-"));
-    if (error) {
+    if (error && touched[field]) {
       el.classList.add("is-invalid");
       errEl.innerText = error;
       errEl.style.display = "block";
@@ -45,19 +48,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function validateAllFields() {
-    let valid = true;
-    for (const field of fields) {
-      const value = form[field].value.trim();
-      const error = validateField(field, value);
-      setError(field, error);
-      if (error) valid = false;
-    }
-    return valid;
-  }
-
+  // Khi nhập/chạm vào trường thì đánh dấu touched
   fields.forEach(field => {
     form[field].addEventListener("input", function () {
+      touched[field] = true;
+      const value = form[field].value.trim();
+      setError(field, validateField(field, value));
+      updateRegisterBtn();
+    });
+    form[field].addEventListener("blur", function () {
+      touched[field] = true;
       const value = form[field].value.trim();
       setError(field, validateField(field, value));
       updateRegisterBtn();
@@ -87,7 +87,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let allValid = true;
     for (const field of fields) {
       const value = form[field].value.trim();
+      // Nếu có value nhưng lỗi => không hợp lệ
       if (value && validateField(field, value)) allValid = false;
+      // Nếu rỗng => không hợp lệ
       if (!value) allValid = false;
     }
     if (!form["terms-conditions"].checked) allValid = false;
@@ -95,19 +97,15 @@ document.addEventListener("DOMContentLoaded", function () {
     registerBtn.disabled = !allValid;
   }
 
-  // ----- ĐÂY LÀ PHẦN SUBMIT AJAX HOÀN CHỈNH -----
+  // Submit AJAX giữ nguyên như cũ
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    if (!validateAllFields() || !form["terms-conditions"].checked || !captchaOk) {
-      updateRegisterBtn();
-      return false;
-    }
+    if (!updateRegisterBtn()) return false;
+
     registerBtn.disabled = true;
     document.getElementById('form-message').innerText = "Đang xử lý...";
 
-    // Lấy token captcha
     const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
-
     const body = {
       username: form.username.value.trim(),
       fullname: form.fullname.value.trim(),
@@ -147,6 +145,5 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  // Khi mới load trang: disable Đăng ký
   updateRegisterBtn();
 });
