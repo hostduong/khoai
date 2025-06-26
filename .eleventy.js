@@ -7,7 +7,9 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "build": "build" });
   // Copy resources/assets/js sang resources/assets/js
   eleventyConfig.addPassthroughCopy({ "resources/assets/js": "resources/assets/js" });
-
+  // Bổ sung dòng này để copy js từ src/js → /js
+  eleventyConfig.addPassthroughCopy({ "src/js": "js" });
+  
   return {
     dir: {
       input: "src",
