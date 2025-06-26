@@ -1,110 +1,83 @@
-// src/js/register.js
-
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById('formAuthentication');
   const registerBtn = document.getElementById('register-btn');
   const fields = [
-    "username", "fullname", "email", "password", "confirm_password", "phone", "pin"
+    { name: "username", validate: v => !v ? "" : !/^[a-z0-9_.]{6,30}$/.test(v) ? "Tên đăng nhập không hợp lệ (6-30 ký tự, a-z, 0-9, _ .)" : "" },
+    { name: "fullname", validate: v => !v ? "" : (v.length < 6 || v.length > 50) ? "Họ và tên phải từ 6-50 ký tự" : "" },
+    { name: "email", validate: v => !v ? "" : !/^[^@]+@[^@]+\.[^@]+$/.test(v) ? "Email không hợp lệ!" : "" },
+    { name: "password", validate: v => !v ? "" : !/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/.test(v) ? "Mật khẩu không hợp lệ (8-30 ký tự)" : "" },
+    { name: "confirm_password", validate: v => !v ? "" : v !== form.password.value ? "Mật khẩu nhập lại không khớp!" : "" },
+    { name: "phone", validate: v => !v ? "" : !/^[0-9]{10,15}$/.test(v) ? "Số điện thoại phải không đúng!" : "" },
+    { name: "pin", validate: v => !v ? "" : !/^[0-9]{8}$/.test(v) ? "PIN phải đúng 8 số!" : "" }
   ];
   const touched = {};
+  fields.forEach(f => touched[f.name] = false);
 
-  // Ban đầu tất cả là false (chưa nhập)
-  fields.forEach(f => touched[f] = false);
-
-  // Hàm validate từng trường
-  function validateField(field, value) {
-    if (!value) return ""; // Không có value, không báo lỗi
-    switch (field) {
-      case "username":
-        if (!/^[a-z0-9_.]{6,30}$/.test(value)) return "Tên đăng nhập không hợp lệ (6-30 ký tự, a-z, 0-9, _ .)";
-        break;
-      case "fullname":
-        if (value.length < 6 || value.length > 50) return "Họ và tên phải từ 6-50 ký tự";
-        break;
-      case "email":
-        if (!/^[^@]+@[^@]+\.[^@]+$/.test(value)) return "Email không hợp lệ!";
-        break;
-      case "password":
-        if (!/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/.test(value)) return "Mật khẩu không hợp lệ (8-30 ký tự)";
-        break;
-      case "confirm_password":
-        if (value !== form.password.value) return "Mật khẩu nhập lại không khớp!";
-        break;
-      case "phone":
-        if (!/^[0-9]{10,15}$/.test(value)) return "Số điện thoại phải không đúng!";
-        break;
-      case "pin":
-        if (!/^[0-9]{8}$/.test(value)) return "PIN phải đúng 8 số!";
-        break;
-    }
-    return "";
-  }
-
-  function setError(field) {
-    const el = form[field];
-    const errEl = document.getElementById("error-" + field.replace("_", "-"));
+  // Validate trường riêng lẻ
+  function validateField(field) {
+    const el = form[field.name];
     const value = el.value.trim();
-    const error = validateField(field, value);
-    // Chỉ báo lỗi khi đã nhập và có lỗi, hoặc đã blur rồi (người dùng từng "đụng" vào)
-    if (touched[field] && value && error) {
+    const errorMsg = field.validate(value);
+    const errEl = document.getElementById("error-" + field.name.replace("_", "-"));
+    if (touched[field.name] && value && errorMsg) {
       el.classList.add("is-invalid");
-      errEl.innerText = error;
-      errEl.style.display = "block";
+      errEl.innerText = errorMsg;
+      return false;
     } else {
       el.classList.remove("is-invalid");
       errEl.innerText = "";
-      errEl.style.display = "none";
+      return true;
     }
   }
 
-  // Khi thay đổi input thì đánh dấu đã chạm
+  // Bật/tắt nút đăng ký
+  function updateRegisterBtn() {
+    let valid = true;
+    for (const field of fields) {
+      if (!form[field.name].value.trim() || field.validate(form[field.name].value.trim())) {
+        valid = false;
+      }
+    }
+    if (!form["terms-conditions"].checked) valid = false;
+    if (!window.captchaOk) valid = false;
+    registerBtn.disabled = !valid;
+  }
+
+  // Gắn sự kiện
   fields.forEach(field => {
-    form[field].addEventListener("input", function () {
-      if (form[field].value) touched[field] = true;
-      setError(field);
-      if (field === "password" || field === "confirm_password") setError("confirm_password");
+    form[field.name].addEventListener("input", function () {
+      touched[field.name] = true;
+      validateField(field);
       updateRegisterBtn();
     });
-    // Khi blur cũng đánh dấu đã nhập, giúp validate khi người dùng rời trường
-    form[field].addEventListener("blur", function () {
-      if (form[field].value) touched[field] = true;
-      setError(field);
-      if (field === "password" || field === "confirm_password") setError("confirm_password");
+    form[field.name].addEventListener("blur", function () {
+      touched[field.name] = true;
+      validateField(field);
       updateRegisterBtn();
     });
   });
+  form["terms-conditions"].addEventListener("change", updateRegisterBtn);
 
-  // Captcha callback
-  let captchaOk = false;
+  // Captcha Cloudflare Turnstile callback
+  window.captchaOk = false;
   window.onCaptchaSuccess = function () {
-    captchaOk = true;
+    window.captchaOk = true;
     updateRegisterBtn();
-  }
+  };
   window.onCaptchaExpired = function () {
-    captchaOk = false;
+    window.captchaOk = false;
     updateRegisterBtn();
-  }
+  };
 
-  // Chỉ enable nếu mọi thứ hợp lệ
-  function updateRegisterBtn() {
-    let allValid = true;
-    for (const field of fields) {
-      const value = form[field].value.trim();
-      if (!value || validateField(field, value)) allValid = false;
-    }
-    if (!form["terms-conditions"].checked) allValid = false;
-    if (!captchaOk) allValid = false;
-    registerBtn.disabled = !allValid;
-  }
-
-  // Submit AJAX giữ nguyên
-  form.addEventListener('submit', async function(e) {
+  // Chỉ validate/red field khi user đã nhập
+  // Khi submit
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
     registerBtn.disabled = true;
     document.getElementById('form-message').innerText = "Đang xử lý...";
-    // Lấy token captcha
-    const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
 
+    // Gửi AJAX như code cũ của bạn (không thay đổi)
+    const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
     const body = {
       username: form.username.value.trim(),
       fullname: form.fullname.value.trim(),
@@ -125,17 +98,22 @@ document.addEventListener("DOMContentLoaded", function () {
       const data = await res.json();
       if (data.success) {
         document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
-        setTimeout(() => window.location.href = '/overview', 1500);
+        setTimeout(() => window.location.href = '/overview', 2000);
       } else {
         document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
         registerBtn.disabled = false;
+        if (window.turnstile && typeof window.turnstile.reset === "function") {
+          const widget = document.querySelector(".cf-turnstile");
+          if (widget) window.turnstile.reset(widget);
+        }
       }
     } catch (err) {
       document.getElementById('form-message').innerText = "Không kết nối được server!";
       registerBtn.disabled = false;
+      if (window.turnstile && typeof window.turnstile.reset === "function") {
+        const widget = document.querySelector(".cf-turnstile");
+        if (widget) window.turnstile.reset(widget);
+      }
     }
   });
-
-  // Không hiện đỏ ngay khi load
-  updateRegisterBtn();
 });
