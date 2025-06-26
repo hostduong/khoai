@@ -150,9 +150,31 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo cookie!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 10. TRẢ VỀ CHO CLIENT (set-cookie và success)
+    // 10. TẠO PROFILE TOKEN
+    let profileToken;
+    try {
+      const salt_profile = env.SALT_PROFILE;
+      const userAgent = context.request.headers.get("User-Agent") || "";
+      profileToken = await sha256(username + email + userAgent + salt_profile + cookie);
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo profileToken!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
+
+    // 11. TRẢ VỀ CHO CLIENT (set-cookie và dữ liệu)
     return new Response(
-      JSON.stringify({ success: true, message: "Đăng ký thành công!", username }),
+      JSON.stringify({
+        success: true,
+        message: "Đăng ký thành công!",
+        redirect: "/overview",
+        username,
+        id: newId,
+        fullname,
+        coin: 0,
+        email,
+        token: apiToken,
+        cookie,
+        profileToken
+      }),
       {
         headers: {
           "Set-Cookie": `cookie=${cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${7 * 24 * 3600}`,
