@@ -1,6 +1,6 @@
 module.exports = function(eleventyConfig) {
   // Copy toàn bộ build_fe sang build_fe (gốc)
-  eleventyConfig.addPassthroughCopy({ "build_fe": "build_fe" });
+  eleventyConfig.addPassthroughCopy({ "src/build_fe": "build_fe" });
   // Copy assets/img sang assets/img
   eleventyConfig.addPassthroughCopy({ "assets/img": "assets/img" });
   // Copy build sang build
