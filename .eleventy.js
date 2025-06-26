@@ -1,19 +1,21 @@
 module.exports = function(eleventyConfig) {
-  // Copy toàn bộ build_fe sang build_fe (gốc)
-  eleventyConfig.addPassthroughCopy({ "src/build_fe": "build_fe" });
-  // Copy assets/img sang assets/img
-  eleventyConfig.addPassthroughCopy({ "assets/img": "assets/img" });
-  // Copy build sang build
-  eleventyConfig.addPassthroughCopy({ "build": "build" });
-  // Copy resources/assets/js sang resources/assets/js
-  eleventyConfig.addPassthroughCopy({ "resources/assets/js": "resources/assets/js" });
-  // Bổ sung dòng này để copy js từ src/js → /js
-  eleventyConfig.addPassthroughCopy({ "src/js": "js" });
-  
+  const passthrough = [
+    "build",
+    "build_fe",
+    "assets",
+    "images",
+    "js",
+    "resources"
+  ];
+
+  passthrough.forEach(dir => {
+    eleventyConfig.addPassthroughCopy({ [`src/${dir}`]: dir });
+  });
+
   return {
     dir: {
       input: "src",
-      includes: ".",
+      includes: ".",    // để đọc head.njk, footer.njk,... trong src
       output: "_site"
     }
   };
