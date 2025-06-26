@@ -215,26 +215,27 @@ document.getElementById('formAuthentication').addEventListener('submit', async f
   }
 });
 </script>
-// Hàm reset captcha sau mỗi submit (dù thành công hay lỗi)
+<script>
+// --- Các hàm cũ như togglePassword, updateRegisterBtn... ---
+
+// Hàm reset captcha sau mỗi submit lỗi
 function resetCaptcha() {
-  // Cloudflare Turnstile sẽ tự thêm object window.turnstile nếu đã load xong
   if (window.turnstile && typeof window.turnstile.reset === "function") {
-    // Lấy ID widget đầu tiên trên trang (nếu nhiều widget, truyền ID cụ thể)
     const widget = document.querySelector(".cf-turnstile");
     if (widget) window.turnstile.reset(widget);
   }
 }
 
-// Đặt lại captcha sau mỗi submit (thành công hoặc lỗi)
+// Submit AJAX và reset captcha khi lỗi
 document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
   e.preventDefault();
   document.getElementById('register-btn').disabled = true;
   document.getElementById('form-message').innerText = "Đang xử lý...";
 
-  // Lấy token captcha mới nhất
+  // Lấy token captcha
   const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]')?.value || "";
 
-  // ...các bước lấy giá trị form...
+  // ...lấy dữ liệu form như cũ...
 
   try {
     const res = await fetch('/api/register', {
@@ -249,19 +250,19 @@ document.getElementById('formAuthentication').addEventListener('submit', async f
     } else {
       document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
       document.getElementById('register-btn').disabled = false;
-      resetCaptcha(); // Luôn reset captcha sau khi submit lỗi!
+      resetCaptcha(); // Reset captcha sau khi submit lỗi
     }
   } catch (err) {
     document.getElementById('form-message').innerText = "Không kết nối được server!";
     document.getElementById('register-btn').disabled = false;
-    resetCaptcha(); // Luôn reset captcha sau khi submit lỗi!
+    resetCaptcha(); // Reset captcha nếu lỗi mạng/backend
   }
 });
 
-// Đảm bảo captcha luôn mới khi F5 (trang load lại Turnstile auto reset, không cần code thêm)
-// Nếu muốn chủ động reset khi trang vừa load:
+// Nếu muốn chắc chắn, bạn có thể reset captcha mỗi lần trang vừa load (optional)
 window.addEventListener('DOMContentLoaded', resetCaptcha);
 
+</script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 {% include "footer.njk" %}
