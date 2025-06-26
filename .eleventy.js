@@ -1,8 +1,9 @@
+const path = require("path");
+const { renderString } = require("nunjucks");
+
 module.exports = function (eleventyConfig) {
-  // --- Copy các thư mục tĩnh từ src → _site ---
   const passthrough = [
     "build",
-    "build_fe",
     "assets",
     "images",
     "js",
@@ -13,28 +14,45 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPassthroughCopy({ [`src/${dir}`]: dir });
   });
 
-  // --- Cho phép Eleventy xử lý file .js.njk → .js ---
+  // ⚠️ Không copy nguyên build_fe nếu có .js.njk bên trong
+  // eleventyConfig.addPassthroughCopy({ "src/build_fe": "build_fe" }); ← loại bỏ dòng này
+
+  // ✅ Chỉ copy các file KHÔNG phải .njk trong build_fe
+  eleventyConfig.on("beforeBuild", () => {
+    const fs = require("fs");
+    const fse = require("fs-extra");
+    const dirPath = "src/build_fe";
+    const targetPath = "_site/build_fe";
+
+    fs.readdirSync(dirPath).forEach(file => {
+      if (!file.endsWith(".njk")) {
+        fse.copySync(`${dirPath}/${file}`, `${targetPath}/${file}`);
+      }
+    });
+  });
+
+  // ✅ Cho phép xử lý .js.njk → .js
   eleventyConfig.addTemplateFormats("js");
 
   eleventyConfig.addExtension("js", {
     outputFileExtension: "js",
-    compile: function (inputContent, inputPath) {
-      if (inputPath && inputPath.endsWith(".js.njk")) {
-        return async function (data) {
-          // Render với Nunjucks (Eleventy sẽ tự xử lý biến {{ domain }}, ...)
-          return this.config.javascriptFunctions.nunjucksRenderString(inputContent, data);
-        };
-      } else {
-        return async () => inputContent;
+    compile(inputContent, inputPath) {
+      if (inputPath.endsWith(".js.njk")) {
+        return async (data) => renderString(inputContent, data);
       }
+      return async () => inputContent;
+    },
+    getData(inputPath) {
+      // Lấy dữ liệu từ _data
+      return {};
     }
   });
 
   return {
     dir: {
-      input: "src",     // thư mục gốc
-      includes: ".",    // dùng luôn file .njk trong src/
-      output: "_site"   // thư mục xuất
+      input: "src",
+      includes: ".",
+      output: "_site"
     }
   };
 };
