@@ -41,5 +41,24 @@
   </div>
 </footer>
 <script src="{{ domain }}/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll('.custom-option .form-check-input').forEach(function(input) {
+    function update() {
+      if (input.checked) {
+        if (input.type === "radio") {
+          input.closest(".row").querySelectorAll(".custom-option").forEach(opt => opt.classList.remove("checked"));
+        }
+        input.closest(".custom-option").classList.add("checked");
+      } else {
+        input.closest(".custom-option").classList.remove("checked");
+      }
+    }
+    update();
+    input.addEventListener('change', update);
+  });
+});
+</script>
+
 </body>
 </html>
