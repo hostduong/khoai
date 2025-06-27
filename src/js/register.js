@@ -1,5 +1,3 @@
-// ===== File: register.js (HOÀN CHỈNH) =====
-
 const fields = ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"];
 const touched = {};
 
@@ -16,7 +14,7 @@ function validatePhone(val) {
   return val === "" || /^\+?\d[\d\s-]{8,16}$/.test(val);
 }
 function validateName(val) {
-  return val.length >= 2 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+[\]{};:\"'<>?/\\|,~`]+$/.test(val);
+  return val.length >= 2 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val);
 }
 function validatePin(val) {
   return /^[0-9]{8}$/.test(val);
@@ -114,13 +112,62 @@ window.addEventListener('DOMContentLoaded', function() {
   updateRegisterBtn();
 });
 
-// Toggle mật khẩu và PIN
+// Xử lý submit form
 window.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.toggle-password, .toggle-pin').forEach(btn => {
-    btn.addEventListener('click', function () {
-      const input = document.getElementById(this.dataset.target);
-      if (input) input.type = (input.type === 'password') ? 'text' : 'password';
+  document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // Khi submit, đánh dấu touched tất cả để hiện báo lỗi ngay
+    let valid = true;
+    fields.forEach(field => {
+      touched[field] = true;
+      showError(field);
+      const input = document.getElementById(field);
+      if (input.classList.contains('is-invalid') || !input.value) valid = false;
     });
+
+    if (!valid) {
+      updateRegisterBtn();
+      return;
+    }
+
+    const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]').value;
+    const formData = {};
+    fields.forEach(field => formData[field] = document.getElementById(field).value);
+    formData['cf-turnstile-response'] = captchaToken;
+
+    document.getElementById('register-btn').disabled = true;
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
+        setTimeout(() => window.location.href = '/overview', 500);
+      } else {
+        document.getElementById('form-message').innerHTML = `<span style="color:red; font-size:1.3em; font-weight:bold;">❗️ ${data.message || "Có lỗi xảy ra, thử lại!"}</span>`;
+        document.getElementById('register-btn').disabled = false;
+        if (window.turnstile && typeof window.turnstile.reset === "function") {
+          window.turnstile.reset();
+        }
+      }
+    } catch (err) {
+      document.getElementById('form-message').innerText = "Không kết nối được server!";
+      document.getElementById('register-btn').disabled = false;
+      if (window.turnstile && typeof window.turnstile.reset === "function") {
+        window.turnstile.reset();
+      }
+    }
   });
 });
 
+// Toggle mật khẩu/PIN dùng onclick (phải đặt ngoài cùng file, ngoài mọi function)
+window.togglePassword = function(id) {
+  var input = document.getElementById(id);
+  if (!input) return;
+  input.type = (input.type === 'password') ? 'text' : 'password';
+};
