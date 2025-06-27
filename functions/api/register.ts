@@ -33,11 +33,15 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 2–50 ký tự!" });
     }
     if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) return Response.json({ success: false, message: "Email không hợp lệ!" });
-    if (!/^[a-zA-Z0-9!@#$%^&*()\-_\=\+\[\]{};:,.\/?]{8,20}$/.test(val) && !/[\'\"<>;\s]/.test(password)) return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
+    if (
+      !/^[a-zA-Z0-9!@#$%^&*()\-_\=\+\[\]{};:,.\/?]{8,20}$/.test(password) ||
+      /[\'\"<>;\s]/.test(password)
+    ) return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
     if (password !== confirm_password) return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
     if (!/^\+?\d[\d\s-]{8,16}$/.test(phone)) return Response.json({ success: false, message: "Số điện thoại phải 8-16 số!" });
     if (!/^[0-9]{8}$/.test(pin)) return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
 
+    
     // 3. CHECK TỒN TẠI USERNAME/EMAIL
     let userExists, emailExists, idCounter;
     const userKey = `KHOAI__profile__user:${username}`;
