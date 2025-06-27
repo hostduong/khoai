@@ -143,9 +143,9 @@ window.addEventListener('DOMContentLoaded', function() {
       const data = await res.json();
       if (data.success) {
         document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
-        setTimeout(() => window.location.href = '/overview', 1500);
+        setTimeout(() => window.location.href = '/overview', 500);
       } else {
-        document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
+        document.getElementById('form-message').innerHTML = `<span style="color:red; font-size:1.3em; font-weight:bold;">❗️ ${data.message || "Có lỗi xảy ra, thử lại!"}</span>`;
         document.getElementById('register-btn').disabled = false;
         if (window.turnstile && typeof window.turnstile.reset === "function") {
           window.turnstile.reset();
