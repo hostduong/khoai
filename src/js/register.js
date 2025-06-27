@@ -121,3 +121,10 @@ window.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+function togglePassword(id) {
+  var input = document.getElementById(id);
+  if (!input) return;
+  input.type = (input.type === 'password') ? 'text' : 'password';
+}
+
