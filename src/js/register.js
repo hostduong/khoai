@@ -14,7 +14,7 @@ function validatePhone(val) {
   return val === "" || /^\+?\d[\d\s-]{8,16}$/.test(val);
 }
 function validateName(val) {
-  return /^[A-Za-zÀ-ỹà-ỹ\s]+$/u.test(val);
+  return val.length >= 2 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+[\]{};:\"'<>?/\\|,~`]+$/.test(val);
 }
 function validatePin(val) {
   return /^[0-9]{8}$/.test(val);
