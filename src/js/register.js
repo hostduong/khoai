@@ -165,9 +165,13 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Toggle mật khẩu/PIN dùng onclick (phải đặt ngoài cùng file, ngoài mọi function)
-window.togglePassword = function(id) {
+// Toggle mật khẩu/PIN dùng onclick (global, ngoài cùng)
+window.togglePassword = function(id, el) {
   var input = document.getElementById(id);
   if (!input) return;
   input.type = (input.type === 'password') ? 'text' : 'password';
+  // Đổi icon trong <i>
+  if (el && el.querySelector('i')) {
+    el.querySelector('i').className = input.type === 'password' ? 'ti ti-eye-off' : 'ti ti-eye';
+  }
 };
