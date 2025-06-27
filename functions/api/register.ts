@@ -29,11 +29,13 @@ export async function onRequestPost(context) {
     // 2. VALIDATE INPUT
     const { username, fullname, email, password, confirm_password, phone, pin } = data;
     if (!/^[a-z0-9_.]{6,30}$/.test(username)) return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
-    if (!fullname || fullname.length < 6 || fullname.length > 50) return Response.json({ success: false, message: "Họ và tên phải 6-50 ký tự!" });
-    if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) return Response.json({ success: false, message: "Email không hợp lệ!" });
-    if (!/^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$/.test(password)) return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
+    if (typeof fullname !== 'string' || fullname.length < 2 || fullname.length > 50 || /[0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]/.test(fullname)) {
+      return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 2–50 ký tự!" });
+    }
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) return Response.json({ success: false, message: "Email không hợp lệ!" });
+    if (!/^[a-zA-Z0-9!@#$%^&*()\-_\=\+\[\]{};:,.\/?]{8,20}$/.test(val) && !/[\'\"<>;\s]/.test(password)) return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
     if (password !== confirm_password) return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
-    if (!/^[0-9]{10,15}$/.test(phone)) return Response.json({ success: false, message: "Số điện thoại phải 10-15 số!" });
+    if (!/^\+?\d[\d\s-]{8,16}$/.test(phone)) return Response.json({ success: false, message: "Số điện thoại phải 8-16 số!" });
     if (!/^[0-9]{8}$/.test(pin)) return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
 
     // 3. CHECK TỒN TẠI USERNAME/EMAIL
