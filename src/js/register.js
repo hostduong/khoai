@@ -5,7 +5,7 @@ fields.forEach(f => touched[f] = false);
 
 // Hàm validate các trường
 function validateEmail(val) {
-  return val.length <= 500 && /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/.test(val);
+  return val.length <= 500 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
 }
 function validatePassword(val) {
   return /^[a-zA-Z0-9!@#$%^&*()\-_\=\+\[\]{};:,.\/?]{8,20}$/.test(val) && !/[\'\"<>;\s]/.test(val);
