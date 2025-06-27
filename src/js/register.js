@@ -113,14 +113,6 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 
-  // Thêm toggle mật khẩu/PIN dùng onclick cho icon mắt
-  window.togglePassword = function(id) {
-    var input = document.getElementById(id);
-    if (!input) return;
-    input.type = (input.type === 'password') ? 'text' : 'password';
-  };
-});
-
 // Xử lý submit form
 window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
@@ -161,12 +153,10 @@ window.addEventListener('DOMContentLoaded', function() {
   
 });
 
-// Toggle mật khẩu và PIN
-window.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.toggle-password, .toggle-pin').forEach(btn => {
-    btn.addEventListener('click', function () {
-      const input = document.getElementById(this.dataset.target);
-      if (input) input.type = (input.type === 'password') ? 'text' : 'password';
-    });
-  });
+  // Thêm toggle mật khẩu/PIN dùng onclick cho icon mắt
+  window.togglePassword = function(id) {
+    var input = document.getElementById(id);
+    if (!input) return;
+    input.type = (input.type === 'password') ? 'text' : 'password';
+  };
 });
