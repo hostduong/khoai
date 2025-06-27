@@ -17,7 +17,7 @@ function validateName(val) {
   return /^[A-Za-zÀ-ỹà-ỹ\s]+$/u.test(val);
 }
 function validatePin(val) {
-  return /^\d{8}$/.test(val);
+  return /^[0-9]{8}$/.test(val);
 }
 
 // Hàm kiểm tra lỗi
