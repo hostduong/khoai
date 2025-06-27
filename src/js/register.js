@@ -1,3 +1,5 @@
+// ===== File: register.js (HOÀN CHỈNH) =====
+
 const fields = ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"];
 const touched = {};
 
@@ -112,48 +114,13 @@ window.addEventListener('DOMContentLoaded', function() {
   updateRegisterBtn();
 });
 
-// Xử lý submit form
+// Toggle mật khẩu và PIN
 window.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
-    e.preventDefault(); // Ngăn chặn form reset và submit mặc định
-
-    const captchaToken = document.querySelector('.cf-turnstile input[name=\"cf-turnstile-response\"]').value;
-    const formData = {};
-    fields.forEach(field => formData[field] = document.getElementById(field).value);
-    formData['cf-turnstile-response'] = captchaToken;
-
-    document.getElementById('register-btn').disabled = true;
-
-    try {
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      const data = await res.json();
-      if (data.success) {
-        document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
-        setTimeout(() => window.location.href = '/overview', 500);
-      } else {
-        document.getElementById('form-message').innerHTML = `<span style=\"color:red; font-size:1.3em; font-weight:bold;\">❗️ ${data.message || \"Có lỗi xảy ra, thử lại!\"}</span>`;
-        document.getElementById('register-btn').disabled = false;
-        if (window.turnstile && typeof window.turnstile.reset === \"function\") {
-          window.turnstile.reset();
-        }
-      }
-    } catch (err) {
-      document.getElementById('form-message').innerText = "Không kết nối được server!";
-      document.getElementById('register-btn').disabled = false;
-      if (window.turnstile && typeof window.turnstile.reset === \"function\") {
-        window.turnstile.reset();
-      }
-    }
+  document.querySelectorAll('.toggle-password, .toggle-pin').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const input = document.getElementById(this.dataset.target);
+      if (input) input.type = (input.type === 'password') ? 'text' : 'password';
+    });
   });
 });
 
-// Toggle mật khẩu/PIN dùng onclick
-window.togglePassword = function(id) {
-  var input = document.getElementById(id);
-  if (!input) return;
-  input.type = (input.type === 'password') ? 'text' : 'password';
-};
