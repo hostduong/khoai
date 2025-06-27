@@ -112,12 +112,22 @@ window.addEventListener('DOMContentLoaded', function() {
   updateRegisterBtn();
 });
 
+// Toggle mật khẩu và PIN
+window.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.toggle-password, .toggle-pin').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const input = document.getElementById(this.dataset.target);
+      if (input) input.type = (input.type === 'password') ? 'text' : 'password';
+    });
+  });
+});
+
 // Xử lý submit form
 window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
     e.preventDefault(); // Ngăn chặn form reset và submit mặc định
 
-    const captchaToken = document.querySelector('.cf-turnstile input[name=\"cf-turnstile-response\"]').value;
+    const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]').value;
     const formData = {};
     fields.forEach(field => formData[field] = document.getElementById(field).value);
     formData['cf-turnstile-response'] = captchaToken;
@@ -135,25 +145,26 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
         setTimeout(() => window.location.href = '/overview', 500);
       } else {
-        document.getElementById('form-message').innerHTML = `<span style=\"color:red; font-size:1.3em; font-weight:bold;\">❗️ ${data.message || \"Có lỗi xảy ra, thử lại!\"}</span>`;
+        document.getElementById('form-message').innerHTML = `<span style="color:red; font-size:1.3em; font-weight:bold;">❗️ ${data.message || "Có lỗi xảy ra, thử lại!"}</span>`;
         document.getElementById('register-btn').disabled = false;
-        if (window.turnstile && typeof window.turnstile.reset === \"function\") {
+        if (window.turnstile && typeof window.turnstile.reset === "function") {
           window.turnstile.reset();
         }
       }
     } catch (err) {
       document.getElementById('form-message').innerText = "Không kết nối được server!";
       document.getElementById('register-btn').disabled = false;
-      if (window.turnstile && typeof window.turnstile.reset === \"function\") {
+      if (window.turnstile && typeof window.turnstile.reset === "function") {
         window.turnstile.reset();
       }
     }
   });
 });
 
-// Toggle mật khẩu/PIN dùng onclick
-window.togglePassword = function(id) {
-  var input = document.getElementById(id);
-  if (!input) return;
-  input.type = (input.type === 'password') ? 'text' : 'password';
-};
+  // Thêm toggle mật khẩu/PIN dùng onclick cho icon mắt
+  window.togglePassword = function(id) {
+    var input = document.getElementById(id);
+    if (!input) return;
+    input.type = (input.type === 'password') ? 'text' : 'password';
+  };
+});
