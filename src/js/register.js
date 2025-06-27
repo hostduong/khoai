@@ -122,6 +122,14 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+  // Thêm toggle mật khẩu/PIN dùng onclick cho icon mắt
+  window.togglePassword = function(id) {
+    var input = document.getElementById(id);
+    if (!input) return;
+    input.type = (input.type === 'password') ? 'text' : 'password';
+  };
+});
+
 // Xử lý submit form
 window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
