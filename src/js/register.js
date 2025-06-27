@@ -122,9 +122,41 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-function togglePassword(id) {
-  var input = document.getElementById(id);
-  if (!input) return;
-  input.type = (input.type === 'password') ? 'text' : 'password';
-}
+// Xử lý submit form
+window.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Ngăn chặn form reset và submit mặc định
 
+    const captchaToken = document.querySelector('.cf-turnstile input[name="cf-turnstile-response"]').value;
+    const formData = {};
+    fields.forEach(field => formData[field] = document.getElementById(field).value);
+    formData['cf-turnstile-response'] = captchaToken;
+
+    document.getElementById('register-btn').disabled = true;
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('form-message').innerText = "🎉 Đăng ký thành công!";
+        setTimeout(() => window.location.href = '/overview', 1500);
+      } else {
+        document.getElementById('form-message').innerText = data.message || "Có lỗi xảy ra, thử lại!";
+        document.getElementById('register-btn').disabled = false;
+        if (window.turnstile && typeof window.turnstile.reset === "function") {
+          window.turnstile.reset();
+        }
+      }
+    } catch (err) {
+      document.getElementById('form-message').innerText = "Không kết nối được server!";
+      document.getElementById('register-btn').disabled = false;
+      if (window.turnstile && typeof window.turnstile.reset === "function") {
+        window.turnstile.reset();
+      }
+    }
+  });
+});
