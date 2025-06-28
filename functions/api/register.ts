@@ -4,6 +4,8 @@ export async function onRequestPost(context) {
   try {
     const { request, env } = context;
     const data = await request.json();
+    const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("x-forwarded-for") || "";
+    const ua = request.headers.get("User-Agent") || "";
 
     // 1. VALIDATE CAPTCHA
     const captchaToken = data["cf-turnstile-response"];
@@ -86,7 +88,6 @@ export async function onRequestPost(context) {
     }
 
     // 7. GHI VÀO KV
-    const now = Math.floor(Date.now() / 1000);
     const userProfile = {
       id: newId,
       status: "live",
@@ -102,8 +103,8 @@ export async function onRequestPost(context) {
       open_pin: "false",
       ip_whitelist: [],
       open_ip: "false",
-      ip_logged: [],
-      ua_logged: [],
+      ip_logged: ip ? [ip] : [],
+      ua_logged: ua ? [ua] : [],
       country: "VN",
       language: "vi",
       coin: 0,
