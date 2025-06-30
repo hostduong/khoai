@@ -1,52 +1,92 @@
 {% set title = "Đăng nhập | Gem.id.vn - Hệ thống Email Tự Động" %}
-{% set description = "Tạo tài khoản mới trên Gem.id.vn – hệ thống email tự động, bảo mật cao, chuyên cho MMO và doanh nghiệp." %}
-{% set keywords = "Gem.id.vn, đăng ký email, hệ thống email tự động, MMO" %}
+{% set description = "Đăng nhập tài khoản Gem.id.vn – hệ thống email tự động, bảo mật cao, chuyên cho MMO và doanh nghiệp." %}
+{% set keywords = "Gem.id.vn, đăng nhập email, hệ thống email tự động, MMO" %}
 {% set page_url = "/login/" %}
 {% set og_image = "/img/logo.png" %}
 {% include "head.njk" %}
 {% include "navbar.njk" %}
 
-<!-- Phần nội dung chính của trang login sẽ nằm ở đây, ví dụ: -->
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-      <div class="card p-4 shadow-sm rounded-3">
-        <h2 class="mb-3 text-center">Đăng nhập</h2>
-        <form id="login-form">
-          <div class="mb-3">
-            <label for="username" class="form-label">Tên đăng nhập hoặc Email</label>
-            <input type="text" class="form-control" id="username" name="username" autocomplete="username" required>
-            <div id="error-username" class="form-text text-danger"></div>
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">Mật khẩu</label>
-            <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
-            <div id="error-password" class="form-text text-danger"></div>
-          </div>
-          <!-- Tùy chọn: mã PIN nếu bật open_pin -->
-          <div class="mb-3 d-none" id="pin-group">
-            <label for="pin" class="form-label">Mã PIN (nếu có)</label>
-            <input type="password" class="form-control" id="pin" name="pin" autocomplete="one-time-code" maxlength="6">
-            <div id="error-pin" class="form-text text-danger"></div>
-          </div>
-          <!-- Captcha -->
-          <div class="mb-3">
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
-            <div id="error-captcha" class="form-text text-danger"></div>
-          </div>
-          <button class="btn btn-primary w-100" type="submit" id="login-btn">Đăng nhập</button>
-        </form>
-        <div class="mt-3 text-center">
-          <a href="/forgot-password/">Quên mật khẩu?</a>
-        </div>
-        <div class="mt-2 text-center">
-          Chưa có tài khoản? <a href="/register/">Đăng ký ngay</a>
+<!-- Wrapper giống unlimitmail: căn giữa card -->
+<section class="authentication-wrapper bg-body">
+  <div class="authentication-inner">
+    <div class="card shadow-sm rounded-3">
+      <div class="card-body">
+        <div class="mx-auto pt-4 px-2" style="max-width: 400px;">
+          <h4 class="mb-1 text-center">Chào mừng đến với Gem.id.vn! 👋</h4>
+          <p class="mb-4 text-center">Vui lòng đăng nhập để tiếp tục.</p>
+
+          <form id="login-form" autocomplete="on" novalidate>
+            <!-- Username/Email -->
+            <div class="mb-3">
+              <label for="username" class="form-label">Email hoặc Tên đăng nhập</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Nhập email hoặc username" autocomplete="username" required autofocus>
+              <div id="error-username" class="invalid-feedback"></div>
+            </div>
+            <!-- Password -->
+            <div class="mb-3 form-password-toggle">
+              <label class="form-label" for="password">Mật khẩu</label>
+              <div class="input-group input-group-merge has-validation">
+                <input type="password" id="password" class="form-control" name="password" placeholder="••••••••" autocomplete="current-password" required>
+                <span class="input-group-text cursor-pointer" onclick="togglePassword('password', this)"><i class="ti ti-eye-off"></i></span>
+              </div>
+              <div id="error-password" class="invalid-feedback"></div>
+            </div>
+            <!-- PIN (ẩn/hiện động) -->
+            <div class="mb-3 d-none" id="pin-group">
+              <label class="form-label" for="pin">Mã PIN (nếu có)</label>
+              <div class="input-group input-group-merge has-validation">
+                <input type="password" class="form-control" id="pin" name="pin" maxlength="6" placeholder="Nhập mã PIN 6 số" autocomplete="one-time-code">
+                <span class="input-group-text cursor-pointer" onclick="togglePassword('pin', this)"><i class="ti ti-eye-off"></i></span>
+              </div>
+              <div id="error-pin" class="invalid-feedback"></div>
+            </div>
+            <!-- Ghi nhớ đăng nhập + Quên mật khẩu -->
+            <div class="my-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="form-check mb-0 ms-2">
+                  <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                  <label class="form-check-label" for="rememberMe">
+                    Ghi nhớ đăng nhập
+                  </label>
+                </div>
+                <a href="/forgot-password/"><span class="mb-0 small">Quên mật khẩu?</span></a>
+              </div>
+            </div>
+            <!-- Captcha -->
+            <div class="mb-3">
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
+              <div id="error-captcha" class="invalid-feedback"></div>
+            </div>
+            <!-- Nút Đăng nhập -->
+            <button class="btn btn-primary d-grid w-100 waves-effect waves-light" type="submit" id="login-btn">
+              Đăng nhập
+            </button>
+          </form>
+          <p class="text-center mt-4 mb-0">
+            <span>Bạn chưa có tài khoản?</span>
+            <a href="/register/"><span>Đăng ký ngay</span></a>
+          </p>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
+<script>
+function togglePassword(inputId, el) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === "password") {
+    input.type = "text";
+    el.querySelector('i').classList.remove('ti-eye-off');
+    el.querySelector('i').classList.add('ti-eye');
+  } else {
+    input.type = "password";
+    el.querySelector('i').classList.remove('ti-eye');
+    el.querySelector('i').classList.add('ti-eye-off');
+  }
+}
+</script>
 <script src="{{ domain }}/js/login.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% include "footer.njk" %}
