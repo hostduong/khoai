@@ -26,16 +26,20 @@
                   <label class="form-label" for="password">Mật khẩu</label>
                   <div class="input-group input-group-merge has-validation">
                     <input type="password" id="password" class="form-control" name="password" placeholder="••••••••" autocomplete="current-password" required>
-                    <span class="input-group-text cursor-pointer" onclick="togglePassword('password', this)"><i class="ti ti-eye-off"></i></span>
+                    <span class="input-group-text cursor-pointer">
+                      <i class="ti ti-eye-off"></i>
+                    </span>
                   </div>
                   <div id="error-password" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                 </div>
-                <!-- Mã PIN: ẩn/hiện bằng JS khi cần -->
+                <!-- Mã PIN: ẩn/hiện qua JS khi cần -->
                 <div class="mb-6 fv-plugins-icon-container d-none" id="pin-group">
                   <label class="form-label" for="pin">Mã PIN (nếu có)</label>
                   <div class="input-group input-group-merge has-validation">
                     <input type="password" class="form-control" id="pin" name="pin" maxlength="6" placeholder="Nhập mã PIN 6 số" autocomplete="one-time-code">
-                    <span class="input-group-text cursor-pointer" onclick="togglePassword('pin', this)"><i class="ti ti-eye-off"></i></span>
+                    <span class="input-group-text cursor-pointer">
+                      <i class="ti ti-eye-off"></i>
+                    </span>
                   </div>
                   <div id="error-pin" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                 </div>
@@ -48,14 +52,13 @@
                     <a href="/forgot-password/"><p class="mb-0">Quên mật khẩu?</p></a>
                   </div>
                 </div>
-            <!-- Captcha Cloudflare (căn giữa) -->
-            <div class="mb-3">
-              <div class="d-flex justify-content-center">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
-              </div>
-              <div id="error-captcha" class="invalid-feedback"></div>
-            </div>
-
+                <!-- Captcha Cloudflare căn giữa -->
+                <div class="mb-3">
+                  <div class="d-flex justify-content-center">
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
+                  </div>
+                  <div id="error-captcha" class="invalid-feedback"></div>
+                </div>
                 <button class="btn btn-primary d-grid w-100 waves-effect waves-light" type="submit" id="login-btn">
                   Đăng nhập
                 </button>
@@ -72,22 +75,6 @@
     </div>
   </div>
 </section>
-
-<script>
-function togglePassword(inputId, el) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-  if (input.type === "password") {
-    input.type = "text";
-    el.querySelector('i').classList.remove('ti-eye-off');
-    el.querySelector('i').classList.add('ti-eye');
-  } else {
-    input.type = "password";
-    el.querySelector('i').classList.remove('ti-eye');
-    el.querySelector('i').classList.add('ti-eye-off');
-  }
-}
-</script>
 
 <script src="{{ domain }}/js/login.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
