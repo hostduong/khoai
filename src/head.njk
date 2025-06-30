@@ -8,66 +8,97 @@
       data-style="light">
 
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
-    <meta name="csrf-token" content="{{ csrf_token or '' }}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token | default('') }}">
 
-    <title>{{ title }}</title>
+  <title>{{ title }} | Gem.id.vn</title>
 
-    <!-- Meta Tags SEO -->
-    <meta name="title" content="{{ title }}">
-    <meta name="description" content="{{ description }}">
-    <meta name="keywords" content="{{ keywords }}">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="Gem.id.vn">
-    <meta name="canonical" content="{{ domain }}{{ page.url }}">
+  <!-- Meta Tags SEO -->
+  <meta name="title" content="{{ title }}">
+  <meta name="description" content="{{ description }}">
+  <meta name="keywords" content="{{ keywords }}">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Gem.id.vn">
+  <meta name="canonical" content="{{ domain }}{{ page.url }}">
 
-    <!-- Open Graph (OG) Meta Tags -->
-    <meta property="og:title" content="{{ title }}">
-    <meta property="og:description" content="{{ description }}">
-    <meta property="og:image" content="{{ keywords }}">
-    <meta property="og:url" content="{{ domain }}">
-    <meta property="og:type" content="website">
+  <!-- Open Graph (OG) Meta Tags -->
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:image" content="{{ domain }}/build/images/logo2.png">
+  <meta property="og:url" content="{{ domain }}{{ page.url }}">
+  <meta property="og:type" content="website">
 
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ title }}">
-    <meta name="twitter:description" content="{{ description }}">
-    <meta name="twitter:image" content="{{ og_image }}">
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ description }}">
+  <meta name="twitter:image" content="{{ domain }}/build/images/logo2.png">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ domain }}/assets/img/favicon/favicon.ico"/>
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ domain }}/assets/img/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ domain }}/assets/img/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ domain }}/assets/img/favicon/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="{{ domain }}/assets/img/favicon/favicon-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="{{ domain }}/assets/img/favicon/favicon-512x512.png">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ domain }}/assets/img/favicon/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ domain }}/assets/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ domain }}/assets/img/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ domain }}/assets/img/favicon/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ domain }}/assets/img/favicon/favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="{{ domain }}/assets/img/favicon/favicon-512x512.png">
 
-    <!-- Include Styles -->
-    <!-- $isFront is used to append the front layout styles only on the front layout otherwise the variable will be blank -->
-    <!-- BEGIN: Theme CSS-->
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&amp;display=swap" rel="stylesheet">
 
-<!-- Icons -->
-<link rel="preload" as="style" href="{{ domain }}/build_fe/tabler-icons.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/fontawesome.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/flag-icons.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/node-waves.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/tabler-icons.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/fontawesome.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/flag-icons.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/node-waves.css" /><!-- Core CSS -->
-<link rel="preload" as="style" href="{{ domain }}/build_fe/core2.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/theme-default2.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/demo.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/node-waves.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/front-page.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/app.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/sweetalert2.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/toastr.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/core2.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/theme-default2.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/demo.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/node-waves.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/front-page.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/app.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/sweetalert2.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/toastr.css" />
-<!-- Vendor Styles -->
-<link rel="preload" as="style" href="{{ domain }}/build_fe/perfect-scrollbar.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/typeahead.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/perfect-scrollbar.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/typeahead.css" /><link rel="preload" as="style" href="{{ domain }}/build_fe/form-validation.css" /><link rel="stylesheet" href="{{ domain }}/build_fe/form-validation.css" />
-<!-- Page Styles -->
+  <!-- Icons -->
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/tabler-icons.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/fontawesome.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/flag-icons.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/node-waves.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/tabler-icons.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/fontawesome.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/flag-icons.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/node-waves.css">
 
-    <!-- Include Scripts for customizer, helper, analytics, config -->
-    <!-- $isFront is used to append the front layout scriptsIncludes only on the front layout otherwise the variable will be blank -->
-    <!-- laravel style -->
-<link rel="modulepreload" href="{{ domain }}/build_fe/helpers.js" /><script type="module" src="{{ domain }}/build_fe/helpers.js"></script><!-- beautify ignore:start -->
-  <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-  <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
-  <link rel="preload" as="style" href="{{ domain }}/build_fe/template-customizer.css" /><link rel="modulepreload" href="{{ domain }}/build_fe/template-customizer.js" /><link rel="stylesheet" href="{{ domain }}/build_fe/template-customizer.css" /><script type="module" src="{{ domain }}/build_fe/template-customizer.js"></script>
-  <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-  <link rel="modulepreload" href="{{ domain }}/build_fe/front-config.js" /><script type="module" src="{{ domain }}/build_fe/front-config.js"></script>
-<script type="module">
+  <!-- Core CSS (theme, layout) -->
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/core2.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/core-dark2.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/theme-default2.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/theme-default-dark2.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/demo.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/front-page.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/app.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/sweetalert2.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/toastr.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/core2.css" class="template-customizer-core-css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/core-dark2.css" class="template-customizer-core-css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/theme-default2.css" class="template-customizer-theme-css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/theme-default-dark2.css" class="template-customizer-theme-css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/demo.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/front-page.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/app.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/sweetalert2.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/toastr.css">
+
+  <!-- Vendor Styles -->
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/perfect-scrollbar.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/typeahead.css">
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/form-validation.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/perfect-scrollbar.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/typeahead.css">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/form-validation.css">
+
+  <!-- Template Customizer & Config JS (must in <head>) -->
+  <link rel="preload" as="style" href="{{ domain }}/build_fe/template-customizer.css">
+  <link rel="modulepreload" href="{{ domain }}/build_fe/template-customizer.js">
+  <link rel="stylesheet" href="{{ domain }}/build_fe/template-customizer.css">
+  <script type="module" src="{{ domain }}/build_fe/template-customizer.js"></script>
+
+  <link rel="modulepreload" href="{{ domain }}/build_fe/helpers.js">
+  <script type="module" src="{{ domain }}/build_fe/helpers.js"></script>
+  <link rel="modulepreload" href="{{ domain }}/build_fe/front-config.js">
+  <script type="module" src="{{ domain }}/build_fe/front-config.js"></script>
+
+  <!-- Khởi tạo theme customizer ngay trong head -->
+  <script type="module">
     window.templateCustomizer = new TemplateCustomizer({
       cssPath: '',
       themesPath: '',
@@ -75,30 +106,37 @@
       displayCustomizer: "1",
       pathResolver: function(path) {
         var resolvedPaths = {
-          // Core stylesheets
-                      'core.scss': '{{ domain }}/build_fe/core2.css',
-            'core-dark.scss': '{{ domain }}/build_fe/core-dark2.css',
-          
-          // Themes
-                      'theme-default.scss': '{{ domain }}/build_fe/theme-default2.css',
-            'theme-default-dark.scss': '{{ domain }}/build_fe/theme-default-dark2.css',
-                      'theme-bordered.scss': '{{ domain }}/build_fe/theme-bordered2.css',
-            'theme-bordered-dark.scss': '{{ domain }}/build_fe/theme-bordered-dark2.css',
-                      'theme-semi-dark.scss': '{{ domain }}/build_fe/theme-semi-dark2.css',
-            'theme-semi-dark-dark.scss': '{{ domain }}/build_fe/theme-semi-dark-dark2.css',
-                  }
+          'core.scss': '{{ domain }}/build_fe/core2.css',
+          'core-dark.scss': '{{ domain }}/build_fe/core-dark2.css',
+          'theme-default.scss': '{{ domain }}/build_fe/theme-default2.css',
+          'theme-default-dark.scss': '{{ domain }}/build_fe/theme-default-dark2.css',
+          'theme-bordered.scss': '{{ domain }}/build_fe/theme-bordered2.css',
+          'theme-bordered-dark.scss': '{{ domain }}/build_fe/theme-bordered-dark2.css',
+          'theme-semi-dark.scss': '{{ domain }}/build_fe/theme-semi-dark2.css',
+          'theme-semi-dark-dark.scss': '{{ domain }}/build_fe/theme-semi-dark-dark2.css'
+        }
         return resolvedPaths[path] || path;
       },
-      'controls': ["rtl","style"],
-
+      controls: ["rtl","style"]
     });
   </script>
-    <script src="{{ domain }}/build/js/jquery.min.js"></script>
- <script>
-   // Lấy style theme đã lưu, nếu chưa có thì trả về 'system' (hoặc 'light')
-   const mode = localStorage.getItem('templateCustomizer-vertical-menu-theme-default-light--Style') || 'system';
-   // Gán class cho <html> hoặc đổi data-style
-   document.documentElement.setAttribute('data-style', mode);
- </script>
+
+  <!-- jQuery (nếu cần) -->
+  <script src="{{ domain }}/build/js/jquery.min.js"></script>
+
+  <!-- Style fix để chuẩn Layout Navbar như UnlimitMail -->
+  <style type="text/css">
+    .layout-menu-fixed .layout-navbar-full .layout-menu,
+    .layout-menu-fixed-offcanvas .layout-navbar-full .layout-menu {
+      top: 90px !important;
+    }
+    .layout-page {
+      padding-top: 90px !important;
+    }
+    .content-wrapper {
+      padding-bottom: 0px !important;
+    }
+  </style>
 </head>
+
   <body class="bg-light">
