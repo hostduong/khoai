@@ -78,6 +78,14 @@ document.addEventListener("DOMContentLoaded", function() {
 <script type="module" src="{{ domain }}/build_fe/pages-auth.js"></script>
 {{ extra_scripts | safe }}
 <script src="{{ domain }}/build/js/main.js"></script>
+<script>
+        $(function () {
+           var search = window.location.search;
+              var params = new URLSearchParams(search);
+              var param = params.get('ref');
+                $('#ref').val(param);
+        });
+    </script>
 <script src="{{ domain }}/build/libs/datatables.net/js/jquery.dataTables.min.js"></script>
 <!-- END: Vendor JS-->
 
