@@ -12,8 +12,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
     <meta name="csrf-token" content="{{ csrf_token or '' }}">
 
-    <!-- Meta Tags SEO -->
     <title>{{ title }}</title>
+
+    <!-- Meta Tags SEO -->
+    <meta name="title" content="{{ title }}">
     <meta name="description" content="{{ description }}">
     <meta name="keywords" content="{{ keywords }}">
     <meta name="robots" content="index, follow">
