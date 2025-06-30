@@ -48,11 +48,14 @@
                     <a href="/forgot-password/"><p class="mb-0">Quên mật khẩu?</p></a>
                   </div>
                 </div>
-                <!-- Captcha Cloudflare -->
-                <div class="mb-3">
-                  <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
-                  <div id="error-captcha" class="invalid-feedback"></div>
-                </div>
+            <!-- Captcha Cloudflare (căn giữa) -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-center">
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
+              </div>
+              <div id="error-captcha" class="invalid-feedback"></div>
+            </div>
+
                 <button class="btn btn-primary d-grid w-100 waves-effect waves-light" type="submit" id="login-btn">
                   Đăng nhập
                 </button>
