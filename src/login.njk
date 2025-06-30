@@ -6,55 +6,65 @@
 {% include "head.njk" %}
 {% include "navbar.njk" %}
 
-<section class="authentication-wrapper bg-body">
-  <div class="authentication-inner">
-    <div class="card p-4 shadow-sm rounded-3">
-      <div class="card-body">
-        <h4 class="mb-1 text-center">Chào mừng đến với Gem.id.vn! 👋</h4>
-        <p class="mb-4 text-center">Vui lòng đăng nhập để tiếp tục.</p>
-        <form id="login-form" autocomplete="on" novalidate>
-          <div class="mb-3">
-            <label for="username" class="form-label">Email hoặc Tên đăng nhập</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="Nhập email hoặc username" autocomplete="username" required autofocus>
-            <div id="error-username" class="invalid-feedback"></div>
-          </div>
-          <div class="mb-3 form-password-toggle">
-            <label class="form-label" for="password">Mật khẩu</label>
-            <div class="input-group input-group-merge has-validation">
-              <input type="password" id="password" class="form-control" name="password" placeholder="••••••••" autocomplete="current-password" required>
-              <span class="input-group-text cursor-pointer" onclick="togglePassword('password', this)"><i class="ti ti-eye-off"></i></span>
+<section class="section-py bg-body landing-reviews pb-0">
+  <div class="container d-flex justify-content-center align-items-center pt-3 pb-4">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="mx-auto pt-4" style="max-width: 400px;">
+              <h4 class="mb-1 text-center">Chào mừng đến với Gem.id.vn! 👋</h4>
+              <p class="mb-6 text-center">Vui lòng đăng nhập để tiếp tục.</p>
+
+              <form id="login-form" class="mb-6 fv-plugins-bootstrap5 fv-plugins-framework" autocomplete="on" novalidate>
+                <div class="mb-6 fv-plugins-icon-container">
+                  <label for="username" class="form-label">Email hoặc Tên đăng nhập</label>
+                  <input type="text" class="form-control" id="username" name="username" placeholder="Nhập email hoặc username" autocomplete="username" required autofocus>
+                  <div id="error-username" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                </div>
+                <div class="mb-6 form-password-toggle fv-plugins-icon-container">
+                  <label class="form-label" for="password">Mật khẩu</label>
+                  <div class="input-group input-group-merge has-validation">
+                    <input type="password" id="password" class="form-control" name="password" placeholder="••••••••" autocomplete="current-password" required>
+                    <span class="input-group-text cursor-pointer" onclick="togglePassword('password', this)"><i class="ti ti-eye-off"></i></span>
+                  </div>
+                  <div id="error-password" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                </div>
+                <!-- Mã PIN: ẩn/hiện bằng JS khi cần -->
+                <div class="mb-6 fv-plugins-icon-container d-none" id="pin-group">
+                  <label class="form-label" for="pin">Mã PIN (nếu có)</label>
+                  <div class="input-group input-group-merge has-validation">
+                    <input type="password" class="form-control" id="pin" name="pin" maxlength="6" placeholder="Nhập mã PIN 6 số" autocomplete="one-time-code">
+                    <span class="input-group-text cursor-pointer" onclick="togglePassword('pin', this)"><i class="ti ti-eye-off"></i></span>
+                  </div>
+                  <div id="error-pin" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                </div>
+                <div class="my-8">
+                  <div class="d-flex justify-content-between">
+                    <div class="form-check mb-0 ms-2">
+                      <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
+                      <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                    </div>
+                    <a href="/forgot-password/"><p class="mb-0">Quên mật khẩu?</p></a>
+                  </div>
+                </div>
+                <!-- Captcha Cloudflare -->
+                <div class="mb-3">
+                  <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
+                  <div id="error-captcha" class="invalid-feedback"></div>
+                </div>
+                <button class="btn btn-primary d-grid w-100 waves-effect waves-light" type="submit" id="login-btn">
+                  Đăng nhập
+                </button>
+              </form>
+
+              <p class="text-center mt-4 mb-0">
+                <span>Bạn chưa có tài khoản?</span>
+                <a href="/register/"><span>Đăng ký ngay</span></a>
+              </p>
             </div>
-            <div id="error-password" class="invalid-feedback"></div>
           </div>
-          <!-- PIN (ẩn khi chưa cần) -->
-          <div class="mb-3 d-none" id="pin-group">
-            <label class="form-label" for="pin">Mã PIN (nếu có)</label>
-            <div class="input-group input-group-merge has-validation">
-              <input type="password" class="form-control" id="pin" name="pin" maxlength="6" placeholder="Nhập mã PIN 6 số" autocomplete="one-time-code">
-              <span class="input-group-text cursor-pointer" onclick="togglePassword('pin', this)"><i class="ti ti-eye-off"></i></span>
-            </div>
-            <div id="error-pin" class="invalid-feedback"></div>
-          </div>
-          <div class="mb-3 d-flex justify-content-between align-items-center">
-            <div class="form-check mb-0">
-              <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
-              <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
-            </div>
-            <a href="/forgot-password/" class="small">Quên mật khẩu?</a>
-          </div>
-          <!-- Captcha (thêm chi tiết này nếu bạn muốn) -->
-          <div class="mb-3">
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAABiYUvkjZoEsX0vR" id="captcha-login"></div>
-            <div id="error-captcha" class="invalid-feedback"></div>
-          </div>
-          <button class="btn btn-primary d-grid w-100 waves-effect waves-light" type="submit" id="login-btn">
-            Đăng nhập
-          </button>
-        </form>
-        <p class="text-center mt-4 mb-0">
-          <span>Bạn chưa có tài khoản?</span>
-          <a href="/register/"><span>Đăng ký ngay</span></a>
-        </p>
+        </div>
       </div>
     </div>
   </div>
@@ -75,6 +85,7 @@ function togglePassword(inputId, el) {
   }
 }
 </script>
+
 <script src="{{ domain }}/js/login.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 {% include "footer.njk" %}
