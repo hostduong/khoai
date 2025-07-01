@@ -61,6 +61,7 @@
   <link rel="stylesheet" href="{{ domain }}/build_fe/node-waves.css">
 
   <!-- Core CSS (theme, layout) -->
+  {{ scripts_head | safe }}
   <link rel="preload" as="style" href="{{ domain }}/build_fe/core2.css">
   <link rel="preload" as="style" href="{{ domain }}/build_fe/core-dark2.css">
   <link rel="preload" as="style" href="{{ domain }}/build_fe/theme-default2.css">
@@ -101,7 +102,6 @@
 
   <!-- jQuery -->
   <script src="{{ domain }}/build/js/jquery.min.js"></script>
-  {{ scripts_head | safe }}
 
   <!-- Khởi tạo theme customize -->
   <script type="module">
