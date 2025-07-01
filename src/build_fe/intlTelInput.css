@@ -1,6 +1,8 @@
 .iti {
   position: relative;
-  display: inline-block; }
+  display: inline-block;
+  width: 100% !important;}
+.iti input[type="tel"].form-control { width: 100% !important; min-width: 0 !important; }
   .iti * {
     box-sizing: border-box;
     -moz-box-sizing: border-box; }
