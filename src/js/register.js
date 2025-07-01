@@ -200,7 +200,7 @@ const phoneInput = window.intlTelInput(input, {
   },
   nationalMode: false,
   formatOnDisplay: true,
-  utilsScript: "{{ domain }}/js/utils.js"
+  utilsScript: window.location.origin + "/js/utils.js"
 });
 
 window.phoneInput = phoneInput;
