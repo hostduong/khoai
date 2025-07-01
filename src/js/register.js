@@ -202,21 +202,21 @@ const phoneInput = window.intlTelInput(input, {
 
 window.phoneInput = phoneInput;
 
-// Sau khi geoIpLookup hoàn thành, nếu input rỗng thì điền luôn mã vùng
+// Sự kiện khi thay đổi quốc gia (bao gồm lần đầu khi auto detect)
 input.addEventListener('countrychange', function () {
   if (!input.value) {
     const dialCode = phoneInput.getSelectedCountryData().dialCode;
     if (dialCode) input.value = '+' + dialCode + ' ';
   }
 });
-// Khi khởi tạo, cũng gọi như trên nếu cần:
-phoneInput.promise.then(() => {
+
+// Nếu muốn chắc chắn auto set + mã vùng ngay từ đầu (trường hợp geoIpLookup trả về chậm):
+setTimeout(() => {
   if (!input.value) {
     const dialCode = phoneInput.getSelectedCountryData().dialCode;
     if (dialCode) input.value = '+' + dialCode + ' ';
   }
-});
-
+}, 500); // 500ms, có thể điều chỉnh nếu cần
 
 input.addEventListener("input", validatePhoneField);
 input.addEventListener("blur", validatePhoneField);
