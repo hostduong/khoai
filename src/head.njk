@@ -61,7 +61,6 @@
   <link rel="stylesheet" href="{{ domain }}/build_fe/node-waves.css">
 
   <!-- Core CSS (theme, layout) -->
-  {{ scripts_head | safe }}
   <link rel="preload" as="style" href="{{ domain }}/build_fe/core2.css">
   <link rel="preload" as="style" href="{{ domain }}/build_fe/core-dark2.css">
   <link rel="preload" as="style" href="{{ domain }}/build_fe/theme-default2.css">
@@ -94,6 +93,7 @@
   <link rel="modulepreload" href="{{ domain }}/build_fe/template-customizer.js">
   <link rel="stylesheet" href="{{ domain }}/build_fe/template-customizer.css">
   <script type="module" src="{{ domain }}/build_fe/template-customizer.js"></script>
+  {{ scripts_head | safe }}
 
   <link rel="modulepreload" href="{{ domain }}/build_fe/helpers.js">
   <script type="module" src="{{ domain }}/build_fe/helpers.js"></script>
