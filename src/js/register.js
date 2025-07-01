@@ -4,6 +4,9 @@ const touched = {};
 fields.forEach(f => touched[f] = false);
 
 // Hàm validate các trường
+function validateUsername(val) {
+  return /^[a-z0-9_.]{6,30}$/.test(val);
+}
 function validateEmail(val) {
   return val.length <= 500 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
 }
