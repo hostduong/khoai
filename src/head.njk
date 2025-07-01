@@ -122,11 +122,13 @@
       controls: ["rtl","style"]
     });
   </script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css" />
-  <!-- jQuery (nếu cần) -->
+
+  <!-- jQuery -->
   <script src="{{ domain }}/build/js/jquery.min.js"></script>
 
-  <!-- Style fix để chuẩn Layout Navbar như UnlimitMail -->
+  {{ scripts_head | safe }}
+
+  <!-- Style fix -->
   <style type="text/css">
     .layout-menu-fixed .layout-navbar-full .layout-menu,
     .layout-menu-fixed-offcanvas .layout-navbar-full .layout-menu {
