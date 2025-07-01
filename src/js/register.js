@@ -200,57 +200,60 @@ const phoneInput = window.intlTelInput(input, {
   },
   nationalMode: false,
   formatOnDisplay: true,
-  utilsScript: "/js/utils.js"
+  utilsScript: "{{ domain }}/js/utils.js"
 });
 
 window.phoneInput = phoneInput;
 
-// Sự kiện khi thay đổi quốc gia (bao gồm lần đầu khi auto detect)
+// Lấy mã vùng hiện tại (có dấu +)
 function getDialCode() {
-  return phoneInput.getSelectedCountryData().dialCode;
+  return "+" + phoneInput.getSelectedCountryData().dialCode;
 }
 
+// Luôn đảm bảo input bắt đầu bằng mã vùng, không thể xóa
 input.addEventListener('input', function () {
-  let dialCode = '+' + getDialCode();
+  let dialCode = getDialCode();
   let value = input.value;
 
-  // Nếu không bắt đầu bằng mã vùng, tự động thêm lại mã vùng
+  // Nếu không bắt đầu bằng mã vùng, auto thêm lại
   if (!value.startsWith(dialCode)) {
-    // Xóa hết dấu +, số ở đầu nếu bị gõ/copy lung tung
+    // Xóa hết ký tự + hoặc số ở đầu
     value = value.replace(/^\+?\d{1,}/, '');
-    // Thêm lại mã vùng
     value = dialCode + (value.startsWith(' ') ? '' : ' ') + value.replace(/[^0-9 ]/g, '');
   } else {
-    // Sau mã vùng chỉ cho số và khoảng trắng
+    // Sau mã vùng chỉ cho phép số và khoảng trắng
     let numberPart = value.slice(dialCode.length).replace(/[^0-9 ]/g, '');
     value = dialCode + numberPart;
   }
-
   if (input.value !== value) input.value = value;
   validatePhoneField();
 });
 
+// Khi chọn quốc gia khác
 input.addEventListener('countrychange', function () {
-  let dialCode = '+' + getDialCode();
+  let dialCode = getDialCode();
   if (!input.value.startsWith(dialCode)) {
     input.value = dialCode + ' ';
   }
   validatePhoneField();
 });
 
+// Khi blur nếu trống hoặc thiếu mã vùng thì tự điền lại
 input.addEventListener('blur', function () {
-  let dialCode = '+' + getDialCode();
+  let dialCode = getDialCode();
   if (!input.value || !input.value.startsWith(dialCode)) {
     input.value = dialCode + ' ';
   }
   validatePhoneField();
 });
 
-
+// Hàm validate chuẩn nhất
 function validatePhoneField() {
   const hidden = document.querySelector("#phone_e164");
-  const value = input.value;
+  let value = input.value;
+  let dialCode = getDialCode();
 
+  // Không cho phép ký tự lạ
   if (/[^0-9+ ]/.test(value)) {
     input.classList.add("is-invalid");
     input.closest(".iti")?.classList.add("is-invalid");
@@ -259,31 +262,30 @@ function validatePhoneField() {
     return;
   }
 
-// Loại bỏ dấu + và khoảng trắng để kiểm tra phần số điện thoại đã nhập sau mã vùng
-const value = input.value.replace(/[+\s]/g, '');
-// Lấy đúng mã vùng hiện tại
-const dialCode = phoneInput.getSelectedCountryData().dialCode;
-// Chỉ báo lỗi nếu user đã nhập ít nhất 1 số sau mã vùng
-if (value.length > dialCode.length) {
-  if (phoneInput.isValidNumber()) {
-    // hợp lệ
+  // Loại bỏ dấu + và khoảng trắng, kiểm tra phần số điện thoại đã nhập sau mã vùng
+  let justNumber = value.replace(/[+\s]/g, "");
+  let regionCode = dialCode.replace(/[+\s]/g, "");
+  let numberLength = justNumber.length - regionCode.length;
+
+  // Chỉ báo lỗi nếu user đã nhập ít nhất 1 số sau mã vùng
+  if (numberLength > 0) {
+    if (phoneInput.isValidNumber()) {
+      input.classList.remove("is-invalid");
+      input.closest(".iti")?.classList.remove("is-invalid");
+      document.getElementById("error-phone").textContent = "";
+      if (hidden) hidden.value = phoneInput.getNumber();
+    } else {
+      input.classList.add("is-invalid");
+      input.closest(".iti")?.classList.add("is-invalid");
+      document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
+      if (hidden) hidden.value = "";
+    }
+  } else {
+    // Chưa nhập số nào: không hiện lỗi
     input.classList.remove("is-invalid");
     input.closest(".iti")?.classList.remove("is-invalid");
     document.getElementById("error-phone").textContent = "";
-    if (hidden) hidden.value = phoneInput.getNumber();
-  } else {
-    // không hợp lệ
-    input.classList.add("is-invalid");
-    input.closest(".iti")?.classList.add("is-invalid");
-    document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
     if (hidden) hidden.value = "";
   }
-} else {
-  // Chưa nhập số nào: không hiện lỗi
-  input.classList.remove("is-invalid");
-  input.closest(".iti")?.classList.remove("is-invalid");
-  document.getElementById("error-phone").textContent = "";
-  if (hidden) hidden.value = "";
 }
-
 
