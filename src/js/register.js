@@ -29,19 +29,20 @@ function showError(field) {
 
   if (input.value) {
     if (field === "username" && !/^[a-z0-9_.]{6,30}$/.test(input.value)) {
-     error = "Tên đăng nhập chỉ dùng chữ thường, số, _ hoặc . từ 6–30 ký tự";
-    }
-    if (field === "confirm_password") {
-      const pw = document.getElementById("password").value;
-      if (input.value !== pw) error = "Mật khẩu nhập lại không khớp!";
+      error = "Tên đăng nhập chỉ dùng chữ thường, số, _ hoặc . từ 6–30 ký tự";
+    } else if (field === "fullname" && !validateName(input.value)) {
+      error = "Họ tên không hợp lệ.";
     } else if (field === "email" && !validateEmail(input.value)) {
       error = "Email không hợp lệ.";
     } else if (field === "password" && !validatePassword(input.value)) {
       error = "Mật khẩu không hợp lệ.";
+    } else if (field === "confirm_password") {
+      const pw = document.getElementById("password").value;
+      if (input.value !== pw) {
+        error = "Mật khẩu nhập lại không khớp!";
+      }
     } else if (field === "phone" && !validatePhone(input.value)) {
       error = "Số điện thoại không hợp lệ.";
-    } else if (field === "fullname" && !validateName(input.value)) {
-      error = "Họ tên không hợp lệ.";
     } else if (field === "pin" && !validatePin(input.value)) {
       error = "PIN phải đúng 8 số.";
     } else if (!input.checkValidity()) {
@@ -57,6 +58,7 @@ function showError(field) {
     feedback.textContent = "";
   }
 }
+
 
 // Cập nhật nút đăng ký
 function updateRegisterBtn() {
