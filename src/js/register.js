@@ -196,20 +196,24 @@ document.getElementById("email").addEventListener("input", function(e) {
 });
 
 
-import { parsePhoneNumberFromString } from 'https://cdn.skypack.dev/libphonenumber-js';
+const input = document.querySelector("#phone");
+const phoneInput = window.intlTelInput(input, {
+  initialCountry: "vn",
+  nationalMode: false,
+  utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+});
 
-// gắn vào window để dùng ở khắp nơi
-window.formatInternationalPhone = function (rawInput) {
-  let raw = rawInput.trim().replace(/\s+/g, '');
-  if (!raw.startsWith('+')) {
-    if (raw.startsWith('0')) raw = raw.slice(1);
-    raw = '+84' + raw;
+// Cập nhật hidden field mỗi khi thay đổi
+input.addEventListener("blur", function () {
+  const hidden = document.querySelector("#phone_e164");
+  if (phoneInput.isValidNumber()) {
+    hidden.value = phoneInput.getNumber(); // dạng +84977...
+    input.classList.remove("is-invalid");
+    document.getElementById("error-phone").textContent = "";
+  } else {
+    hidden.value = "";
+    input.classList.add("is-invalid");
+    document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
   }
-  const phone = parsePhoneNumberFromString(raw);
-  if (!phone || !phone.isValid()) return null;
-  return {
-    formatted: `+${phone.countryCallingCode} ${phone.nationalNumber} (${phone.country})`,
-    e164: phone.number,
-    country: phone.country
-  };
-};
+});
+
