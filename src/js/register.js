@@ -15,9 +15,21 @@ function validatePassword(val) {
   return val.length >= 8 && val.length <= 30 && /^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) && !/[\'\"<>\s]/.test(val);
 }
 function validatePhone(val) {
-  // 8-15 số, chỉ số
-  return /^[0-9]{8,15}$/.test(val);
+  const cleaned = val.trim().replace(/\s+/g, '');
+  // Nếu không có dấu "+" → kiểm tra dạng số đơn giản (8–15 số)
+  if (!cleaned.startsWith('+')) {
+    return /^[0-9]{8,15}$/.test(cleaned);
+  }
+
+  // Nếu có dấu "+" → dùng libphonenumber-js để kiểm tra
+  try {
+    const phone = window.formatInternationalPhone(val);
+    return phone !== null;
+  } catch (e) {
+    return false;
+  }
 }
+
 function validateName(val) {
   // 6-50 ký tự, không số, không ký tự đặc biệt
   return val.length >= 6 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]+$/.test(val);
