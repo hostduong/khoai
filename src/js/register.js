@@ -18,9 +18,22 @@ function validateName(val) {
   // 6-50 ký tự, không số, không ký tự đặc biệt
   return val.length >= 6 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]+$/.test(val);
 }
+
 function validatePin(val) {
   return /^[0-9]{8}$/.test(val);
 }
+const pinInput = document.getElementById('pin');
+pinInput.addEventListener('input', function () {
+  // Chỉ giữ lại các số 0-9 (loại bỏ ký tự khác kể cả khi paste)
+  let value = pinInput.value.replace(/[^0-9]/g, '');
+  // Chỉ tối đa 8 số
+  if (value.length > 8) value = value.slice(0, 8);
+  if (pinInput.value !== value) pinInput.value = value;
+});
+
+
+
+
 function validatePhone(val) {
   const input = document.querySelector("#phone");
   if (!window.phoneInput) return false;
@@ -188,7 +201,7 @@ document.getElementById("email").addEventListener("input", function(e) {
 
 
 
-// Xử lý số điện thoại theo quốc gia
+// ✅ Xử lý số điện thoại theo quốc gia
 const input = document.querySelector("#phone");
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
@@ -289,3 +302,4 @@ function validatePhoneField() {
   }
 }
 
+// Kêt thúc
