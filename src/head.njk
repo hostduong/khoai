@@ -99,7 +99,11 @@
   <link rel="modulepreload" href="{{ domain }}/build_fe/front-config.js">
   <script type="module" src="{{ domain }}/build_fe/front-config.js"></script>
 
-  <!-- Khởi tạo theme customizer ngay trong head -->
+  <!-- jQuery -->
+  <script src="{{ domain }}/build/js/jquery.min.js"></script>
+  {{ scripts_head | safe }}
+
+  <!-- Khởi tạo theme customize -->
   <script type="module">
     window.templateCustomizer = new TemplateCustomizer({
       cssPath: '',
@@ -122,11 +126,6 @@
       controls: ["rtl","style"]
     });
   </script>
-
-  <!-- jQuery -->
-  <script src="{{ domain }}/build/js/jquery.min.js"></script>
-
-  {{ scripts_head | safe }}
 
   <!-- Style fix -->
   <style type="text/css">
