@@ -230,6 +230,16 @@ input.addEventListener('blur', function () {
 
 function validatePhoneField() {
   const hidden = document.querySelector("#phone_e164");
+  const value = input.value;
+
+  if (/[^0-9+ ]/.test(value)) {
+    input.classList.add("is-invalid");
+    input.closest(".iti")?.classList.add("is-invalid");
+    document.getElementById("error-phone").textContent = "Số điện thoại chỉ được chứa số và dấu +.";
+    if (hidden) hidden.value = "";
+    return;
+  }
+
   if (phoneInput.isValidNumber()) {
     const e164 = phoneInput.getNumber();
     if (hidden) hidden.value = e164;
@@ -243,3 +253,4 @@ function validatePhoneField() {
     document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
   }
 }
+
