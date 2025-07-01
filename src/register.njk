@@ -22,11 +22,12 @@
                 <div class="mb-6">
                   <label for="username" class="form-label">Tên đăng nhập</label>
                   <input type="text" class="form-control" id="username" name="username"
-                         minlength="6" maxlength="30" pattern="^[a-z0-9_.]{6,30}$"
+                         minlength="6" maxlength="30"
                          placeholder="Tên đăng nhập" required>
                   <div class="invalid-feedback" id="error-username"></div>
                 </div>
                 <!-- Email -->
+
                 <div class="mb-6">
                   <label for="email" class="form-label">Email</label>
                   <input type="email" class="form-control" id="email" name="email"
@@ -37,16 +38,18 @@
                 <div class="mb-6">
                   <label for="fullname" class="form-label">Họ và tên</label>
                   <input type="text" class="form-control" id="fullname" name="fullname"
-                         minlength="6" maxlength="50" placeholder="Họ và tên" required>
+                         minlength="6" maxlength="50"
+                         placeholder="Họ và tên" required>
                   <div class="invalid-feedback" id="error-fullname"></div>
                 </div>
+
                 <!-- Mật khẩu -->
                 <div class="mb-6 form-password-toggle fv-plugins-icon-container">
                   <label class="form-label" for="password">Mật khẩu</label>
                   <div class="input-group input-group-merge has-validation">
                     <input type="password" id="password" class="form-control" name="password"
-                           minlength="8" maxlength="30"
                            pattern="^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$"
+                           minlength="6" maxlength="30"
                            placeholder="Nhập mật khẩu" required>
                     <span class="input-group-text cursor-pointer">
                       <i class="ti ti-eye-off"></i>
@@ -54,6 +57,7 @@
                   </div>
                   <div class="invalid-feedback" id="error-password"></div>
                 </div>
+
                 <!-- Nhập lại mật khẩu -->
                 <div class="mb-6 form-password-toggle fv-plugins-icon-container">
                   <label class="form-label" for="confirm_password">Nhập lại mật khẩu</label>
@@ -67,13 +71,16 @@
                   </div>
                   <div class="invalid-feedback" id="error-confirm-password"></div>
                 </div>
+
                 <!-- Số điện thoại -->
                 <div class="mb-6">
                   <label for="phone" class="form-label">Số điện thoại</label>
                   <input type="tel" class="form-control" id="phone" name="phone"
-                         pattern="^[0-9]{10,15}$" placeholder="Số điện thoại" required>
+                         pattern="^[0-9]{8,15}$" minlength="8" maxlength="15"
+                         placeholder="Số điện thoại" required>
                   <div class="invalid-feedback" id="error-phone"></div>
                 </div>
+
                 <!-- PIN (8 số) -->
                 <div class="mb-6 form-password-toggle fv-plugins-icon-container">
                   <label class="form-label" for="pin">Mã PIN (8 số)</label>
