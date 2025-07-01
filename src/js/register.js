@@ -187,7 +187,6 @@ document.getElementById("email").addEventListener("input", function(e) {
 
 
 const input = document.querySelector("#phone");
-
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
   geoIpLookup: function (callback) {
@@ -200,6 +199,24 @@ const phoneInput = window.intlTelInput(input, {
   formatOnDisplay: true,
   utilsScript: "{{ domain }}/js/utils.js"
 });
+
+window.phoneInput = phoneInput;
+
+// Sau khi geoIpLookup hoàn thành, nếu input rỗng thì điền luôn mã vùng
+input.addEventListener('countrychange', function () {
+  if (!input.value) {
+    const dialCode = phoneInput.getSelectedCountryData().dialCode;
+    if (dialCode) input.value = '+' + dialCode + ' ';
+  }
+});
+// Khi khởi tạo, cũng gọi như trên nếu cần:
+phoneInput.promise.then(() => {
+  if (!input.value) {
+    const dialCode = phoneInput.getSelectedCountryData().dialCode;
+    if (dialCode) input.value = '+' + dialCode + ' ';
+  }
+});
+
 
 input.addEventListener("input", validatePhoneField);
 input.addEventListener("blur", validatePhoneField);
