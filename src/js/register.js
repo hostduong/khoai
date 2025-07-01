@@ -219,7 +219,14 @@ setTimeout(() => {
 }, 500); // 500ms, có thể điều chỉnh nếu cần
 
 input.addEventListener("input", validatePhoneField);
-input.addEventListener("blur", validatePhoneField);
+input.addEventListener('blur', function () {
+  if (!input.value.trim()) {
+    // Lấy mã vùng hiện tại
+    const dialCode = phoneInput.getSelectedCountryData().dialCode;
+    if (dialCode) input.value = '+' + dialCode + ' ';
+  }
+});
+
 
 function validatePhoneField() {
   const hidden = document.querySelector("#phone_e164");
