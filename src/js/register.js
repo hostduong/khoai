@@ -28,6 +28,9 @@ function showError(field) {
   let error = "";
 
   if (input.value) {
+    if (field === "username" && !/^[a-z0-9_.]{6,30}$/.test(input.value)) {
+     error = "Tên đăng nhập chỉ dùng chữ thường, số, _ hoặc . từ 6–30 ký tự";
+    }
     if (field === "confirm_password") {
       const pw = document.getElementById("password").value;
       if (input.value !== pw) error = "Mật khẩu nhập lại không khớp!";
