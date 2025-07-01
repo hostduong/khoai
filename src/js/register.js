@@ -50,11 +50,11 @@ function showError(field) {
 
   if (input.value) {
     if (field === "username" && !validateUsername(input.value)) {
-      error = "Tên đăng nhập chỉ dùng chữ thường, số, _ hoặc . từ 6–30 ký tự";
+      error = "Tên đăng nhập 6–30 ký tự, a-z, 0-9, _ hoặc . ";
     } else if (field === "email" && !validateEmail(input.value)) {
       error = "Email không hợp lệ.";
     } else if (field === "password" && !validatePassword(input.value)) {
-      error = "Mật khẩu 8–30 ký tự, không khoảng trắng, không ký tự đặc biệt ngoài ~!@#$%^&*()_+.";
+      error = "Mật khẩu 8–30 ký tự, a-z, 0-9, ~!@#$%^&*()_+.";
     } else if (field === "confirm_password") {
       const pw = document.getElementById("password").value;
       if (input.value !== pw) error = "Mật khẩu nhập lại không khớp!";
