@@ -69,6 +69,7 @@ function updateRegisterBtn() {
   for (let field of fields) {
     const input = document.getElementById(field);
     if (!input.value) valid = false;
+    else if (field === "username" && !validateUsername(input.value)) valid = false;
     else if (field === "confirm_password") {
       const pw = document.getElementById("password").value;
       if (input.value !== pw) valid = false;
@@ -83,6 +84,7 @@ function updateRegisterBtn() {
   if (!window.captchaOk) valid = false;
   document.getElementById('register-btn').disabled = !valid;
 }
+
 
 fields.forEach(field => {
   const input = document.getElementById(field);
