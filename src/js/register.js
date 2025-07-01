@@ -203,43 +203,44 @@ const phoneInput = window.intlTelInput(input, {
 window.phoneInput = phoneInput;
 
 // Sự kiện khi thay đổi quốc gia (bao gồm lần đầu khi auto detect)
-input.addEventListener('countrychange', function () {
-  if (!input.value) {
-    const dialCode = phoneInput.getSelectedCountryData().dialCode;
-    if (dialCode) input.value = '+' + dialCode + ' ';
-  }
-});
-
-// Nếu muốn chắc chắn auto set + mã vùng ngay từ đầu (trường hợp geoIpLookup trả về chậm):
-setTimeout(() => {
-  if (!input.value) {
-    const dialCode = phoneInput.getSelectedCountryData().dialCode;
-    if (dialCode) input.value = '+' + dialCode + ' ';
-  }
-}, 500); // 500ms, có thể điều chỉnh nếu cần
+function getDialCode() {
+  return phoneInput.getSelectedCountryData().dialCode;
+}
 
 input.addEventListener('input', function () {
-  // Xử lý để chỉ cho phép 1 dấu + duy nhất ở đầu, sau đó chỉ số và khoảng trắng
-  let v = input.value;
-  // Loại bỏ mọi dấu + không ở đầu (dù copy-paste hay gõ)
-  v = v.replace(/(?!^)\+/g, '');
-  // Nếu có nhiều dấu + ở đầu thì chỉ giữ 1
-  if (v.startsWith('++')) v = '+' + v.replace(/\+/g, '');
-  // Không cho phép dấu + xuất hiện ở bất kỳ vị trí nào ngoài đầu
-  if (v.indexOf('+') > 0) v = v.replace(/\+/g, '');
-  // Chỉ cho phép + đầu tiên (nếu có), còn lại chỉ số và khoảng trắng
-  v = v.replace(/[^+\d ]/g, '');
-  // Đặt lại giá trị nếu đã bị thay đổi
-  if (input.value !== v) input.value = v;
+  let dialCode = '+' + getDialCode();
+  let value = input.value;
+
+  // Nếu không bắt đầu bằng mã vùng, tự động thêm lại mã vùng
+  if (!value.startsWith(dialCode)) {
+    // Xóa hết dấu +, số ở đầu nếu bị gõ/copy lung tung
+    value = value.replace(/^\+?\d{1,}/, '');
+    // Thêm lại mã vùng
+    value = dialCode + (value.startsWith(' ') ? '' : ' ') + value.replace(/[^0-9 ]/g, '');
+  } else {
+    // Sau mã vùng chỉ cho số và khoảng trắng
+    let numberPart = value.slice(dialCode.length).replace(/[^0-9 ]/g, '');
+    value = dialCode + numberPart;
+  }
+
+  if (input.value !== value) input.value = value;
+  validatePhoneField();
+});
+
+input.addEventListener('countrychange', function () {
+  let dialCode = '+' + getDialCode();
+  if (!input.value.startsWith(dialCode)) {
+    input.value = dialCode + ' ';
+  }
   validatePhoneField();
 });
 
 input.addEventListener('blur', function () {
-  if (!input.value.trim()) {
-    // Lấy mã vùng hiện tại
-    const dialCode = phoneInput.getSelectedCountryData().dialCode;
-    if (dialCode) input.value = '+' + dialCode + ' ';
+  let dialCode = '+' + getDialCode();
+  if (!input.value || !input.value.startsWith(dialCode)) {
+    input.value = dialCode + ' ';
   }
+  validatePhoneField();
 });
 
 
