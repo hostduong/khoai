@@ -219,14 +219,16 @@ setTimeout(() => {
 }, 500); // 500ms, có thể điều chỉnh nếu cần
 
 input.addEventListener('input', function () {
-  // Chỉ cho phép nhập số, dấu + và khoảng trắng
-  let newValue = input.value.replace(/[^0-9+ ]/g, '');
-  if (input.value !== newValue) {
-    input.value = newValue;
-  }
+  // Giữ lại duy nhất dấu + ở đầu, sau là số và khoảng trắng
+  let v = input.value;
+  v = v.replace(/[^+\d ]/g, '');        // Loại ký tự lạ
+  v = v.replace(/\++/g, '+');           // Gộp nhiều dấu + liên tiếp thành 1
+  if (!v.startsWith('+')) v = v.replace(/\+/g, ''); // Loại + không ở đầu
+  if (v.indexOf('+') > 0) v = v.replace(/\+/g, ''); // Chỉ giữ + ở đầu
+  if (input.value !== v) input.value = v;
+
   validatePhoneField();
 });
-
 input.addEventListener('blur', function () {
   if (!input.value.trim()) {
     // Lấy mã vùng hiện tại
