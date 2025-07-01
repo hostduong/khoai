@@ -186,6 +186,8 @@ document.getElementById("email").addEventListener("input", function(e) {
 });
 
 
+const input = document.querySelector("#phone");
+
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
   geoIpLookup: function (callback) {
@@ -199,8 +201,6 @@ const phoneInput = window.intlTelInput(input, {
   utilsScript: "{{ domain }}/js/utils.js"
 });
 
-
-// Cập nhật hidden field mỗi khi thay đổi
 input.addEventListener("input", validatePhoneField);
 input.addEventListener("blur", validatePhoneField);
 
@@ -219,6 +219,3 @@ function validatePhoneField() {
     document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
   }
 }
-
-
-
