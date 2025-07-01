@@ -186,6 +186,9 @@ document.getElementById("email").addEventListener("input", function(e) {
 });
 
 
+
+
+// Xử lý số điện thoại theo quốc gia
 const input = document.querySelector("#phone");
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
@@ -197,7 +200,7 @@ const phoneInput = window.intlTelInput(input, {
   },
   nationalMode: false,
   formatOnDisplay: true,
-  utilsScript: "{{ domain }}/js/utils.js"
+  utilsScript: "/js/utils.js"
 });
 
 window.phoneInput = phoneInput;
