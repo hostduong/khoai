@@ -184,3 +184,20 @@ document.getElementById("email").addEventListener("input", function(e) {
 });
 
 
+import { parsePhoneNumberFromString } from 'https://cdn.skypack.dev/libphonenumber-js';
+
+// gắn vào window để dùng ở khắp nơi
+window.formatInternationalPhone = function (rawInput) {
+  let raw = rawInput.trim().replace(/\s+/g, '');
+  if (!raw.startsWith('+')) {
+    if (raw.startsWith('0')) raw = raw.slice(1);
+    raw = '+84' + raw;
+  }
+  const phone = parsePhoneNumberFromString(raw);
+  if (!phone || !phone.isValid()) return null;
+  return {
+    formatted: `+${phone.countryCallingCode} ${phone.nationalNumber} (${phone.country})`,
+    e164: phone.number,
+    country: phone.country
+  };
+};
