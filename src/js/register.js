@@ -187,23 +187,32 @@ document.getElementById("email").addEventListener("input", function(e) {
 
 
 const input = document.querySelector("#phone");
+
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "vn",
   nationalMode: false,
+  formatOnDisplay: true, // ✅ Hiển thị +84 977 297 179
   utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
 });
+
+window.phoneInput = phoneInput; // ✅ Đảm bảo biến toàn cục
 
 // Cập nhật hidden field mỗi khi thay đổi
 input.addEventListener("blur", function () {
   const hidden = document.querySelector("#phone_e164");
+
   if (phoneInput.isValidNumber()) {
-    hidden.value = phoneInput.getNumber(); // dạng +84977...
+    const e164 = phoneInput.getNumber(); // dạng +84977...
+    if (hidden) hidden.value = e164;
     input.classList.remove("is-invalid");
+    input.closest(".iti")?.classList.remove("is-invalid"); // ✅ Nếu có class .iti cha
     document.getElementById("error-phone").textContent = "";
   } else {
-    hidden.value = "";
+    if (hidden) hidden.value = "";
     input.classList.add("is-invalid");
+    input.closest(".iti")?.classList.add("is-invalid"); // ✅ Hiển thị lỗi viền
     document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
   }
 });
+
 
