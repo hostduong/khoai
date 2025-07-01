@@ -3,8 +3,6 @@
 {% set keywords = "Gem.id.vn, đăng ký email, hệ thống email tự động, MMO" %}
 {% set page_url = domain ~ '/register/' %}
 {% set og_image = domain ~ '/img/logo.png' %}
-{% include "head.njk" %}
-{% include "navbar.njk" %}
 {% set scripts_head = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">' %}
 {% set scripts_footer = '
 <script type="module" src="' ~ domain ~ '/build_fe/pages-register.js"></script>
@@ -13,7 +11,8 @@
 <script src="' ~ domain ~ '/js/register.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 ' %}
-
+{% include "head.njk" %}
+{% include "navbar.njk" %}
 
 <section class="section-py bg-body landing-reviews pb-0">
   <div class="container d-flex justify-content-center align-items-center p-3">
