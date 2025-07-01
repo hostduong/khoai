@@ -256,17 +256,31 @@ function validatePhoneField() {
     return;
   }
 
+// Loại bỏ dấu + và khoảng trắng để kiểm tra phần số điện thoại đã nhập sau mã vùng
+const value = input.value.replace(/[+\s]/g, '');
+// Lấy đúng mã vùng hiện tại
+const dialCode = phoneInput.getSelectedCountryData().dialCode;
+// Chỉ báo lỗi nếu user đã nhập ít nhất 1 số sau mã vùng
+if (value.length > dialCode.length) {
   if (phoneInput.isValidNumber()) {
-    const e164 = phoneInput.getNumber();
-    if (hidden) hidden.value = e164;
+    // hợp lệ
     input.classList.remove("is-invalid");
     input.closest(".iti")?.classList.remove("is-invalid");
     document.getElementById("error-phone").textContent = "";
+    if (hidden) hidden.value = phoneInput.getNumber();
   } else {
-    if (hidden) hidden.value = "";
+    // không hợp lệ
     input.classList.add("is-invalid");
     input.closest(".iti")?.classList.add("is-invalid");
     document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
+    if (hidden) hidden.value = "";
   }
+} else {
+  // Chưa nhập số nào: không hiện lỗi
+  input.classList.remove("is-invalid");
+  input.closest(".iti")?.classList.remove("is-invalid");
+  document.getElementById("error-phone").textContent = "";
+  if (hidden) hidden.value = "";
 }
+
 
