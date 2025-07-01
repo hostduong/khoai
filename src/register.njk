@@ -5,7 +5,12 @@
 {% set og_image = domain ~ '/img/logo.png' %}
 {% include "head.njk" %}
 {% include "navbar.njk" %}
-{% set extra_scripts = '<script type="module" src="' ~ domain ~ '/build_fe/pages-register.js"></script>' %}
+{% set scripts_footer = '<script type="module" src="' ~ domain ~ '/build_fe/pages-register.js"></script>' %}
+{% set extra_head = '
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
+' %}
+
 
 <section class="section-py bg-body landing-reviews pb-0">
   <div class="container d-flex justify-content-center align-items-center p-3">
