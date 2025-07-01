@@ -219,16 +219,21 @@ setTimeout(() => {
 }, 500); // 500ms, có thể điều chỉnh nếu cần
 
 input.addEventListener('input', function () {
-  // Giữ lại duy nhất dấu + ở đầu, sau là số và khoảng trắng
+  // Xử lý để chỉ cho phép 1 dấu + duy nhất ở đầu, sau đó chỉ số và khoảng trắng
   let v = input.value;
-  v = v.replace(/[^+\d ]/g, '');        // Loại ký tự lạ
-  v = v.replace(/\++/g, '+');           // Gộp nhiều dấu + liên tiếp thành 1
-  if (!v.startsWith('+')) v = v.replace(/\+/g, ''); // Loại + không ở đầu
-  if (v.indexOf('+') > 0) v = v.replace(/\+/g, ''); // Chỉ giữ + ở đầu
+  // Loại bỏ mọi dấu + không ở đầu (dù copy-paste hay gõ)
+  v = v.replace(/(?!^)\+/g, '');
+  // Nếu có nhiều dấu + ở đầu thì chỉ giữ 1
+  if (v.startsWith('++')) v = '+' + v.replace(/\+/g, '');
+  // Không cho phép dấu + xuất hiện ở bất kỳ vị trí nào ngoài đầu
+  if (v.indexOf('+') > 0) v = v.replace(/\+/g, '');
+  // Chỉ cho phép + đầu tiên (nếu có), còn lại chỉ số và khoảng trắng
+  v = v.replace(/[^+\d ]/g, '');
+  // Đặt lại giá trị nếu đã bị thay đổi
   if (input.value !== v) input.value = v;
-
   validatePhoneField();
 });
+
 input.addEventListener('blur', function () {
   if (!input.value.trim()) {
     // Lấy mã vùng hiện tại
