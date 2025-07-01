@@ -5,25 +5,28 @@ fields.forEach(f => touched[f] = false);
 
 // Hàm validate các trường
 function validateUsername(val) {
-  return /^[a-z0-9_.]{6,30}$/.test(val);
+  return val.length >= 6 && val.length <= 30 && /^[a-z0-9_.]+$/.test(val);
 }
 function validateEmail(val) {
-  return val.length <= 500 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
+  return val.length > 0 && val.length <= 100 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
 }
 function validatePassword(val) {
-  return /^[a-zA-Z0-9!@#$%^&*()\-_\=\+\[\]{};:,.\/?]{8,20}$/.test(val) && !/[\'\"<>;\s]/.test(val);
+  // 8-30 ký tự, chữ số, các ký tự ~!@#$%^&*()_+.
+  return val.length >= 8 && val.length <= 30 && /^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) && !/[\'\"<>\s]/.test(val);
 }
 function validatePhone(val) {
-  return val === "" || /^\+?\d[\d\s-]{8,16}$/.test(val);
+  // 8-15 số, chỉ số
+  return /^[0-9]{8,15}$/.test(val);
 }
 function validateName(val) {
-  return val.length >= 2 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val);
+  // 6-50 ký tự, không số, không ký tự đặc biệt
+  return val.length >= 6 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]+$/.test(val);
 }
 function validatePin(val) {
   return /^[0-9]{8}$/.test(val);
 }
 
-// Hàm kiểm tra lỗi
+// Hàm kiểm tra lỗi và show message
 function showError(field) {
   const input = document.getElementById(field);
   const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
@@ -31,21 +34,19 @@ function showError(field) {
   let error = "";
 
   if (input.value) {
-    if (field === "username" && !/^[a-z0-9_.]{6,30}$/.test(input.value)) {
+    if (field === "username" && !validateUsername(input.value)) {
       error = "Tên đăng nhập chỉ dùng chữ thường, số, _ hoặc . từ 6–30 ký tự";
-    } else if (field === "fullname" && !validateName(input.value)) {
-      error = "Họ tên không hợp lệ.";
     } else if (field === "email" && !validateEmail(input.value)) {
       error = "Email không hợp lệ.";
     } else if (field === "password" && !validatePassword(input.value)) {
-      error = "Mật khẩu không hợp lệ.";
+      error = "Mật khẩu 8–30 ký tự, không khoảng trắng, không ký tự đặc biệt ngoài ~!@#$%^&*()_+.";
     } else if (field === "confirm_password") {
       const pw = document.getElementById("password").value;
-      if (input.value !== pw) {
-        error = "Mật khẩu nhập lại không khớp!";
-      }
+      if (input.value !== pw) error = "Mật khẩu nhập lại không khớp!";
     } else if (field === "phone" && !validatePhone(input.value)) {
-      error = "Số điện thoại không hợp lệ.";
+      error = "Số điện thoại phải đủ 10–15 số.";
+    } else if (field === "fullname" && !validateName(input.value)) {
+      error = "Họ tên không hợp lệ.";
     } else if (field === "pin" && !validatePin(input.value)) {
       error = "PIN phải đúng 8 số.";
     } else if (!input.checkValidity()) {
