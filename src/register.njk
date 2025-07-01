@@ -13,7 +13,7 @@
       <div class="col-sm-12">
         <div class="card">
           <div class="card-body">
-            <div class="mx-auto pt-4" style="max-width: 600px;">
+            <div class="mx-auto pt-4" style="max-width: 400px;">
               <h4 class="mb-1 text-center">Chào mừng đến với GemID! 👋</h4>
               <p class="mb-6 text-center">Vui lòng đăng ký để tiếp tục.</p>
 
@@ -21,37 +21,30 @@
                 <!-- Tên đăng nhập -->
                 <div class="mb-6">
                   <label for="username" class="form-label">Tên đăng nhập</label>
-                  <input type="text" class="form-control"
-                         id="username" name="username"
-                         minlength="6" maxlength="30"
-                         pattern="^[a-z0-9_.]{6,30}$"
+                  <input type="text" class="form-control" id="username" name="username"
+                         minlength="6" maxlength="30" pattern="^[a-z0-9_.]{6,30}$"
                          placeholder="Tên đăng nhập" required>
                   <div class="invalid-feedback" id="error-username"></div>
                 </div>
                 <!-- Họ và tên -->
                 <div class="mb-6">
                   <label for="fullname" class="form-label">Họ và tên</label>
-                  <input type="text" class="form-control"
-                         id="fullname" name="fullname"
-                         minlength="6" maxlength="50"
-                         placeholder="Họ và tên" required>
+                  <input type="text" class="form-control" id="fullname" name="fullname"
+                         minlength="6" maxlength="50" placeholder="Họ và tên" required>
                   <div class="invalid-feedback" id="error-fullname"></div>
                 </div>
                 <!-- Email -->
                 <div class="mb-6">
                   <label for="email" class="form-label">Email</label>
-                  <input type="email" class="form-control"
-                         id="email" name="email"
-                         maxlength="100"
-                         placeholder="Địa chỉ email" required>
+                  <input type="email" class="form-control" id="email" name="email"
+                         maxlength="100" placeholder="Địa chỉ email" required>
                   <div class="invalid-feedback" id="error-email"></div>
                 </div>
                 <!-- Mật khẩu -->
-                <div class="mb-6">
-                  <label for="password" class="form-label">Mật khẩu</label>
+                <div class="mb-6 form-password-toggle fv-plugins-icon-container">
+                  <label class="form-label" for="password">Mật khẩu</label>
                   <div class="input-group input-group-merge has-validation">
-                    <input type="password" class="form-control"
-                           id="password" name="password"
+                    <input type="password" id="password" class="form-control" name="password"
                            minlength="8" maxlength="30"
                            pattern="^[a-zA-Z0-9~!@#$%^&*()_+]{8,30}$"
                            placeholder="Nhập mật khẩu" required>
@@ -62,11 +55,10 @@
                   <div class="invalid-feedback" id="error-password"></div>
                 </div>
                 <!-- Nhập lại mật khẩu -->
-                <div class="mb-6">
-                  <label for="confirm_password" class="form-label">Nhập lại mật khẩu</label>
+                <div class="mb-6 form-password-toggle fv-plugins-icon-container">
+                  <label class="form-label" for="confirm_password">Nhập lại mật khẩu</label>
                   <div class="input-group input-group-merge has-validation">
-                    <input type="password" class="form-control"
-                           id="confirm_password" name="confirm_password"
+                    <input type="password" id="confirm_password" class="form-control" name="confirm_password"
                            minlength="8" maxlength="30"
                            placeholder="Nhập lại mật khẩu" required>
                     <span class="input-group-text cursor-pointer">
@@ -78,20 +70,16 @@
                 <!-- Số điện thoại -->
                 <div class="mb-6">
                   <label for="phone" class="form-label">Số điện thoại</label>
-                  <input type="tel" class="form-control"
-                         id="phone" name="phone"
-                         pattern="^[0-9]{10,15}$"
-                         placeholder="Số điện thoại" required>
+                  <input type="tel" class="form-control" id="phone" name="phone"
+                         pattern="^[0-9]{10,15}$" placeholder="Số điện thoại" required>
                   <div class="invalid-feedback" id="error-phone"></div>
                 </div>
                 <!-- PIN (8 số) -->
-                <div class="mb-6">
-                  <label for="pin" class="form-label">Mã PIN (8 số)</label>
+                <div class="mb-6 form-password-toggle fv-plugins-icon-container">
+                  <label class="form-label" for="pin">Mã PIN (8 số)</label>
                   <div class="input-group input-group-merge has-validation">
-                    <input type="password" class="form-control"
-                           id="pin" name="pin"
-                           pattern="^[0-9]{8}$"
-                           minlength="8" maxlength="8"
+                    <input type="password" id="pin" class="form-control" name="pin"
+                           pattern="^[0-9]{8}$" minlength="8" maxlength="8"
                            placeholder="Nhập mã PIN 8 số" inputmode="numeric" required>
                     <span class="input-group-text cursor-pointer">
                       <i class="ti ti-eye-off"></i>
@@ -103,8 +91,7 @@
                 <!-- Điều khoản -->
                 <div class="mb-6 mt-8">
                   <div class="form-check mb-8 ms-2">
-                    <input class="form-check-input" type="checkbox"
-                           id="terms-conditions" name="terms" required>
+                    <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms" required>
                     <label class="form-check-label" for="terms-conditions">
                       Tôi đồng ý với <a href="{{ domain }}/terms" target="_blank">Điều khoản và điều kiện</a>
                     </label>
