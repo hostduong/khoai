@@ -148,5 +148,25 @@ input.is-invalid, .form-control.is-invalid {
 {% include "footer.njk" %}
 <script src="{{ domain }}/js/register.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<script type="module">
+  import { parsePhoneNumberFromString } from 'https://cdn.skypack.dev/libphonenumber-js';
+
+  window.formatInternationalPhone = function (rawInput) {
+    let raw = rawInput.trim().replace(/\s+/g, '');
+    if (!raw.startsWith('+')) {
+      if (raw.startsWith('0')) raw = raw.slice(1);
+      raw = '+84' + raw;
+    }
+    const phone = parsePhoneNumberFromString(raw);
+    if (!phone || !phone.isValid()) return null;
+    return {
+      formatted: `+${phone.countryCallingCode} ${phone.nationalNumber} (${phone.country})`,
+      e164: phone.number,
+      country: phone.country
+    };
+  };
+</script>
+
 </body>
 </html>
