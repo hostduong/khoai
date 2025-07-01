@@ -218,7 +218,15 @@ setTimeout(() => {
   }
 }, 500); // 500ms, có thể điều chỉnh nếu cần
 
-input.addEventListener("input", validatePhoneField);
+input.addEventListener('input', function () {
+  // Chỉ cho phép nhập số, dấu + và khoảng trắng
+  let newValue = input.value.replace(/[^0-9+ ]/g, '');
+  if (input.value !== newValue) {
+    input.value = newValue;
+  }
+  validatePhoneField();
+});
+
 input.addEventListener('blur', function () {
   if (!input.value.trim()) {
     // Lấy mã vùng hiện tại
