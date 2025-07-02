@@ -1,9 +1,10 @@
 const fields = ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"];
+const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
 const touched = {};
 
 fields.forEach(f => touched[f] = false);
 
-// Hàm validate các trường
+// ✅ Hàm validate các trường
 function validateUsername(val) {
   return val.length >= 6 && val.length <= 30 && /^[a-zA-Z0-9_.]+$/.test(val);
 }
@@ -137,13 +138,15 @@ function showError(field) {
 }
 
 // ✅ Cập nhật nút đăng ký
-const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
-
 function updateRegisterBtn() {
   let valid = true;
   for (let field of fields) {
     const input = document.getElementById(field);
+
+    // Chỉ các trường bắt buộc mới phải có value
     if (!input.value && requiredFields.includes(field)) valid = false;
+
+    // Các trường còn lại chỉ validate nếu có nhập
     else if (field === "username" && input.value && !validateUsername(input.value)) valid = false;
     else if (field === "confirm_password" && input.value) {
       const pw = document.getElementById("password").value;
@@ -161,7 +164,8 @@ function updateRegisterBtn() {
 }
 
 
-// Gắn sự kiện
+
+// ✅ Gắn sự kiện
 fields.forEach(field => {
   const input = document.getElementById(field);
   if (!input) return;
@@ -198,21 +202,20 @@ window.addEventListener('DOMContentLoaded', function() {
   updateRegisterBtn();
 });
 
-// Xử lý submit form
+// ✅ Xử lý submit form
 window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    // Khi submit, đánh dấu touched tất cả để hiện báo lỗi ngay
     let valid = true;
     fields.forEach(field => {
       touched[field] = true;
       showError(field);
       const input = document.getElementById(field);
+
       if (input.classList.contains('is-invalid')) valid = false;
       if (!input.value && requiredFields.includes(field)) valid = false;
     });
-
 
     if (!valid) {
       updateRegisterBtn();
