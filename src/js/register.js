@@ -1,10 +1,9 @@
 const fields = ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"];
-const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
 const touched = {};
 
 fields.forEach(f => touched[f] = false);
 
-// ✅ Hàm validate các trường
+// Hàm validate các trường
 function validateUsername(val) {
   return val.length >= 6 && val.length <= 30 && /^[a-zA-Z0-9_.]+$/.test(val);
 }
@@ -140,32 +139,27 @@ function showError(field) {
 // ✅ Cập nhật nút đăng ký
 function updateRegisterBtn() {
   let valid = true;
-  for (let field of fields) {
-    const input = document.getElementById(field);
-
-    // Chỉ các trường bắt buộc mới phải có value
-    if (!input.value && requiredFields.includes(field)) valid = false;
-
-    // Các trường còn lại chỉ validate nếu có nhập
-    else if (field === "username" && input.value && !validateUsername(input.value)) valid = false;
-    else if (field === "confirm_password" && input.value) {
-      const pw = document.getElementById("password").value;
-      if (input.value !== pw) valid = false;
-    } else if (field === "email" && input.value && !validateEmail(input.value)) valid = false;
-    else if (field === "password" && input.value && !validatePassword(input.value)) valid = false;
-    else if (field === "phone" && input.value && !validatePhone(input.value)) valid = false;
-    else if (field === "fullname" && input.value && !validateName(input.value)) valid = false;
-    else if (field === "pin" && input.value && !validatePin(input.value)) valid = false;
-    else if (!input.checkValidity()) valid = false;
-  }
-  if (!document.getElementById('terms-conditions').checked) valid = false;
-  if (!window.captchaOk) valid = false;
-  document.getElementById('register-btn').disabled = !valid;
+const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
+for (let field of fields) {
+  const input = document.getElementById(field);
+  // Chỉ các trường bắt buộc mới kiểm tra rỗng
+  if (!input.value && requiredFields.includes(field)) valid = false;
+  // Các trường không bắt buộc: nếu có nhập thì phải hợp lệ
+  else if (field === "fullname" && input.value && !validateName(input.value)) valid = false;
+  else if (field === "phone" && input.value && !validatePhone(input.value)) valid = false;
+  // Trường bắt buộc: kiểm tra như cũ
+  else if (field === "username" && !validateUsername(input.value)) valid = false;
+  else if (field === "confirm_password") {
+    const pw = document.getElementById("password").value;
+    if (input.value !== pw) valid = false;
+  } else if (field === "email" && !validateEmail(input.value)) valid = false;
+  else if (field === "password" && !validatePassword(input.value)) valid = false;
+  else if (field === "pin" && !validatePin(input.value)) valid = false;
+  else if (!input.checkValidity() && requiredFields.includes(field)) valid = false;
 }
 
 
-
-// ✅ Gắn sự kiện
+// Gắn sự kiện
 fields.forEach(field => {
   const input = document.getElementById(field);
   if (!input) return;
@@ -202,20 +196,22 @@ window.addEventListener('DOMContentLoaded', function() {
   updateRegisterBtn();
 });
 
-// ✅ Xử lý submit form
+// Xử lý submit form
 window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    // Khi submit, đánh dấu touched tất cả để hiện báo lỗi ngay
     let valid = true;
     fields.forEach(field => {
       touched[field] = true;
       showError(field);
       const input = document.getElementById(field);
-
+      // Chỉ các trường bắt buộc mới kiểm tra rỗng
       if (input.classList.contains('is-invalid')) valid = false;
       if (!input.value && requiredFields.includes(field)) valid = false;
     });
+
 
     if (!valid) {
       updateRegisterBtn();
