@@ -19,13 +19,13 @@
               <form id="login-form" class="mb-6 fv-plugins-bootstrap5 fv-plugins-framework" autocomplete="on" novalidate>
                 <div class="mb-6 fv-plugins-icon-container">
                   <label for="username" class="form-label">Email hoặc Tên đăng nhập</label>
-                  <input type="text" class="form-control" id="username" name="username" placeholder="Nhập email hoặc username" autocomplete="username" required autofocus>
+                  <input type="text" class="form-control" id="username" name="username" minlength="6" maxlength="100" placeholder="Nhập email hoặc username" autocomplete="username" required autofocus>
                   <div id="error-username" class="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                 </div>
                 <div class="mb-6 form-password-toggle fv-plugins-icon-container">
                   <label class="form-label" for="password">Mật khẩu</label>
                   <div class="input-group input-group-merge has-validation">
-                    <input type="password" id="password" class="form-control" name="password" placeholder="••••••••" autocomplete="current-password" required>
+                    <input type="password" id="password" class="form-control" name="password" minlength="6" maxlength="30" placeholder="••••••••" autocomplete="current-password" required>
                     <span class="input-group-text cursor-pointer">
                       <i class="ti ti-eye-off"></i>
                     </span>
@@ -36,7 +36,7 @@
                 <div class="mb-6 fv-plugins-icon-container d-none" id="pin-group">
                   <label class="form-label" for="pin">Mã PIN (nếu có)</label>
                   <div class="input-group input-group-merge has-validation">
-                    <input type="password" class="form-control" id="pin" name="pin" maxlength="6" placeholder="Nhập mã PIN 6 số" autocomplete="one-time-code">
+                    <input type="password" class="form-control" id="pin" name="pin" minlength="8" maxlength="8" placeholder="Nhập mã PIN 8 số" autocomplete="one-time-code">
                     <span class="input-group-text cursor-pointer">
                       <i class="ti ti-eye-off"></i>
                     </span>
@@ -49,7 +49,7 @@
                       <input class="form-check-input" type="checkbox" id="rememberMe" name="rememberMe">
                       <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
                     </div>
-                    <a href="/forgot-password/"><p class="mb-0">Quên mật khẩu?</p></a>
+                    <a href="{{ domain }}/forgot-password/"><p class="mb-0">Quên mật khẩu?</p></a>
                   </div>
                 </div>
                 <!-- Captcha Cloudflare căn giữa -->
@@ -66,7 +66,7 @@
 
               <p class="text-center mt-4 mb-0">
                 <span>Bạn chưa có tài khoản?</span>
-                <a href="/register/"><span>Đăng ký ngay</span></a>
+                <a href="{{ domain }}/register/"><span>Đăng ký ngay</span></a>
               </p>
             </div>
           </div>
