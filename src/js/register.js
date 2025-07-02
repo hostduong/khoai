@@ -142,7 +142,7 @@ function updateRegisterBtn() {
   for (let field of fields) {
     const input = document.getElementById(field);
     if (!input.value) {
-      // Không bắt buộc với fullname, phone
+      // fullname và phone là không bắt buộc
       if (field === "fullname" || field === "phone") continue;
       valid = false;
     } else if (field === "username" && !validateUsername(input.value)) valid = false;
@@ -151,7 +151,7 @@ function updateRegisterBtn() {
       if (input.value !== pw) valid = false;
     } else if (field === "email" && !validateEmail(input.value)) valid = false;
     else if (field === "password" && !validatePassword(input.value)) valid = false;
-    // Chỉ check nếu field có nhập
+    // Chỉ validate nếu có nhập
     else if (field === "phone" && input.value && !validatePhone(input.value)) valid = false;
     else if (field === "fullname" && input.value && !validateName(input.value)) valid = false;
     else if (field === "pin" && !validatePin(input.value)) valid = false;
@@ -161,6 +161,7 @@ function updateRegisterBtn() {
   if (!window.captchaOk) valid = false;
   document.getElementById('register-btn').disabled = !valid;
 }
+
 
 
 // Gắn sự kiện
