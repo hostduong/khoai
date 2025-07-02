@@ -344,21 +344,32 @@ function validatePhoneField(isBlur = false) {
   let regionCode = dialCode.replace(/[+\s]/g, "");
   let numberLength = justNumber.length - regionCode.length;
 
-  // Chỉ báo lỗi khi BLUR hoặc đã nhập đủ ≥ 8 ký tự (và có nhập gì đó)
-  if ((numberLength >= 8 || isBlur) && numberLength > 0) {
-    if (phoneInput.isValidNumber()) {
+  // --- ĐIỀU CHỈNH Ở ĐÂY ---
+  if (isBlur) {
+    if (numberLength === 0) {
+      // Chưa nhập gì ngoài mã vùng thì không báo lỗi
       input.classList.remove("is-invalid");
       input.closest(".iti")?.classList.remove("is-invalid");
       document.getElementById("error-phone").textContent = "";
-      if (hidden) hidden.value = phoneInput.getNumber();
-    } else {
+      if (hidden) hidden.value = "";
+    } else if (numberLength < 8) {
+      input.classList.add("is-invalid");
+      input.closest(".iti")?.classList.add("is-invalid");
+      document.getElementById("error-phone").textContent = "Số điện thoại quá ngắn.";
+      if (hidden) hidden.value = "";
+    } else if (!phoneInput.isValidNumber()) {
       input.classList.add("is-invalid");
       input.closest(".iti")?.classList.add("is-invalid");
       document.getElementById("error-phone").textContent = "Số điện thoại không hợp lệ.";
       if (hidden) hidden.value = "";
+    } else {
+      input.classList.remove("is-invalid");
+      input.closest(".iti")?.classList.remove("is-invalid");
+      document.getElementById("error-phone").textContent = "";
+      if (hidden) hidden.value = phoneInput.getNumber();
     }
   } else {
-    // Đang nhập dở (<8 số) hoặc chưa nhập số: không báo lỗi
+    // Đang nhập: chỉ báo lỗi nếu nhập ký tự lạ
     input.classList.remove("is-invalid");
     input.closest(".iti")?.classList.remove("is-invalid");
     document.getElementById("error-phone").textContent = "";
