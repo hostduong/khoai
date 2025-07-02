@@ -174,11 +174,22 @@ function updateRegisterBtn() {
 fields.forEach(field => {
   const input = document.getElementById(field);
   if (!input) return;
-  input.addEventListener("input", function () {
-    touched[field] = true;
-    showError(field);
-    updateRegisterBtn();
-  });
+input.addEventListener("input", function () {
+  touched[field] = true;
+  showError(field);
+  // Nếu sửa ô password thì check lại confirm_password
+  if (field === "password") showError("confirm_password");
+  // Nếu sửa ô confirm_password thì cũng check lại ô password để đồng bộ (optional)
+  if (field === "confirm_password") showError("password");
+  updateRegisterBtn();
+});
+input.addEventListener("blur", function () {
+  touched[field] = true;
+  showError(field);
+  if (field === "password") showError("confirm_password");
+  if (field === "confirm_password") showError("password");
+});
+
   input.addEventListener("blur", function () {
     touched[field] = true;
     showError(field);
