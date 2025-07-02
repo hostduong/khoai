@@ -141,19 +141,15 @@ function updateRegisterBtn() {
   let valid = true;
   for (let field of fields) {
     const input = document.getElementById(field);
-    if (!input.value) {
-      // fullname và phone là không bắt buộc
-      if (field === "fullname" || field === "phone") continue;
-      valid = false;
-    } else if (field === "username" && !validateUsername(input.value)) valid = false;
+    if (!input.value) valid = false;
+    else if (field === "username" && !validateUsername(input.value)) valid = false;
     else if (field === "confirm_password") {
       const pw = document.getElementById("password").value;
       if (input.value !== pw) valid = false;
     } else if (field === "email" && !validateEmail(input.value)) valid = false;
     else if (field === "password" && !validatePassword(input.value)) valid = false;
-    // Chỉ validate nếu có nhập
-    else if (field === "phone" && input.value && !validatePhone(input.value)) valid = false;
-    else if (field === "fullname" && input.value && !validateName(input.value)) valid = false;
+    else if (field === "phone" && !validatePhone(input.value)) valid = false;
+    else if (field === "fullname" && !validateName(input.value)) valid = false;
     else if (field === "pin" && !validatePin(input.value)) valid = false;
     else if (!input.checkValidity()) valid = false;
   }
@@ -161,8 +157,6 @@ function updateRegisterBtn() {
   if (!window.captchaOk) valid = false;
   document.getElementById('register-btn').disabled = !valid;
 }
-
-
 
 // Gắn sự kiện
 fields.forEach(field => {
@@ -208,15 +202,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Khi submit, đánh dấu touched tất cả để hiện báo lỗi ngay
     let valid = true;
-    fields.forEach(field => 
+    fields.forEach(field => {
       touched[field] = true;
       showError(field);
       const input = document.getElementById(field);
-      if (input.classList.contains('is-invalid')) valid = false;
-      // CHỈ các trường bắt buộc mới check value
-      if (!input.value && ["username", "email", "password", "confirm_password", "pin"].includes(field)) valid = false;
+      if (input.classList.contains('is-invalid') || !input.value) valid = false;
     });
-
 
     if (!valid) {
       updateRegisterBtn();
