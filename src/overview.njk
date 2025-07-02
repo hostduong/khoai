@@ -1,0 +1,58 @@
+<!-- Sections:Start -->
+<section class="section-py bg-body landing-reviews">
+<div class="container mt-8">
+<div>
+
+<div class="row mb-4">
+  <div class="col-sm-12">
+    <div class="card">
+      <form id="changeApiToken" class="changeApiToken card-body" method="POST" action="/api/change-token">
+        <div class="row align-items-end">
+          <div class="col-md-8 form-password-toggle">
+            <label class="form-label">Token cá nhân (Không được chia sẻ với ai)</label>
+            <div class="input-group input-group-merge">
+              <input type="password" id="apiTokenUser" class="form-control" readonly value="{{ user.token || '' }}" placeholder="············" aria-describedby="api-token">
+              <span class="input-group-text cursor-pointer" onclick="toggleToken('apiTokenUser', this)"><i class="ti ti-eye-off"></i></span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary waves-effect waves-light" type="button" onclick="copyToken('apiTokenUser')">
+              <i class="fa-regular fa-copy"></i> Sao chép
+            </button>
+            <button class="btn btn-primary px-2 ms-2 waves-effect waves-light" type="submit">
+              <i class="fa-solid fa-rotate-right"></i> Làm mới Token
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-sm-12">
+    <div class="card">
+      <form id="changeApiTokenTiktok" class="changeApiToken card-body" method="POST" action="/api/change-token-tiktok">
+        <div class="row align-items-end">
+          <div class="col-md-8 form-password-toggle">
+            <label class="form-label">Token TikTok (Không được chia sẻ với ai)</label>
+            <div class="input-group input-group-merge">
+              <input type="password" id="apiTokenTiktok" class="form-control" readonly value="{{ user.token_tiktok || '' }}" placeholder="············" aria-describedby="api-token-tiktok">
+              <span class="input-group-text cursor-pointer" onclick="toggleToken('apiTokenTiktok', this)"><i class="ti ti-eye-off"></i></span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary waves-effect waves-light" type="button" onclick="copyToken('apiTokenTiktok')">
+              <i class="fa-regular fa-copy"></i> Sao chép
+            </button>
+            <button class="btn btn-primary px-2 ms-2 waves-effect waves-light" type="submit">
+              <i class="fa-solid fa-rotate-right"></i> Làm mới Token
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</section>
