@@ -32,8 +32,6 @@ pinInput.addEventListener('input', function () {
 });
 
 
-
-
 function validatePhone(val) {
   const input = document.querySelector("#phone");
   if (!window.phoneInput) return false;
@@ -41,35 +39,80 @@ function validatePhone(val) {
 }
 
 
-// Hàm kiểm tra lỗi và show message
+// ✅ Hàm kiểm tra lỗi và show message
 function showError(field) {
   const input = document.getElementById(field);
   const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
   if (!input) return;
   let error = "";
+  const val = input.value || "";
 
-  if (input.value) {
-    if (field === "username" && !validateUsername(input.value)) {
-      error = "Xin lỗi, chỉ được phép sử dụng các chữ cái (a-z), số (0-9), và dấu chấm (.).";
-    } else if (field === "email" && !validateEmail(input.value)) {
+  // Lấy min/max từ validate của bạn (hoặc từ HTML)
+  const min = input.getAttribute('minlength') ? +input.getAttribute('minlength') : 0;
+  const max = input.getAttribute('maxlength') ? +input.getAttribute('maxlength') : 1000;
+
+  // FOCUS: chỉ báo lỗi nếu SAI KÝ TỰ/FORMAT, không báo thiếu ký tự
+  if (document.activeElement === input) {
+    if (field === "username" && val && !/^[a-z0-9_.]+$/.test(val)) {
+      error = "Tên đăng nhập chỉ gồm chữ thường (a-z), số, dấu _ và dấu .";
+    } else if (field === "fullname" && val && !/^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val)) {
+      error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
+    } else if (field === "email" && val && !validateEmail(val)) {
       error = "Email không hợp lệ.";
-    } else if (field === "password" && !validatePassword(input.value)) {
-      error = "Mật khẩu 8–30 ký tự, a-z, 0-9, ~!@#$%^&*()_+.";
-    } else if (field === "confirm_password") {
+    } else if (field === "password" && val && (!/^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) || /[\'\"<>\s]/.test(val))) {
+      error = "Không sử dụng ký tự đặc biệt hoặc dấu cách trong mật khẩu.";
+    } else if (field === "confirm_password" && val) {
       const pw = document.getElementById("password").value;
-      if (input.value !== pw) error = "Mật khẩu nhập lại không khớp!";
-    } else if (field === "phone" && !validatePhone(input.value)) {
-      error = "Số điện thoại phải đủ 8–15 số.";
-    } else if (field === "fullname" && !validateName(input.value)) {
-      error = "Họ tên không hợp lệ.";
-    } else if (field === "pin" && !validatePin(input.value)) {
-      error = "PIN phải đúng 8 số.";
-    } else if (!input.checkValidity()) {
-      error = input.validationMessage;
+      if (val !== pw) error = "Mật khẩu nhập lại không khớp!";
+    } else if (field === "phone" && val && !validatePhone(val)) {
+      error = "Số điện thoại không hợp lệ.";
+    } else if (field === "pin" && val && !/^[0-9]*$/.test(val)) {
+      error = "PIN chỉ được chứa số.";
     }
+    // Không báo thiếu ký tự khi focus
+  }
+  // BLUR hoặc đã touched (và không focus): báo thiếu ký tự hoặc sai ký tự
+  else if (touched[field]) {
+    if (val) {
+      if (field === "username") {
+        if (val.length < 6 || val.length > 30)
+          error = "Tên đăng nhập phải từ 6-30 ký tự.";
+        else if (!/^[a-z0-9_.]+$/.test(val))
+          error = "Tên đăng nhập chỉ gồm chữ thường (a-z), số, dấu _ và dấu .";
+      } else if (field === "fullname") {
+        if (val.length < 6 || val.length > 50)
+          error = "Họ tên từ 6-50 ký tự, không số, không ký tự đặc biệt.";
+        else if (!/^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val))
+          error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
+      } else if (field === "email") {
+        if (val.length < 6 || val.length > 100)
+          error = "Email phải từ 6-100 ký tự.";
+        else if (!validateEmail(val))
+          error = "Email không hợp lệ.";
+      } else if (field === "password") {
+        if (val.length < 8 || val.length > 30)
+          error = "Mật khẩu từ 8-30 ký tự.";
+        else if (!/^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) || /[\'\"<>\s]/.test(val))
+          error = "Không sử dụng ký tự đặc biệt hoặc dấu cách trong mật khẩu.";
+      } else if (field === "confirm_password") {
+        const pw = document.getElementById("password").value;
+        if (val !== pw)
+          error = "Mật khẩu nhập lại không khớp!";
+      } else if (field === "phone") {
+        if (!validatePhone(val))
+          error = "Số điện thoại phải đủ 8–15 số.";
+      } else if (field === "pin") {
+        if (val.length !== 8)
+          error = "PIN phải đúng 8 số.";
+        else if (!/^[0-9]+$/.test(val))
+          error = "PIN chỉ gồm các số.";
+      }
+    }
+    // Nếu chưa nhập thì không báo lỗi gì cả
   }
 
-  if (touched[field] && error) {
+  // Báo lỗi
+  if (error) {
     input.classList.add("is-invalid");
     feedback.textContent = error;
   } else {
@@ -79,7 +122,9 @@ function showError(field) {
 }
 
 
-// Cập nhật nút đăng ký
+
+
+// ✅ Cập nhật nút đăng ký
 function updateRegisterBtn() {
   let valid = true;
   for (let field of fields) {
