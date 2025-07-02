@@ -208,13 +208,15 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Khi submit, đánh dấu touched tất cả để hiện báo lỗi ngay
     let valid = true;
-    fields.forEach(field => {
+    fields.forEach(field => 
       touched[field] = true;
       showError(field);
       const input = document.getElementById(field);
       if (input.classList.contains('is-invalid')) valid = false;
-      if (!input.value && field !== "fullname" && field !== "phone") valid = false;
+      // CHỈ các trường bắt buộc mới check value
+      if (!input.value && ["username", "email", "password", "confirm_password", "pin"].includes(field)) valid = false;
     });
+
 
     if (!valid) {
       updateRegisterBtn();
