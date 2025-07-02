@@ -1,3 +1,11 @@
+{% set title = "Trang chủ | Gem.id.vn - Hệ thống Email Tự Động" %}
+{% set description = "Gem.id.vn chuyên cung cấp Hotmail, Gmail, Mail Domain chất lượng cao, uy tín cho dân MMO. Hỗ trợ 24/7, giá rẻ, đáp ứng nhanh mọi nhu cầu." %}
+{% set keywords = "mua hotmail, mua gmail, mail domain giá rẻ, email cho MMO, dịch vụ email uy tín, gem.id.vn" %}
+{% set page_url = "/overview/" %}
+{% set og_image = "/img/logo.png" %}
+{% include "head.njk" %}
+{% include "navbar.njk" %}
+
 <!-- Sections:Start -->
 <section class="section-py bg-body landing-reviews">
 <div class="container mt-8">
@@ -32,7 +40,7 @@
 <div class="row mb-4">
   <div class="col-sm-12">
     <div class="card">
-      <form id="changeApiTokenTiktok" class="changeApiToken card-body" method="POST" action="/api/change-token-tiktok">
+      <form id="changeApiTokenTiktok" class="changeApiToken card-body" method="POST" action="{{ domain }}/api/change-token-tiktok/">
         <div class="row align-items-end">
           <div class="col-md-8 form-password-toggle">
             <label class="form-label">Token TikTok (Không được chia sẻ với ai)</label>
@@ -56,3 +64,6 @@
 </div>
 
 </section>
+
+
+{% include "footer.njk" %}
