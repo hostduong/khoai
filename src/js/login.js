@@ -4,7 +4,7 @@ fields.forEach(f => touched[f] = false);
 
 // Hàm validate các trường
 function validateUsername(val) {
-  // Email hoặc username (không bắt buộc chỉ a-z thường), chấp nhận chữ hoa, số, dấu ._@
+  // Email hoặc username (không bắt buộc chỉ a-z thường), chấp nhận chữ hoa, số, dấu ._@+-
   return (
     typeof val === "string" &&
     val.length >= 6 &&
@@ -100,6 +100,26 @@ function updateLoginBtn() {
   document.getElementById('login-btn').disabled = !valid;
 }
 
+// Xử lý Ghi nhớ đăng nhập (Remember Me) 7 ngày
+function tryFillRemembered() {
+  const savedUser = localStorage.getItem('remember_user');
+  const savedPass = localStorage.getItem('remember_pass');
+  const expire = parseInt(localStorage.getItem('remember_expire') || "0", 10);
+
+  // Nếu còn hạn (chưa hết 7 ngày)
+  if (savedUser && expire && expire > Date.now()) {
+    document.getElementById('username').value = savedUser;
+    document.getElementById('password').value = savedPass;
+    document.getElementById('rememberMe').checked = true;
+  } else {
+    // Hết hạn thì xóa
+    localStorage.removeItem('remember_user');
+    localStorage.removeItem('remember_pass');
+    localStorage.removeItem('remember_expire');
+    document.getElementById('rememberMe').checked = false;
+  }
+}
+
 // Sự kiện validate từng trường
 fields.forEach(field => {
   const input = document.getElementById(field);
@@ -128,6 +148,7 @@ if (pinInput) {
 }
 
 window.addEventListener('DOMContentLoaded', function () {
+  tryFillRemembered();
   fields.forEach(field => {
     const input = document.getElementById(field);
     const feedback = document.getElementById(`error-${field}`);
@@ -166,6 +187,19 @@ window.addEventListener('DOMContentLoaded', function () {
     const formData = {};
     fields.forEach(field => formData[field] = document.getElementById(field)?.value ?? "");
     formData['cf-turnstile-response'] = captchaToken;
+
+    // Ghi nhớ đăng nhập nếu có chọn
+    const rememberMe = document.getElementById('rememberMe').checked;
+    if (rememberMe) {
+      localStorage.setItem('remember_user', document.getElementById('username').value);
+      localStorage.setItem('remember_pass', document.getElementById('password').value);
+      // Lưu hạn sử dụng (7 ngày)
+      localStorage.setItem('remember_expire', (Date.now() + 7 * 24 * 3600 * 1000).toString());
+    } else {
+      localStorage.removeItem('remember_user');
+      localStorage.removeItem('remember_pass');
+      localStorage.removeItem('remember_expire');
+    }
 
     document.getElementById('login-btn').disabled = true;
 
