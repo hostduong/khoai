@@ -84,28 +84,27 @@ if (
   return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
 }
 
-// Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format JS: +, số, khoảng trắng
+// Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format quốc tế và hợp lệ cơ bản
 if (
   typeof phone === "string" &&
   phone.trim().length > 0
 ) {
   let value = phone.trim();
-  // Phải bắt đầu bằng +, sau đó là mã vùng và số, cho phép khoảng trắng
-  // (Loại bỏ mọi khoảng trắng để kiểm tra độ dài số, giống JS)
-  let dialCodeMatch = value.match(/^\+[\d]+/);
-  if (!dialCodeMatch) {
-    return Response.json({ success: false, message: "Số điện thoại không hợp lệ!" });
-  }
-  // Lấy tất cả số sau dấu + (bỏ khoảng trắng)
-  let raw = value.replace(/[^\d]/g, "");
-  if (raw.length < 8 || raw.length > 15) {
-    return Response.json({ success: false, message: "Số điện thoại không hợp lệ!" });
-  }
-  // Không được có ký tự lạ
+  // Không được chứa ký tự lạ
   if (/[^\d+\s]/.test(value)) {
-    return Response.json({ success: false, message: "Số điện thoại không hợp lệ!" });
+    return Response.json({ success: false, message: "Số điện thoại chỉ được chứa số, +, và khoảng trắng!" });
+  }
+  // Phải bắt đầu bằng +
+  if (!value.startsWith("+")) {
+    return Response.json({ success: false, message: "Số điện thoại phải bắt đầu bằng dấu + (quốc tế)!" });
+  }
+  // Số điện thoại sau khi bỏ khoảng trắng phải từ 8–15 số (tùy từng quốc gia)
+  let raw = value.replace(/[^\d]/g, ""); // chỉ lấy số
+  if (raw.length < 8 || raw.length > 15) {
+    return Response.json({ success: false, message: "Số điện thoại không hợp lệ, phải từ 8–15 số!" });
   }
 }
+
 
     
 
