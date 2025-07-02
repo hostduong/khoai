@@ -50,7 +50,7 @@ function showError(field) {
 
   if (input.value) {
     if (field === "username" && !validateUsername(input.value)) {
-      error = "Tên đăng nhập 6–30 ký tự, a-z, 0-9, _ hoặc . ";
+      error = "Xin lỗi, chỉ được phép sử dụng các chữ cái (a-z), số (0-9), và dấu chấm (.).";
     } else if (field === "email" && !validateEmail(input.value)) {
       error = "Email không hợp lệ.";
     } else if (field === "password" && !validatePassword(input.value)) {
