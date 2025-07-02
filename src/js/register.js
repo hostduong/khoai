@@ -137,26 +137,29 @@ function showError(field) {
 }
 
 // ✅ Cập nhật nút đăng ký
+const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
+
 function updateRegisterBtn() {
   let valid = true;
   for (let field of fields) {
     const input = document.getElementById(field);
-    if (!input.value) valid = false;
-    else if (field === "username" && !validateUsername(input.value)) valid = false;
-    else if (field === "confirm_password") {
+    if (!input.value && requiredFields.includes(field)) valid = false;
+    else if (field === "username" && input.value && !validateUsername(input.value)) valid = false;
+    else if (field === "confirm_password" && input.value) {
       const pw = document.getElementById("password").value;
       if (input.value !== pw) valid = false;
-    } else if (field === "email" && !validateEmail(input.value)) valid = false;
-    else if (field === "password" && !validatePassword(input.value)) valid = false;
-    else if (field === "phone" && !validatePhone(input.value)) valid = false;
-    else if (field === "fullname" && !validateName(input.value)) valid = false;
-    else if (field === "pin" && !validatePin(input.value)) valid = false;
+    } else if (field === "email" && input.value && !validateEmail(input.value)) valid = false;
+    else if (field === "password" && input.value && !validatePassword(input.value)) valid = false;
+    else if (field === "phone" && input.value && !validatePhone(input.value)) valid = false;
+    else if (field === "fullname" && input.value && !validateName(input.value)) valid = false;
+    else if (field === "pin" && input.value && !validatePin(input.value)) valid = false;
     else if (!input.checkValidity()) valid = false;
   }
   if (!document.getElementById('terms-conditions').checked) valid = false;
   if (!window.captchaOk) valid = false;
   document.getElementById('register-btn').disabled = !valid;
 }
+
 
 // Gắn sự kiện
 fields.forEach(field => {
@@ -206,8 +209,10 @@ window.addEventListener('DOMContentLoaded', function() {
       touched[field] = true;
       showError(field);
       const input = document.getElementById(field);
-      if (input.classList.contains('is-invalid') || !input.value) valid = false;
+      if (input.classList.contains('is-invalid')) valid = false;
+      if (!input.value && requiredFields.includes(field)) valid = false;
     });
+
 
     if (!valid) {
       updateRegisterBtn();
