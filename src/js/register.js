@@ -212,7 +212,8 @@ window.addEventListener('DOMContentLoaded', function() {
       touched[field] = true;
       showError(field);
       const input = document.getElementById(field);
-      if (input.classList.contains('is-invalid') || !input.value) valid = false;
+      if (input.classList.contains('is-invalid')) valid = false;
+      if (!input.value && field !== "fullname" && field !== "phone") valid = false;
     });
 
     if (!valid) {
