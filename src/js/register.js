@@ -47,26 +47,28 @@ function showError(field) {
   let error = "";
   const val = input.value || "";
 
-  // Lấy min/max từ validate của bạn (hoặc từ HTML)
-  const min = input.getAttribute('minlength') ? +input.getAttribute('minlength') : 0;
-  const max = input.getAttribute('maxlength') ? +input.getAttribute('maxlength') : 1000;
-
   // FOCUS: chỉ báo lỗi nếu SAI KÝ TỰ/FORMAT, không báo thiếu ký tự
   if (document.activeElement === input) {
-    if (field === "username" && val && !/^[a-z0-9_.]+$/.test(val)) {
+    if (field === "phone" && val && /[^0-9+()\s\-]/.test(val)) {
+      error = "Số điện thoại chỉ gồm số, dấu +, (), hoặc dấu -.";
+    }
+    else if (field === "username" && val && !/^[a-z0-9_.]+$/.test(val)) {
       error = "Tên đăng nhập chỉ gồm chữ thường (a-z), số, dấu _ và dấu .";
-    } else if (field === "fullname" && val && !/^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val)) {
+    }
+    else if (field === "fullname" && val && !/^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val)) {
       error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
-    } else if (field === "email" && val && !validateEmail(val)) {
+    }
+    else if (field === "email" && val && !validateEmail(val)) {
       error = "Email không hợp lệ.";
-    } else if (field === "password" && val && (!/^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) || /[\'\"<>\s]/.test(val))) {
+    }
+    else if (field === "password" && val && (!/^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) || /[\'\"<>\s]/.test(val))) {
       error = "Không sử dụng ký tự đặc biệt hoặc dấu cách trong mật khẩu.";
-    } else if (field === "confirm_password" && val) {
+    }
+    else if (field === "confirm_password" && val) {
       const pw = document.getElementById("password").value;
       if (val !== pw) error = "Mật khẩu nhập lại không khớp!";
-    } else if (field === "phone" && val && !validatePhone(val)) {
-      error = "Số điện thoại không hợp lệ.";
-    } else if (field === "pin" && val && !/^[0-9]*$/.test(val)) {
+    }
+    else if (field === "pin" && val && !/^[0-9]*$/.test(val)) {
       error = "PIN chỉ được chứa số.";
     }
     // Không báo thiếu ký tự khi focus
@@ -79,29 +81,40 @@ function showError(field) {
           error = "Tên đăng nhập phải từ 6-30 ký tự.";
         else if (!/^[a-z0-9_.]+$/.test(val))
           error = "Tên đăng nhập chỉ gồm chữ thường (a-z), số, dấu _ và dấu .";
-      } else if (field === "fullname") {
+      }
+      else if (field === "fullname") {
         if (val.length < 6 || val.length > 50)
           error = "Họ tên từ 6-50 ký tự, không số, không ký tự đặc biệt.";
         else if (!/^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val))
           error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
-      } else if (field === "email") {
+      }
+      else if (field === "email") {
         if (val.length < 6 || val.length > 100)
           error = "Email phải từ 6-100 ký tự.";
         else if (!validateEmail(val))
           error = "Email không hợp lệ.";
-      } else if (field === "password") {
+      }
+      else if (field === "password") {
         if (val.length < 8 || val.length > 30)
           error = "Mật khẩu từ 8-30 ký tự.";
         else if (!/^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) || /[\'\"<>\s]/.test(val))
           error = "Không sử dụng ký tự đặc biệt hoặc dấu cách trong mật khẩu.";
-      } else if (field === "confirm_password") {
+      }
+      else if (field === "confirm_password") {
         const pw = document.getElementById("password").value;
         if (val !== pw)
           error = "Mật khẩu nhập lại không khớp!";
-      } else if (field === "phone") {
-        if (!validatePhone(val))
-          error = "Số điện thoại phải đủ 8–15 số.";
-      } else if (field === "pin") {
+      }
+      else if (field === "phone") {
+        // Lưu ý: vẫn giữ nguyên validatePhone cho chuẩn quốc tế/mã vùng
+        if (/[^0-9+()\s\-]/.test(val)) {
+          error = "Số điện thoại chỉ gồm số, dấu +, (), hoặc dấu -.";
+        }
+        else if (!validatePhone(val)) {
+          error = "Số điện thoại phải đủ 8–15 số, đúng định dạng quốc tế hoặc Việt Nam.";
+        }
+      }
+      else if (field === "pin") {
         if (val.length !== 8)
           error = "PIN phải đúng 8 số.";
         else if (!/^[0-9]+$/.test(val))
@@ -120,6 +133,7 @@ function showError(field) {
     feedback.textContent = "";
   }
 }
+
 
 
 
