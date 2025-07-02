@@ -2,7 +2,7 @@ const fields = ["username", "fullname", "email", "password", "confirm_password",
 const touched = {};
 fields.forEach(f => touched[f] = false);
 
-// Hàm validate các trường
+// ✅ Hàm validate các trường
 function validateUsername(val) {
   return val.length >= 6 && val.length <= 30 && /^[a-zA-Z0-9_.]+$/.test(val);
 }
@@ -34,7 +34,7 @@ function validatePhone(val) {
   return phoneInput.isValidNumber();
 }
 
-// Hàm kiểm tra lỗi và show message
+// ✅ Hàm kiểm tra lỗi và show message
 function showError(field) {
   const input = document.getElementById(field);
   const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
@@ -138,7 +138,7 @@ function showError(field) {
   }
 }
 
-// ✅ Cập nhật nút đăng ký (fix chuẩn)
+// ✅ Cập nhật nút đăng ký
 function updateRegisterBtn() {
   let valid = true;
   const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
@@ -174,25 +174,18 @@ function updateRegisterBtn() {
 fields.forEach(field => {
   const input = document.getElementById(field);
   if (!input) return;
-input.addEventListener("input", function () {
-  touched[field] = true;
-  showError(field);
-  // Nếu sửa ô password thì check lại confirm_password
-  if (field === "password") showError("confirm_password");
-  // Nếu sửa ô confirm_password thì cũng check lại ô password để đồng bộ (optional)
-  if (field === "confirm_password") showError("password");
-  updateRegisterBtn();
-});
-input.addEventListener("blur", function () {
-  touched[field] = true;
-  showError(field);
-  if (field === "password") showError("confirm_password");
-  if (field === "confirm_password") showError("password");
-});
-
+  input.addEventListener("input", function () {
+    touched[field] = true;
+    showError(field);
+    if (field === "password") showError("confirm_password");
+    if (field === "confirm_password") showError("password");
+    updateRegisterBtn();
+  });
   input.addEventListener("blur", function () {
     touched[field] = true;
     showError(field);
+    if (field === "password") showError("confirm_password");
+    if (field === "confirm_password") showError("password");
   });
 });
 
@@ -218,7 +211,7 @@ window.addEventListener('DOMContentLoaded', function() {
   updateRegisterBtn();
 });
 
-// Xử lý submit form
+// ✅ Xử lý submit form
 window.addEventListener('DOMContentLoaded', function() {
   document.getElementById('formAuthentication').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -273,7 +266,7 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Xử lý số điện thoại theo quốc gia
+// ✅ Xử lý số điện thoại theo quốc gia
 const input = document.querySelector("#phone");
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
