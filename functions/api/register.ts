@@ -28,71 +28,86 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, message: "Captcha không hợp lệ!", error: result }, { status: 400 });
     }
 
+
+
     // 2. VALIDATE INPUT
-    const { username, fullname, email, password, confirm_password, phone, pin } = data;
+const { username, fullname, email, password, confirm_password, phone, pin } = data;
 
-    // Username: BẮT BUỘC, 6-30 ký tự, chỉ chữ/số/._, không phân biệt hoa/thường
-    if (
-      typeof username !== "string" ||
-      username.length < 6 || username.length > 30 ||
-      !/^[a-zA-Z0-9_.]+$/.test(username)
-    ) {
-      return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
-    }
+// Username: BẮT BUỘC, 6-30 ký tự, chỉ chữ/số/._, không phân biệt hoa/thường
+if (
+  typeof username !== "string" ||
+  username.length < 6 || username.length > 30 ||
+  !/^[a-zA-Z0-9_.]+$/.test(username)
+) {
+  return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
+}
 
-    // Họ tên: KHÔNG bắt buộc, nếu có thì phải 6-50 ký tự, không số, không ký tự đặc biệt
-    if (
-      typeof fullname === "string" &&
-      fullname.length > 0 && (
-        fullname.length < 6 || fullname.length > 50 ||
-        /[0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]/.test(fullname)
-      )
-    ) {
-      return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
-    }
+// Họ tên: KHÔNG bắt buộc, nếu có thì phải 6-50 ký tự, không số, không ký tự đặc biệt
+if (
+  typeof fullname === "string" &&
+  fullname.length > 0 && (
+    fullname.length < 6 || fullname.length > 50 ||
+    /[0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]/.test(fullname)
+  )
+) {
+  return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
+}
 
-    // Email: BẮT BUỘC, 6-100 ký tự, regex chuẩn
-    if (
-      typeof email !== "string" ||
-      email.length < 6 || email.length > 100 ||
-      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
-    ) {
-      return Response.json({ success: false, message: "Email không hợp lệ!" });
-    }
+// Email: BẮT BUỘC, 6-100 ký tự, regex chuẩn
+if (
+  typeof email !== "string" ||
+  email.length < 6 || email.length > 100 ||
+  !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+) {
+  return Response.json({ success: false, message: "Email không hợp lệ!" });
+}
 
-    // Mật khẩu: BẮT BUỘC, 8-30 ký tự, không chứa ', ", <, >, dấu cách, `, chỉ ký tự ASCII 0x21-0x7E
-    if (
-      typeof password !== "string" ||
-      password.length < 8 || password.length > 30 ||
-      /['"<>\s`]/.test(password) ||
-      !/^[\x21-\x7E]+$/.test(password)
-    ) {
-      return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
-    }
+// Mật khẩu: BẮT BUỘC, 8-30 ký tự, không chứa ', ", <, >, dấu cách, `, chỉ ký tự ASCII 0x21-0x7E
+if (
+  typeof password !== "string" ||
+  password.length < 8 || password.length > 30 ||
+  /['"<>\s`]/.test(password) ||
+  !/^[\x21-\x7E]+$/.test(password)
+) {
+  return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
+}
 
-    // Nhập lại mật khẩu: BẮT BUỘC, phải trùng password
-    if (password !== confirm_password)
-      return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
+// Nhập lại mật khẩu: BẮT BUỘC, phải trùng password
+if (password !== confirm_password)
+  return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
 
-    // PIN: BẮT BUỘC, đúng 8 số
-    if (
-      typeof pin !== "string" ||
-      !/^[0-9]{8}$/.test(pin)
-    ) {
-      return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
-    }
+// PIN: BẮT BUỘC, đúng 8 số
+if (
+  typeof pin !== "string" ||
+  !/^[0-9]{8}$/.test(pin)
+) {
+  return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
+}
 
-    // Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng mã quốc tế và hợp lệ cơ bản (+..., 8-15 số)
-    if (
-      typeof phone === "string" &&
-      phone.trim().length > 0
-    ) {
-      // Loại bỏ khoảng trắng, kiểm tra đúng dạng +84..., 8-15 số
-      let raw = phone.replace(/\s/g, "");
-      if (!/^\+\d{8,15}$/.test(raw)) {
-        return Response.json({ success: false, message: "Số điện thoại không hợp lệ!" });
-      }
-    }
+// Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format JS: +, số, khoảng trắng
+if (
+  typeof phone === "string" &&
+  phone.trim().length > 0
+) {
+  let value = phone.trim();
+  // Phải bắt đầu bằng +, sau đó là mã vùng và số, cho phép khoảng trắng
+  // (Loại bỏ mọi khoảng trắng để kiểm tra độ dài số, giống JS)
+  let dialCodeMatch = value.match(/^\+[\d]+/);
+  if (!dialCodeMatch) {
+    return Response.json({ success: false, message: "Số điện thoại không hợp lệ!" });
+  }
+  // Lấy tất cả số sau dấu + (bỏ khoảng trắng)
+  let raw = value.replace(/[^\d]/g, "");
+  if (raw.length < 8 || raw.length > 15) {
+    return Response.json({ success: false, message: "Số điện thoại không hợp lệ!" });
+  }
+  // Không được có ký tự lạ
+  if (/[^\d+\s]/.test(value)) {
+    return Response.json({ success: false, message: "Số điện thoại không hợp lệ!" });
+  }
+}
+
+    
 
     
     // 3. CHECK TỒN TẠI USERNAME/EMAIL
