@@ -35,7 +35,6 @@ export async function onRequestPost(context) {
     password = (password || "").trim();
 
     // 3. TÌM USER BẰNG username/email
-    let profile;
     let userKey = `KHOAI__profile__user:${username}`;
     let userProfile = await env.KHOAI_KV_USER.get(userKey, "json");
     if (!userProfile) {
@@ -85,14 +84,12 @@ export async function onRequestPost(context) {
     }
     userProfile.ip_logged = ip_logged;
     userProfile.ua_logged = ua_logged;
-    // Lưu lại
     await env.KHOAI_KV_USER.put(userKey, JSON.stringify(userProfile));
 
     // 7. TẠO COOKIE, PROFILE_COOKIE
     const cookie = randomBase62(60);
     const cookieSalt = randomBase62(20);
     const token = userProfile.token || (await sha256(randomBase62(60) + salt));
-    // Cookie xác thực KV
     await env.KHOAI_KV_COOKIE.put(
       `KHOAI__cookie__salt:${userProfile.username}`,
       JSON.stringify({ salt: cookieSalt, time: now })
@@ -115,21 +112,37 @@ export async function onRequestPost(context) {
       userProfile.username + userProfile.email + ua + salt_profile + cookie
     );
 
-    // 8. Set-Cookie trả về cho client
+    // 8. Chuẩn hóa trả về đúng các field như mô tả
+    const avatar = userProfile.avatar || "/images/avatar.jpg";
+    const res = {
+      success: true,
+      message: "Đăng nhập thành công!",
+      redirect: "/overview",
+      username: userProfile.username,
+      id: userProfile.id,
+      fullname: userProfile.fullname || "",
+      available_coin: typeof userProfile.available_coin === "number" ? userProfile.available_coin : (userProfile.coin ?? 0),
+      loaded_coin: typeof userProfile.loaded_coin === "number" ? userProfile.loaded_coin : 0,
+      email: userProfile.email,
+      mail_total_save: typeof userProfile.mail_total_save === "number" ? userProfile.mail_total_save : 0,
+      purchased_mail: typeof userProfile.purchased_mail === "number" ? userProfile.purchased_mail : 0,
+      token,
+      cookie,
+      profile_cookie,
+      avatar
+    };
+
+    // Các token dịch vụ nếu có
+    if (userProfile.token_tiktok) res.token_tiktok = userProfile.token_tiktok;
+    if (userProfile.extend_token_tiktok) res.extend_token_tiktok = userProfile.extend_token_tiktok;
+    if (userProfile.token_facebook) res.token_facebook = userProfile.token_facebook;
+    if (userProfile.extend_token_facebook) res.extend_token_facebook = userProfile.extend_token_facebook;
+    if (userProfile.token_zalo) res.token_zalo = userProfile.token_zalo;
+    if (userProfile.extend_token_zalo) res.extend_token_zalo = userProfile.extend_token_zalo;
+    // ... bổ sung token_xxx nếu có
+
     return new Response(
-      JSON.stringify({
-        success: true,
-        message: "Đăng nhập thành công!",
-        redirect: "/overview",
-        username: userProfile.username,
-        email: userProfile.email,
-        id: userProfile.id,
-        fullname: userProfile.fullname,
-        coin: userProfile.coin,
-        token,
-        cookie,
-        profile_cookie
-      }),
+      JSON.stringify(res),
       {
         headers: {
           "Set-Cookie": [
