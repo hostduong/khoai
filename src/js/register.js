@@ -7,47 +7,34 @@ fields.forEach(f => touched[f] = false);
 function validateUsername(val) {
   return val.length >= 6 && val.length <= 30 && /^[a-zA-Z0-9_.]+$/.test(val);
 }
-// showError cũng thay [a-z0-9_.] ➜ [a-zA-Z0-9_.]
-if (field === "username" && val && /[^a-zA-Z0-9_.]/.test(val)) {
-  error = "Tên đăng nhập chỉ gồm chữ, số, dấu _ và dấu .";
-}
-
-
 function validateEmail(val) {
-  // Chấp nhận cả chữ hoa/thường (ở trước @ và domain)
+  // Chấp nhận cả chữ hoa/thường
   return val.length >= 6 && val.length <= 100 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
 }
-
 function validatePassword(val) {
   // Độ dài 8-30, cấm ' " < > ` và dấu cách, cấm Unicode
   return val.length >= 8 && val.length <= 30
     && !/['"<>\s`]/.test(val)
-    && /^[\x21-\x7E]+$/.test(val); // Chỉ ký tự ASCII printable
+    && /^[\x21-\x7E]+$/.test(val);
 }
 function validateName(val) {
   // 6-50 ký tự, không số, không ký tự đặc biệt
   return val.length >= 6 && val.length <= 50 && /^[^0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]+$/.test(val);
 }
-
 function validatePin(val) {
   return /^[0-9]{8}$/.test(val);
 }
 const pinInput = document.getElementById('pin');
 pinInput.addEventListener('input', function () {
-  // Chỉ giữ lại các số 0-9 (loại bỏ ký tự khác kể cả khi paste)
   let value = pinInput.value.replace(/[^0-9]/g, '');
-  // Chỉ tối đa 8 số
   if (value.length > 8) value = value.slice(0, 8);
   if (pinInput.value !== value) pinInput.value = value;
 });
 
-
 function validatePhone(val) {
-  const input = document.querySelector("#phone");
   if (!window.phoneInput) return false;
   return phoneInput.isValidNumber();
 }
-
 
 // ✅ Hàm kiểm tra lỗi và show message
 function showError(field) {
@@ -60,16 +47,16 @@ function showError(field) {
   // FOCUS: chỉ báo lỗi nếu ký tự không cho phép, KHÔNG báo thiếu ký tự
   if (document.activeElement === input) {
     if (field === "username" && val && /[^a-zA-Z0-9_.]/.test(val)) {
-    error = "Tên đăng nhập chỉ gồm chữ, số, dấu _ và dấu .";
+      error = "Tên đăng nhập chỉ gồm chữ, số, dấu _ và dấu .";
     }
-      else if (field === "fullname" && val && /[0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]/.test(val)) {
-        error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
+    else if (field === "fullname" && val && /[0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]/.test(val)) {
+      error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
     }
     else if (field === "email" && val && (/[^a-zA-Z0-9._\-+%@]/.test(val) || /\s/.test(val))) {
       error = "Email chỉ được chứa chữ, số, dấu . _ - + % @, không dấu cách hoặc ký tự lạ.";
     }
-    else if (field === "phone" && val && /[^\d+\-\s()]/.test(val)) {
-      error = "Số điện thoại chỉ gồm số, +, -, khoảng trắng, ( ).";
+    else if (field === "phone" && val && /[^\d+\s]/.test(val)) {
+      error = "Số điện thoại chỉ gồm số, +, khoảng trắng.";
     }
     else if (field === "password" && val) {
       if (/['"<>\s`]/.test(val)) {
@@ -93,8 +80,8 @@ function showError(field) {
       if (field === "username") {
         if (val.length < 6 || val.length > 30)
           error = "Tên đăng nhập phải từ 6-30 ký tự.";
-        else if (!/^[a-z0-9_.]+$/.test(val))
-          error = "Tên đăng nhập chỉ gồm chữ thường (a-z), số, dấu _ và dấu .";
+        else if (!/^[a-zA-Z0-9_.]+$/.test(val))
+          error = "Tên đăng nhập chỉ gồm chữ, số, dấu _ và dấu .";
       }
       else if (field === "fullname") {
         if (val.length < 6 || val.length > 50)
@@ -111,8 +98,8 @@ function showError(field) {
           error = "Email không hợp lệ.";
       }
       else if (field === "phone") {
-        if (/[^\d+\-\s()]/.test(val)) {
-          error = "Số điện thoại chỉ gồm số, +, -, khoảng trắng, ( ).";
+        if (/[^\d+\s]/.test(val)) {
+          error = "Số điện thoại chỉ gồm số, +, khoảng trắng.";
         }
         else if (!validatePhone(val)) {
           error = "Số điện thoại phải đủ 8–15 số, đúng định dạng quốc tế hoặc Việt Nam.";
@@ -149,9 +136,6 @@ function showError(field) {
   }
 }
 
-
-
-
 // ✅ Cập nhật nút đăng ký
 function updateRegisterBtn() {
   let valid = true;
@@ -174,7 +158,7 @@ function updateRegisterBtn() {
   document.getElementById('register-btn').disabled = !valid;
 }
 
-
+// Gắn sự kiện
 fields.forEach(field => {
   const input = document.getElementById(field);
   if (!input) return;
@@ -264,11 +248,7 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-
-
-
 // ✅ Xử lý số điện thoại theo quốc gia
-// Khởi tạo intlTelInput như cũ
 const input = document.querySelector("#phone");
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
@@ -296,17 +276,22 @@ input.addEventListener('input', function () {
 
   // Nếu không bắt đầu bằng mã vùng, auto thêm lại
   if (!value.startsWith(dialCode)) {
-    // Xóa hết ký tự + hoặc số ở đầu
     value = value.replace(/^\+?\d{1,}/, '');
     value = dialCode + (value.startsWith(' ') ? '' : ' ') + value.replace(/[^0-9 ]/g, '');
   } else {
-    // Sau mã vùng chỉ cho phép số và khoảng trắng
     let numberPart = value.slice(dialCode.length).replace(/[^0-9 ]/g, '');
     value = dialCode + numberPart;
   }
-  if (input.value !== value) input.value = value;
+  // Đảm bảo duy nhất một dấu + đầu
+  value = value.replace(/(?!^)\+/g, "");
 
-  validatePhoneField(false); // input: isBlur = false
+  // Loại bỏ khoảng trắng thừa ở đầu sau mã vùng
+  let afterDial = value.slice(dialCode.length);
+  afterDial = afterDial.replace(/^\s+/, '').replace(/ {2,}/g, ' ');
+  value = dialCode + afterDial;
+
+  if (input.value !== value) input.value = value;
+  validatePhoneField(false);
 });
 
 input.addEventListener('countrychange', function () {
@@ -322,16 +307,15 @@ input.addEventListener('blur', function () {
   if (!input.value || !input.value.startsWith(dialCode)) {
     input.value = dialCode + ' ';
   }
-  validatePhoneField(true); // blur: isBlur = true
+  validatePhoneField(true);
 });
 
-// Hàm validate phone: chỉ báo lỗi khi BLUR hoặc đã nhập đủ ≥8 ký tự sau mã vùng
+// Hàm validate phone
 function validatePhoneField(isBlur = false) {
   const hidden = document.querySelector("#phone_e164");
   let value = input.value;
   let dialCode = getDialCode();
 
-  // Không cho phép ký tự lạ
   if (/[^0-9+ ]/.test(value)) {
     input.classList.add("is-invalid");
     input.closest(".iti")?.classList.add("is-invalid");
@@ -340,15 +324,12 @@ function validatePhoneField(isBlur = false) {
     return;
   }
 
-  // Lấy phần số điện thoại đã nhập (sau mã vùng)
   let justNumber = value.replace(/[+\s]/g, "");
   let regionCode = dialCode.replace(/[+\s]/g, "");
   let numberLength = justNumber.length - regionCode.length;
 
-  // --- ĐIỀU CHỈNH Ở ĐÂY ---
   if (isBlur) {
     if (numberLength === 0) {
-      // Chưa nhập gì ngoài mã vùng thì không báo lỗi
       input.classList.remove("is-invalid");
       input.closest(".iti")?.classList.remove("is-invalid");
       document.getElementById("error-phone").textContent = "";
@@ -370,7 +351,6 @@ function validatePhoneField(isBlur = false) {
       if (hidden) hidden.value = phoneInput.getNumber();
     }
   } else {
-    // Đang nhập: chỉ báo lỗi nếu nhập ký tự lạ
     input.classList.remove("is-invalid");
     input.closest(".iti")?.classList.remove("is-invalid");
     document.getElementById("error-phone").textContent = "";
