@@ -1,6 +1,5 @@
 const fields = ["username", "fullname", "email", "password", "confirm_password", "phone", "pin"];
 const touched = {};
-
 fields.forEach(f => touched[f] = false);
 
 // Hàm validate các trường
@@ -30,13 +29,12 @@ pinInput.addEventListener('input', function () {
   if (value.length > 8) value = value.slice(0, 8);
   if (pinInput.value !== value) pinInput.value = value;
 });
-
 function validatePhone(val) {
   if (!window.phoneInput) return false;
   return phoneInput.isValidNumber();
 }
 
-// ✅ Hàm kiểm tra lỗi và show message
+// Hàm kiểm tra lỗi và show message
 function showError(field) {
   const input = document.getElementById(field);
   const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
@@ -101,8 +99,12 @@ function showError(field) {
         if (/[^\d+\s]/.test(val)) {
           error = "Số điện thoại chỉ gồm số, +, khoảng trắng.";
         }
-        else if (!validatePhone(val)) {
-          error = "Số điện thoại phải đủ 8–15 số, đúng định dạng quốc tế hoặc Việt Nam.";
+        else {
+          // Nếu nhập thêm số sau mã vùng thì phải hợp lệ
+          let dialCode = getDialCode();
+          if (val.length > dialCode.length && !validatePhone(val)) {
+            error = "Số điện thoại phải đủ 8–15 số, đúng định dạng quốc tế hoặc Việt Nam.";
+          }
         }
       }
       else if (field === "password") {
@@ -136,28 +138,37 @@ function showError(field) {
   }
 }
 
-// ✅ Cập nhật nút đăng ký
+// ✅ Cập nhật nút đăng ký (fix chuẩn)
 function updateRegisterBtn() {
   let valid = true;
-const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
-for (let field of fields) {
-  const input = document.getElementById(field);
-  // Chỉ các trường bắt buộc mới kiểm tra rỗng
-  if (!input.value && requiredFields.includes(field)) valid = false;
-  // Các trường không bắt buộc: nếu có nhập thì phải hợp lệ
-  else if (field === "fullname" && input.value && !validateName(input.value)) valid = false;
-  else if (field === "phone" && input.value && !validatePhone(input.value)) valid = false;
-  // Trường bắt buộc: kiểm tra như cũ
-  else if (field === "username" && !validateUsername(input.value)) valid = false;
-  else if (field === "confirm_password") {
-    const pw = document.getElementById("password").value;
-    if (input.value !== pw) valid = false;
-  } else if (field === "email" && !validateEmail(input.value)) valid = false;
-  else if (field === "password" && !validatePassword(input.value)) valid = false;
-  else if (field === "pin" && !validatePin(input.value)) valid = false;
-  else if (!input.checkValidity() && requiredFields.includes(field)) valid = false;
+  const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
+  for (let field of fields) {
+    const input = document.getElementById(field);
+    // Các trường bắt buộc mới kiểm tra rỗng
+    if (!input.value && requiredFields.includes(field)) valid = false;
+    // Các trường không bắt buộc: nếu có nhập thì phải hợp lệ
+    else if (field === "fullname" && input.value && !validateName(input.value)) valid = false;
+    else if (field === "phone") {
+      let dialCode = getDialCode();
+      let value = input.value.trim();
+      if (value.length > dialCode.length) {
+        if (!validatePhone(value)) valid = false;
+      }
+    }
+    // Trường bắt buộc như cũ
+    else if (field === "username" && !validateUsername(input.value)) valid = false;
+    else if (field === "confirm_password") {
+      const pw = document.getElementById("password").value;
+      if (input.value !== pw) valid = false;
+    } else if (field === "email" && !validateEmail(input.value)) valid = false;
+    else if (field === "password" && !validatePassword(input.value)) valid = false;
+    else if (field === "pin" && !validatePin(input.value)) valid = false;
+    else if (!input.checkValidity() && requiredFields.includes(field)) valid = false;
+  }
+  if (!document.getElementById('terms-conditions').checked) valid = false;
+  if (!window.captchaOk) valid = false;
+  document.getElementById('register-btn').disabled = !valid;
 }
-
 
 // Gắn sự kiện
 fields.forEach(field => {
@@ -203,15 +214,14 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // Khi submit, đánh dấu touched tất cả để hiện báo lỗi ngay
     let valid = true;
+    const requiredFields = ["username", "email", "password", "confirm_password", "pin"];
     fields.forEach(field => {
       touched[field] = true;
       showError(field);
       const input = document.getElementById(field);
-      // Chỉ các trường bắt buộc mới kiểm tra rỗng
       if (input.classList.contains('is-invalid')) valid = false;
       if (!input.value && requiredFields.includes(field)) valid = false;
     });
-
 
     if (!valid) {
       updateRegisterBtn();
@@ -252,7 +262,7 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// ✅ Xử lý số điện thoại theo quốc gia
+// Xử lý số điện thoại theo quốc gia
 const input = document.querySelector("#phone");
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
