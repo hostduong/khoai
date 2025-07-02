@@ -3,6 +3,7 @@ import { sha256, randomBase62 } from "./hash";
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
+    const now = Math.floor(Date.now() / 1000);
     const data = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("x-forwarded-for") || "";
     const ua = request.headers.get("User-Agent") || "";
@@ -16,7 +17,7 @@ export async function onRequestPost(context) {
         body: new URLSearchParams({
           secret: env.CF_TURNSTILE_SECRET,
           response: captchaToken,
-          remoteip: request.headers.get("CF-Connecting-IP") || "",
+          remoteip: ip,
         }),
         headers: { "content-type": "application/x-www-form-urlencoded" },
       });
@@ -28,87 +29,81 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, message: "Captcha không hợp lệ!", error: result }, { status: 400 });
     }
 
-
-
     // 2. VALIDATE INPUT
-const { username, fullname, email, password, confirm_password, phone, pin } = data;
+    const { username, fullname, email, password, confirm_password, phone, pin } = data;
 
-// Username: BẮT BUỘC, 6-30 ký tự, chỉ chữ/số/._, không phân biệt hoa/thường
-if (
-  typeof username !== "string" ||
-  username.length < 6 || username.length > 30 ||
-  !/^[a-zA-Z0-9_.]+$/.test(username)
-) {
-  return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
-}
+    // Username: BẮT BUỘC, 6-30 ký tự, chỉ chữ/số/._, không phân biệt hoa/thường
+    if (
+      typeof username !== "string" ||
+      username.length < 6 || username.length > 30 ||
+      !/^[a-zA-Z0-9_.]+$/.test(username)
+    ) {
+      return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
+    }
 
-// Họ tên: KHÔNG bắt buộc, nếu có thì phải 6-50 ký tự, không số, không ký tự đặc biệt
-if (
-  typeof fullname === "string" &&
-  fullname.length > 0 && (
-    fullname.length < 6 || fullname.length > 50 ||
-    /[0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]/.test(fullname)
-  )
-) {
-  return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
-}
+    // Họ tên: KHÔNG bắt buộc, nếu có thì phải 6-50 ký tự, không số, không ký tự đặc biệt
+    if (
+      typeof fullname === "string" &&
+      fullname.length > 0 && (
+        fullname.length < 6 || fullname.length > 50 ||
+        /[0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]/.test(fullname)
+      )
+    ) {
+      return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
+    }
 
-// Email: BẮT BUỘC, 6-100 ký tự, regex chuẩn
-if (
-  typeof email !== "string" ||
-  email.length < 6 || email.length > 100 ||
-  !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
-) {
-  return Response.json({ success: false, message: "Email không hợp lệ!" });
-}
+    // Email: BẮT BUỘC, 6-100 ký tự, regex chuẩn
+    if (
+      typeof email !== "string" ||
+      email.length < 6 || email.length > 100 ||
+      !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+    ) {
+      return Response.json({ success: false, message: "Email không hợp lệ!" });
+    }
 
-// Mật khẩu: BẮT BUỘC, 8-30 ký tự, không chứa ', ", <, >, dấu cách, `, chỉ ký tự ASCII 0x21-0x7E
-if (
-  typeof password !== "string" ||
-  password.length < 8 || password.length > 30 ||
-  /['"<>\s`]/.test(password) ||
-  !/^[\x21-\x7E]+$/.test(password)
-) {
-  return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
-}
+    // Mật khẩu: BẮT BUỘC, 8-30 ký tự, không chứa ', ", <, >, dấu cách, `, chỉ ký tự ASCII 0x21-0x7E
+    if (
+      typeof password !== "string" ||
+      password.length < 8 || password.length > 30 ||
+      /['"<>\s`]/.test(password) ||
+      !/^[\x21-\x7E]+$/.test(password)
+    ) {
+      return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
+    }
 
-// Nhập lại mật khẩu: BẮT BUỘC, phải trùng password
-if (password !== confirm_password)
-  return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
+    // Nhập lại mật khẩu: BẮT BUỘC, phải trùng password
+    if (password !== confirm_password)
+      return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
 
-// PIN: BẮT BUỘC, đúng 8 số
-if (
-  typeof pin !== "string" ||
-  !/^[0-9]{8}$/.test(pin)
-) {
-  return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
-}
+    // PIN: BẮT BUỘC, đúng 8 số
+    if (
+      typeof pin !== "string" ||
+      !/^[0-9]{8}$/.test(pin)
+    ) {
+      return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
+    }
 
-// Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format quốc tế và hợp lệ cơ bản
-if (
-  typeof phone === "string" &&
-  phone.trim().length > 0
-) {
-  let value = phone.trim();
-  // Không được chứa ký tự lạ
-  if (/[^\d+\s]/.test(value)) {
-    return Response.json({ success: false, message: "Số điện thoại chỉ được chứa số, +, và khoảng trắng!" });
-  }
-  // Phải bắt đầu bằng +
-  if (!value.startsWith("+")) {
-    return Response.json({ success: false, message: "Số điện thoại phải bắt đầu bằng dấu + (quốc tế)!" });
-  }
-  // Số điện thoại sau khi bỏ khoảng trắng phải từ 8–15 số (tùy từng quốc gia)
-  let raw = value.replace(/[^\d]/g, ""); // chỉ lấy số
-  if (raw.length < 8 || raw.length > 15) {
-    return Response.json({ success: false, message: "Số điện thoại không hợp lệ, phải từ 8–15 số!" });
-  }
-}
+    // Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format quốc tế và hợp lệ cơ bản
+    if (
+      typeof phone === "string" &&
+      phone.trim().length > 0
+    ) {
+      let value = phone.trim();
+      // Không được chứa ký tự lạ
+      if (/[^\d+\s]/.test(value)) {
+        return Response.json({ success: false, message: "Số điện thoại chỉ được chứa số, +, và khoảng trắng!" });
+      }
+      // Phải bắt đầu bằng +
+      if (!value.startsWith("+")) {
+        return Response.json({ success: false, message: "Số điện thoại phải bắt đầu bằng dấu + (quốc tế)!" });
+      }
+      // Số điện thoại sau khi bỏ khoảng trắng phải từ 8–15 số (tùy từng quốc gia)
+      let raw = value.replace(/[^\d]/g, ""); // chỉ lấy số
+      if (raw.length < 8 || raw.length > 15) {
+        return Response.json({ success: false, message: "Số điện thoại không hợp lệ, phải từ 8–15 số!" });
+      }
+    }
 
-
-    
-
-    
     // 3. CHECK TỒN TẠI USERNAME/EMAIL
     let userExists, emailExists, idCounter;
     const userKey = `KHOAI__profile__user:${username}`;
@@ -152,7 +147,9 @@ if (
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo token!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 7. GHI VÀO KV
+    // 7. GHI VÀO KV + Lưu ip_logged, ua_logged
+    let ip_logged = ip ? [ip] : [];
+    let ua_logged = ua ? [ua] : [];
     const userProfile = {
       id: newId,
       status: "live",
@@ -168,8 +165,8 @@ if (
       open_pin: "false",
       ip_whitelist: [],
       open_ip: "false",
-      ip_logged: ip ? [ip] : [],
-      ua_logged: ua ? [ua] : [],
+      ip_logged,
+      ua_logged,
       country: "VN",
       language: "vi",
       coin: 0,
@@ -177,6 +174,7 @@ if (
       mail_total_save: 0,
       time: now,
       token: hashedToken,
+      username, // nên bổ sung username để tiện các thao tác sau
     };
 
     try {
@@ -198,7 +196,7 @@ if (
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi token vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 9. AUTO LOGIN: TẠO COOKIE
+    // 9. AUTO LOGIN: TẠO COOKIE, PROFILE_COOKIE
     let cookie, cookieSalt;
     try {
       cookie = randomBase62(60);
@@ -222,14 +220,14 @@ if (
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo cookie!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 10. TẠO PROFILE TOKEN
-    let profileToken;
+    // 10. TẠO PROFILE_COOKIE
+    let profile_cookie;
     try {
       const salt_profile = env.SALT_PROFILE;
       const userAgent = context.request.headers.get("User-Agent") || "";
-      profileToken = await sha256(username + email + userAgent + salt_profile + cookie);
+      profile_cookie = await sha256(username + email + userAgent + salt_profile + cookie);
     } catch (err) {
-      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo profileToken!", error: String(err), stack: err?.stack }), { status: 500 });
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo profile_cookie!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
     // 11. TRẢ VỀ CHO CLIENT (set-cookie và dữ liệu)
@@ -245,11 +243,14 @@ if (
         email,
         token: apiToken,
         cookie,
-        profileToken
+        profile_cookie
       }),
       {
         headers: {
-          "Set-Cookie": `cookie=${cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${7 * 24 * 3600}`,
+          "Set-Cookie": [
+            `cookie=${cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`,
+            `profile_cookie=${profile_cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`
+          ],
           "Content-Type": "application/json",
         },
         status: 200,
