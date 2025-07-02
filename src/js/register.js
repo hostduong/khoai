@@ -267,6 +267,7 @@ document.getElementById("email").addEventListener("input", function(e) {
 
 
 // ✅ Xử lý số điện thoại theo quốc gia
+// Khởi tạo intlTelInput như cũ
 const input = document.querySelector("#phone");
 const phoneInput = window.intlTelInput(input, {
   initialCountry: "auto",
@@ -280,15 +281,14 @@ const phoneInput = window.intlTelInput(input, {
   formatOnDisplay: true,
   utilsScript: window.location.origin + "/js/utils.js"
 });
-
 window.phoneInput = phoneInput;
 
-// Lấy mã vùng hiện tại (có dấu +)
+// Hàm lấy mã vùng
 function getDialCode() {
   return "+" + phoneInput.getSelectedCountryData().dialCode;
 }
 
-// Luôn đảm bảo input bắt đầu bằng mã vùng, không thể xóa
+// Luôn đảm bảo input bắt đầu bằng mã vùng
 input.addEventListener('input', function () {
   let dialCode = getDialCode();
   let value = input.value;
@@ -304,29 +304,28 @@ input.addEventListener('input', function () {
     value = dialCode + numberPart;
   }
   if (input.value !== value) input.value = value;
-  validatePhoneField();
+
+  validatePhoneField(false); // input: isBlur = false
 });
 
-// Khi chọn quốc gia khác
 input.addEventListener('countrychange', function () {
   let dialCode = getDialCode();
   if (!input.value.startsWith(dialCode)) {
     input.value = dialCode + ' ';
   }
-  validatePhoneField();
+  validatePhoneField(false);
 });
 
-// Khi blur nếu trống hoặc thiếu mã vùng thì tự điền lại
 input.addEventListener('blur', function () {
   let dialCode = getDialCode();
   if (!input.value || !input.value.startsWith(dialCode)) {
     input.value = dialCode + ' ';
   }
-  validatePhoneField();
+  validatePhoneField(true); // blur: isBlur = true
 });
 
-// Hàm validate chuẩn nhất
-function validatePhoneField() {
+// Hàm validate phone: chỉ báo lỗi khi BLUR hoặc đã nhập đủ ≥8 ký tự sau mã vùng
+function validatePhoneField(isBlur = false) {
   const hidden = document.querySelector("#phone_e164");
   let value = input.value;
   let dialCode = getDialCode();
@@ -340,13 +339,13 @@ function validatePhoneField() {
     return;
   }
 
-  // Loại bỏ dấu + và khoảng trắng, kiểm tra phần số điện thoại đã nhập sau mã vùng
+  // Lấy phần số điện thoại đã nhập (sau mã vùng)
   let justNumber = value.replace(/[+\s]/g, "");
   let regionCode = dialCode.replace(/[+\s]/g, "");
   let numberLength = justNumber.length - regionCode.length;
 
-  // Chỉ báo lỗi nếu user đã nhập ít nhất 1 số sau mã vùng
-  if (numberLength > 0) {
+  // Chỉ báo lỗi khi BLUR hoặc đã nhập đủ ≥ 8 ký tự (và có nhập gì đó)
+  if ((numberLength >= 8 || isBlur) && numberLength > 0) {
     if (phoneInput.isValidNumber()) {
       input.classList.remove("is-invalid");
       input.closest(".iti")?.classList.remove("is-invalid");
@@ -359,12 +358,10 @@ function validatePhoneField() {
       if (hidden) hidden.value = "";
     }
   } else {
-    // Chưa nhập số nào: không hiện lỗi
+    // Đang nhập dở (<8 số) hoặc chưa nhập số: không báo lỗi
     input.classList.remove("is-invalid");
     input.closest(".iti")?.classList.remove("is-invalid");
     document.getElementById("error-phone").textContent = "";
     if (hidden) hidden.value = "";
   }
 }
-
-// Kêt thúc
