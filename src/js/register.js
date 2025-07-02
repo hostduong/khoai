@@ -5,11 +5,19 @@ fields.forEach(f => touched[f] = false);
 
 // Hàm validate các trường
 function validateUsername(val) {
-  return val.length >= 6 && val.length <= 30 && /^[a-z0-9_.]+$/.test(val);
+  return val.length >= 6 && val.length <= 30 && /^[a-zA-Z0-9_.]+$/.test(val);
 }
+// showError cũng thay [a-z0-9_.] ➜ [a-zA-Z0-9_.]
+if (field === "username" && val && /[^a-zA-Z0-9_.]/.test(val)) {
+  error = "Tên đăng nhập chỉ gồm chữ, số, dấu _ và dấu .";
+}
+
+
 function validateEmail(val) {
+  // Chấp nhận cả chữ hoa/thường (ở trước @ và domain)
   return val.length >= 6 && val.length <= 100 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
 }
+
 function validatePassword(val) {
   // Độ dài 8-30, cấm ' " < > ` và dấu cách, cấm Unicode
   return val.length >= 8 && val.length <= 30
@@ -51,11 +59,11 @@ function showError(field) {
 
   // FOCUS: chỉ báo lỗi nếu ký tự không cho phép, KHÔNG báo thiếu ký tự
   if (document.activeElement === input) {
-    if (field === "username" && val && /[^a-z0-9_.]/.test(val)) {
-      error = "Tên đăng nhập chỉ gồm chữ thường (a-z), số, dấu _ và dấu .";
+    if (field === "username" && val && /[^a-zA-Z0-9_.]/.test(val)) {
+    error = "Tên đăng nhập chỉ gồm chữ, số, dấu _ và dấu .";
     }
-    else if (field === "fullname" && val && /[0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]/.test(val)) {
-      error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
+      else if (field === "fullname" && val && /[0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]/.test(val)) {
+        error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
     }
     else if (field === "email" && val && (/[^a-zA-Z0-9._\-+%@]/.test(val) || /\s/.test(val))) {
       error = "Email chỉ được chứa chữ, số, dấu . _ - + % @, không dấu cách hoặc ký tự lạ.";
@@ -254,13 +262,6 @@ window.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
-});
-
-document.getElementById("username").addEventListener("input", function(e) {
-  this.value = this.value.toLowerCase();
-});
-document.getElementById("email").addEventListener("input", function(e) {
-  this.value = this.value.toLowerCase();
 });
 
 
