@@ -6,12 +6,12 @@
 <div class="row mb-4">
   <div class="col-sm-12">
     <div class="card">
-      <form id="changeApiToken" class="changeApiToken card-body" method="POST" action="/api/change-token">
+      <form id="changeApiToken" class="changeApiToken card-body" method="POST" action="{{ domain }}/api/change-token/">
         <div class="row align-items-end">
           <div class="col-md-8 form-password-toggle">
             <label class="form-label">Token cá nhân (Không được chia sẻ với ai)</label>
             <div class="input-group input-group-merge">
-              <input type="password" id="apiTokenUser" class="form-control" readonly value="{{ user.token || '' }}" placeholder="············" aria-describedby="api-token">
+              <input type="password" id="apiTokenUser" class="form-control" readonly value="{{ user.token | '' }}" placeholder="············" aria-describedby="api-token">
               <span class="input-group-text cursor-pointer" onclick="toggleToken('apiTokenUser', this)"><i class="ti ti-eye-off"></i></span>
             </div>
           </div>
@@ -37,7 +37,7 @@
           <div class="col-md-8 form-password-toggle">
             <label class="form-label">Token TikTok (Không được chia sẻ với ai)</label>
             <div class="input-group input-group-merge">
-              <input type="password" id="apiTokenTiktok" class="form-control" readonly value="{{ user.token_tiktok || '' }}" placeholder="············" aria-describedby="api-token-tiktok">
+              <input type="password" id="apiTokenTiktok" class="form-control" readonly value="{{ user.token_tiktok | '' }}" placeholder="············" aria-describedby="api-token-tiktok">
               <span class="input-group-text cursor-pointer" onclick="toggleToken('apiTokenTiktok', this)"><i class="ti ti-eye-off"></i></span>
             </div>
           </div>
