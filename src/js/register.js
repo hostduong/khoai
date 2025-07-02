@@ -11,8 +11,10 @@ function validateEmail(val) {
   return val.length >= 6 && val.length <= 100 && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
 }
 function validatePassword(val) {
-  // 8-30 ký tự, chữ số, các ký tự ~!@#$%^&*()_+.
-  return val.length >= 8 && val.length <= 30 && /^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) && !/[\'\"<>\s]/.test(val);
+  // Độ dài 8-30, cấm ' " < > ` và dấu cách, cấm Unicode
+  return val.length >= 8 && val.length <= 30
+    && !/['"<>\s`]/.test(val)
+    && /^[\x21-\x7E]+$/.test(val); // Chỉ ký tự ASCII printable
 }
 function validateName(val) {
   // 6-50 ký tự, không số, không ký tự đặc biệt
@@ -43,37 +45,41 @@ function validatePhone(val) {
 function showError(field) {
   const input = document.getElementById(field);
   const feedback = document.getElementById(`error-${field.replace("_", "-")}`);
-  if (!input) return;
+  if (!input || !feedback) return;
   let error = "";
   const val = input.value || "";
 
-  // FOCUS: chỉ báo lỗi nếu SAI KÝ TỰ/FORMAT, không báo thiếu ký tự
+  // FOCUS: chỉ báo lỗi nếu ký tự không cho phép, KHÔNG báo thiếu ký tự
   if (document.activeElement === input) {
-    if (field === "phone" && val && /[^0-9+()\s\-]/.test(val)) {
-      error = "Số điện thoại chỉ gồm số, dấu +, (), hoặc dấu -.";
-    }
-    else if (field === "username" && val && !/^[a-z0-9_.]+$/.test(val)) {
+    if (field === "username" && val && /[^a-z0-9_.]/.test(val)) {
       error = "Tên đăng nhập chỉ gồm chữ thường (a-z), số, dấu _ và dấu .";
     }
-    else if (field === "fullname" && val && !/^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val)) {
+    else if (field === "fullname" && val && /[0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]/.test(val)) {
       error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
     }
-    else if (field === "email" && val && !validateEmail(val)) {
-      error = "Email không hợp lệ.";
+    else if (field === "email" && val && (/[^a-zA-Z0-9._\-+%@]/.test(val) || /\s/.test(val))) {
+      error = "Email chỉ được chứa chữ, số, dấu . _ - + % @, không dấu cách hoặc ký tự lạ.";
     }
-    else if (field === "password" && val && (!/^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) || /[\'\"<>\s]/.test(val))) {
-      error = "Không sử dụng ký tự đặc biệt hoặc dấu cách trong mật khẩu.";
+    else if (field === "phone" && val && /[^\d+\-\s()]/.test(val)) {
+      error = "Số điện thoại chỉ gồm số, +, -, khoảng trắng, ( ).";
+    }
+    else if (field === "password" && val) {
+      if (/['"<>\s`]/.test(val)) {
+        error = "Mật khẩu không được chứa ', \", <, >, dấu cách hoặc ký tự lạ.";
+      } else if (!/^[\x21-\x7E]+$/.test(val)) {
+        error = "Mật khẩu chỉ cho phép ký tự tiếng Anh và ký tự đặc biệt thông dụng.";
+      }
     }
     else if (field === "confirm_password" && val) {
       const pw = document.getElementById("password").value;
       if (val !== pw) error = "Mật khẩu nhập lại không khớp!";
     }
-    else if (field === "pin" && val && !/^[0-9]*$/.test(val)) {
-      error = "PIN chỉ được chứa số.";
+    else if (field === "pin" && val && /[^\d]/.test(val)) {
+      error = "PIN chỉ gồm 8 chữ số.";
     }
     // Không báo thiếu ký tự khi focus
   }
-  // BLUR hoặc đã touched (và không focus): báo thiếu ký tự hoặc sai ký tự
+  // BLUR hoặc đã touched: báo thiếu ký tự hoặc sai ký tự/format
   else if (touched[field]) {
     if (val) {
       if (field === "username") {
@@ -85,46 +91,47 @@ function showError(field) {
       else if (field === "fullname") {
         if (val.length < 6 || val.length > 50)
           error = "Họ tên từ 6-50 ký tự, không số, không ký tự đặc biệt.";
-        else if (!/^[^0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]+$/.test(val))
+        else if (/[0-9!@#$%^&*()_=+\[\]{};:\"'<>?/\\|,~`]/.test(val))
           error = "Họ tên không được chứa số hoặc ký tự đặc biệt.";
       }
       else if (field === "email") {
         if (val.length < 6 || val.length > 100)
           error = "Email phải từ 6-100 ký tự.";
+        else if (/[^a-zA-Z0-9._\-+%@]/.test(val) || /\s/.test(val))
+          error = "Email chỉ được chứa chữ, số, dấu . _ - + % @, không dấu cách hoặc ký tự lạ.";
         else if (!validateEmail(val))
           error = "Email không hợp lệ.";
       }
+      else if (field === "phone") {
+        if (/[^\d+\-\s()]/.test(val)) {
+          error = "Số điện thoại chỉ gồm số, +, -, khoảng trắng, ( ).";
+        }
+        else if (!validatePhone(val)) {
+          error = "Số điện thoại phải đủ 8–15 số, đúng định dạng quốc tế hoặc Việt Nam.";
+        }
+      }
       else if (field === "password") {
         if (val.length < 8 || val.length > 30)
-          error = "Mật khẩu từ 8-30 ký tự.";
-        else if (!/^[a-zA-Z0-9~!@#$%^&*()_+.]+$/.test(val) || /[\'\"<>\s]/.test(val))
-          error = "Không sử dụng ký tự đặc biệt hoặc dấu cách trong mật khẩu.";
+          error = "Mật khẩu phải từ 8–30 ký tự.";
+        else if (/['"<>\s`]/.test(val) || !/^[\x21-\x7E]+$/.test(val))
+          error = "Mật khẩu không được chứa ', \", <, >, dấu cách, emoji hoặc ký tự lạ.";
       }
       else if (field === "confirm_password") {
         const pw = document.getElementById("password").value;
         if (val !== pw)
           error = "Mật khẩu nhập lại không khớp!";
       }
-      else if (field === "phone") {
-        // Lưu ý: vẫn giữ nguyên validatePhone cho chuẩn quốc tế/mã vùng
-        if (/[^0-9+()\s\-]/.test(val)) {
-          error = "Số điện thoại chỉ gồm số, dấu +, (), hoặc dấu -.";
-        }
-        else if (!validatePhone(val)) {
-          error = "Số điện thoại phải đủ 8–15 số, đúng định dạng quốc tế hoặc Việt Nam.";
-        }
-      }
       else if (field === "pin") {
         if (val.length !== 8)
           error = "PIN phải đúng 8 số.";
-        else if (!/^[0-9]+$/.test(val))
+        else if (/[^\d]/.test(val))
           error = "PIN chỉ gồm các số.";
       }
     }
     // Nếu chưa nhập thì không báo lỗi gì cả
   }
 
-  // Báo lỗi
+  // Hiển thị lỗi
   if (error) {
     input.classList.add("is-invalid");
     feedback.textContent = error;
@@ -133,7 +140,6 @@ function showError(field) {
     feedback.textContent = "";
   }
 }
-
 
 
 
