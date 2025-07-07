@@ -5,7 +5,12 @@ compatibility_date = "2024-06-24"
 kv_namespaces = [
   { binding = "KHOAI_KV_USER", id = "77a8867cc9374bbaa9846d78875efbf0" },
   { binding = "KHOAI_KV_TOKEN", id = "f6f5eef5735443e685d45c500f06df83" },
-  { binding = "KHOAI_KV_COOKIE", id = "9e0fee27605645ae9b60157f6e75e4e7" }
+  { binding = "KHOAI_KV_COOKIE", id = "9e0fee27605645ae9b60157f6e75e4e7" },
+  { binding = "KHOAI_KV_OUTLOOK", id = "60ad76d205ff435c8101bd3e31428a01" },
+  { binding = "KHOAI_KV_GMAIL", id = "08b95e1748744c80b9f797d3c0d4fe4b" },
+  { binding = "KHOAI_KV_COIN", id = "44498515d40948d7b12072b677cf5cb7" },
+  { binding = "KHOAI_KV_LOGGER_COIN", id = "852f904fc9384926be284eefacf15cd2" },
+  { binding = "KHOAI_KV_SETTING", id = "852f904fc9384926be284eefacf15cd2" },
 ]
 
 [triggers]
@@ -15,4 +20,10 @@ routes = [
 
 [vars]
 CF_TURNSTILE_SECRET = "0x4AAAAAABiYUux96DvoHqPKiH1tnc_iUFs"
-SALT_PROFILE = "A7ZK9Q8M3LVCU0EXYRT1NG52HOBWJDKQ"
+SALT_USER = "A7ZK9Q8M3LVCU0EXYRT1NG52HOBWJDKQ"
+SALT_COOKIE = "R6Xq8U1oM2wVhKpBnGZL3tYvE7jCQd9fb4sxA0uTHzlm5iNPyWcDJoerkIgF"
+SALT_PROFILE_COOKIE = "utAHrYKneGpWo8V3ZM6ILbNTa91sdf7cExqRQFXOm0CJ4kl25PybzUgwjhED"
+SALT_TOKEN = "pLk5BWzG1A0uNftJHyRqmiYC8lTvKXEq4bdohZMF2S76OPWc3enDrgsxV9jUL"
+SALT_SETTING = "Km6vz8RWyi5sfCUdbXYl1TEJqrLNOpIAF4MPHtoVu7nQZ9w3gkDjhae0BGxc2"
+ENCRYPTION_KEY_EMAIL = "nSg4ZzErVh5sQpJ0u7fD1YXaW9iMBqLt3c+mD8OwE3M="
+API_SEND_MAIL = ""
