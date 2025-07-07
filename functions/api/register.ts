@@ -32,6 +32,7 @@ export async function onRequestPost(context) {
     // 2. VALIDATE INPUT
     const { username, fullname, email, password, confirm_password, phone, pin } = data;
 
+    // Username: BẮT BUỘC, 6-30 ký tự, chỉ chữ/số/._, không phân biệt hoa/thường
     if (
       typeof username !== "string" ||
       username.length < 6 || username.length > 30 ||
@@ -39,6 +40,8 @@ export async function onRequestPost(context) {
     ) {
       return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
     }
+
+    // Họ tên: KHÔNG bắt buộc, nếu có thì phải 6-50 ký tự, không số, không ký tự đặc biệt
     if (
       typeof fullname === "string" &&
       fullname.length > 0 && (
@@ -48,6 +51,8 @@ export async function onRequestPost(context) {
     ) {
       return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
     }
+
+    // Email: BẮT BUỘC, 6-100 ký tự, regex chuẩn
     if (
       typeof email !== "string" ||
       email.length < 6 || email.length > 100 ||
@@ -55,6 +60,8 @@ export async function onRequestPost(context) {
     ) {
       return Response.json({ success: false, message: "Email không hợp lệ!" });
     }
+
+    // Mật khẩu: BẮT BUỘC, 8-30 ký tự, không chứa ', ", <, >, dấu cách, `, chỉ ký tự ASCII 0x21-0x7E
     if (
       typeof password !== "string" ||
       password.length < 8 || password.length > 30 ||
@@ -63,14 +70,20 @@ export async function onRequestPost(context) {
     ) {
       return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
     }
+
+    // Nhập lại mật khẩu: BẮT BUỘC, phải trùng password
     if (password !== confirm_password)
       return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
+
+    // PIN: BẮT BUỘC, đúng 8 số
     if (
       typeof pin !== "string" ||
       !/^[0-9]{8}$/.test(pin)
     ) {
       return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
     }
+
+    // Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format quốc tế và hợp lệ cơ bản
     if (
       typeof phone === "string" &&
       phone.trim().length > 0
@@ -159,7 +172,7 @@ export async function onRequestPost(context) {
       mail_total_save: 0,
       time: now,
       token: hashedToken,
-      username,
+      username, // dùng để truy vấn thuận tiện
       avatar: "/images/avatar.jpg"
     };
 
@@ -177,7 +190,7 @@ export async function onRequestPost(context) {
         `KHOAI__token__user:${hashedToken}`,
         JSON.stringify({ status: "live", ban_reason: "", user: username, time: now })
       );
-      await env.KHOAI_KV_TOKEN.put(`KHOAI__token__salt:${salt}`, JSON.stringify({ time: now }));
+      await env.KHOAI_KV_TOKEN.put(`KHOAI__token__salt:${salt}`, JSON.stringify({ time: now });
     } catch (err) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi token vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
     }
@@ -197,7 +210,7 @@ export async function onRequestPost(context) {
           user: username,
           open_ip: "off",
           ip: [],
-          au: await sha256(ua + cookieSalt),
+          au: await sha256((context.request.headers.get("User-Agent") || "") + cookieSalt),
           time: now,
         }),
         { expirationTtl: 7 * 24 * 3600 }
@@ -210,7 +223,8 @@ export async function onRequestPost(context) {
     let profile_cookie;
     try {
       const salt_profile = env.SALT_PROFILE;
-      profile_cookie = await sha256(username + email + ua + salt_profile + cookie);
+      const userAgent = context.request.headers.get("User-Agent") || "";
+      profile_cookie = await sha256(username + email + userAgent + salt_profile + cookie);
     } catch (err) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo profile_cookie!", error: String(err), stack: err?.stack }), { status: 500 });
     }
@@ -223,12 +237,12 @@ export async function onRequestPost(context) {
         redirect: "/overview",
         username,
         id: newId,
-        fullname: fullname || "",
+        fullname,
         available_coin: 0,
         loaded_coin: 0,
-        purchased_mail: 0,
-        mail_total_save: 0,
         email,
+        mail_total_save: 0,
+        purchased_mail: 0,
         token: apiToken,
         cookie,
         profile_cookie,
