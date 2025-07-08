@@ -35,15 +35,11 @@ export async function onRequestPost(context) {
     password = (password || "").trim();
 
     // 3. TÌM USER BẰNG username/email
-    let userProfile;
-    let userKey = `KHOAI__profile__user:${username}`;
-    userProfile = await env.KHOAI_KV_USER.get(userKey, "json");
+    let userProfile = await env.KHOAI_KV_USER.get(`KHOAI__profile:user:${username}`, "json");
     if (!userProfile) {
-      const emailKey = `KHOAI__profile__email:${username}`;
-      const emailMap = await env.KHOAI_KV_USER.get(emailKey, "json");
+      const emailMap = await env.KHOAI_KV_USER.get(`KHOAI__profile:email:${username}`, "json");
       if (emailMap?.user) {
-        userKey = `KHOAI__profile__user:${emailMap.user}`;
-        userProfile = await env.KHOAI_KV_USER.get(userKey, "json");
+        userProfile = await env.KHOAI_KV_USER.get(`KHOAI__profile:user:${emailMap.user}`, "json");
       }
     }
     if (!userProfile) {
@@ -53,27 +49,26 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, message: "Tài khoản đã bị khóa!" }, { status: 403 });
     }
 
-    // 4. KIỂM TRA PASSWORD (dùng SALT_USER)
-    const salt = env.SALT_USER;
-    const hashedInputPass = await sha256(password + salt);
-    if (hashedInputPass !== userProfile.pass) {
+    // 4. KIỂM TRA PASSWORD ĐÚNG CHUẨN HỆ THỐNG
+    const hashedInputPass = await sha256(password + userProfile.security.salt_user);
+    if (hashedInputPass !== userProfile.security.user_password) {
       return Response.json({ success: false, message: "Sai mật khẩu!" }, { status: 400 });
     }
 
     // 5. Nếu bật open_pin thì bắt buộc phải kiểm tra PIN
-    if (userProfile.open_pin === "true") {
+    if (userProfile.security.open_pin === true) {
       if (!pin || typeof pin !== "string" || !/^[0-9]{8}$/.test(pin)) {
         return Response.json({ success: false, message: "Vui lòng nhập đúng mã PIN (8 số)!" }, { status: 400 });
       }
-      const hashedPin = await sha256(pin + salt);
-      if (hashedPin !== userProfile.pin) {
+      const hashedPin = await sha256(pin + userProfile.security.salt_user);
+      if (hashedPin !== userProfile.security.pin) {
         return Response.json({ success: false, message: "Mã PIN không đúng!" }, { status: 400 });
       }
     }
 
     // 6. Cập nhật ip_logged/ua_logged
-    let ip_logged = Array.isArray(userProfile.ip_logged) ? [...userProfile.ip_logged] : [];
-    let ua_logged = Array.isArray(userProfile.ua_logged) ? [...userProfile.ua_logged] : [];
+    let ip_logged = Array.isArray(userProfile.security.ip_logged) ? [...userProfile.security.ip_logged] : [];
+    let ua_logged = Array.isArray(userProfile.security.ua_logged) ? [...userProfile.security.ua_logged] : [];
     if (ip && !ip_logged.includes(ip)) {
       ip_logged.unshift(ip);
       if (ip_logged.length > 20) ip_logged = ip_logged.slice(0, 20);
@@ -82,34 +77,44 @@ export async function onRequestPost(context) {
       ua_logged.unshift(ua);
       if (ua_logged.length > 20) ua_logged = ua_logged.slice(0, 20);
     }
-    userProfile.ip_logged = ip_logged;
-    userProfile.ua_logged = ua_logged;
-    await env.KHOAI_KV_USER.put(userKey, JSON.stringify(userProfile));
+    userProfile.security.ip_logged = ip_logged;
+    userProfile.security.ua_logged = ua_logged;
+    await env.KHOAI_KV_USER.put(`KHOAI__profile:user:${userProfile.username}`, JSON.stringify(userProfile));
 
-    // 7. TẠO COOKIE, PROFILE_COOKIE (dùng SALT_COOKIE)
+    // 7. TẠO COOKIE, PROFILE_COOKIE (dùng SALT_COOKIE, SALT_PROFILE_COOKIE)
     const cookie = randomBase62(100);
-    const cookieSalt = env.SALT_COOKIE;
+    const salt_cookie = env.SALT_COOKIE;
+    const salt_profile_cookie = env.SALT_PROFILE_COOKIE;
+
+    // Hash UA
+    const ua_hash = await sha256(ua);
+
+    // COOKIE_ID
+    const cookie_id = await sha256(ua_hash + cookie + salt_cookie);
+
+    // Lưu vào KV
     await env.KHOAI_KV_COOKIE.put(
-      `KHOAI__cookie__salt:${userProfile.username}`,
-      JSON.stringify({ salt: cookieSalt, time: now })
+      `KHOAI__cookie:cookie:${cookie_id}`,
+      JSON.stringify({ user: userProfile.username, last_seen: now }),
+      { expirationTtl: 14 * 24 * 3600 }
     );
     await env.KHOAI_KV_COOKIE.put(
-      `KHOAI__cookie__user:${userProfile.username}:${await sha256(cookie + cookieSalt)}`,
+      `KHOAI__cookie:user:${userProfile.username}:${ua_hash}`,
       JSON.stringify({
-        user: userProfile.username,
-        open_ip: userProfile.open_ip ?? "off",
-        ip: [],
-        au: await sha256(ua + cookieSalt),
-        time: now,
+        cookie_id: cookie_id,
+        ua: ua_hash,
+        device_name: request.headers.get("Sec-CH-UA-Platform") || "",
+        ip_created: ip,
+        country: userProfile.userData?.country || "VN",
+        city: userProfile.userData?.city || "",
+        login_time: now,
+        last_seen: now,
       }),
       { expirationTtl: 14 * 24 * 3600 }
     );
 
-    // profile_cookie = sha256(username + email + UA + salt_profile + cookie)
-    const salt_profile = env.SALT_PROFILE_COOKIE;
-    const profile_cookie = await sha256(
-      userProfile.username + userProfile.email + ua + salt_profile + cookie
-    );
+    // profile_cookie
+    const profile_cookie = await sha256(ua_hash + cookie + salt_profile_cookie);
 
     // 8. Set-Cookie trả về cho client
     return new Response(
