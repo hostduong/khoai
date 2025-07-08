@@ -31,74 +31,53 @@ export async function onRequestPost(context) {
 
     // 2. VALIDATE INPUT
     const { username, fullname, email, password, confirm_password, phone, pin } = data;
-
-    // Username: BẮT BUỘC, 6-30 ký tự, chỉ chữ/số/._, không phân biệt hoa/thường
     if (
       typeof username !== "string" ||
       username.length < 6 || username.length > 30 ||
       !/^[a-zA-Z0-9_.]+$/.test(username)
-    ) {
-      return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
-    }
+    ) return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
 
-    // Họ tên: KHÔNG bắt buộc, nếu có thì phải 6-50 ký tự, không số, không ký tự đặc biệt
     if (
       typeof fullname === "string" &&
       fullname.length > 0 && (
         fullname.length < 6 || fullname.length > 50 ||
         /[0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]/.test(fullname)
       )
-    ) {
-      return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
-    }
+    ) return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
 
-    // Email: BẮT BUỘC, 6-100 ký tự, regex chuẩn
     if (
       typeof email !== "string" ||
       email.length < 6 || email.length > 100 ||
       !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
-    ) {
-      return Response.json({ success: false, message: "Email không hợp lệ!" });
-    }
+    ) return Response.json({ success: false, message: "Email không hợp lệ!" });
 
-    // Mật khẩu: BẮT BUỘC, 8-30 ký tự, không chứa ', ", <, >, dấu cách, `, chỉ ký tự ASCII 0x21-0x7E
     if (
       typeof password !== "string" ||
       password.length < 8 || password.length > 30 ||
       /['"<>\s`]/.test(password) ||
       !/^[\x21-\x7E]+$/.test(password)
-    ) {
-      return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
-    }
+    ) return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
 
-    // Nhập lại mật khẩu: BẮT BUỘC, phải trùng password
     if (password !== confirm_password)
       return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
 
-    // PIN: BẮT BUỘC, đúng 8 số
     if (
       typeof pin !== "string" ||
       !/^[0-9]{8}$/.test(pin)
-    ) {
-      return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
-    }
+    ) return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
 
-    // Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format quốc tế và hợp lệ cơ bản
     if (
       typeof phone === "string" &&
       phone.trim().length > 0
     ) {
       let value = phone.trim();
-      // Không được chứa ký tự lạ
       if (/[^\d+\s]/.test(value)) {
         return Response.json({ success: false, message: "Số điện thoại chỉ được chứa số, +, và khoảng trắng!" });
       }
-      // Phải bắt đầu bằng +
       if (!value.startsWith("+")) {
         return Response.json({ success: false, message: "Số điện thoại phải bắt đầu bằng dấu + (quốc tế)!" });
       }
-      // Số điện thoại sau khi bỏ khoảng trắng phải từ 8–15 số (tùy từng quốc gia)
-      let raw = value.replace(/[^\d]/g, ""); // chỉ lấy số
+      let raw = value.replace(/[^\d]/g, "");
       if (raw.length < 8 || raw.length > 15) {
         return Response.json({ success: false, message: "Số điện thoại không hợp lệ, phải từ 8–15 số!" });
       }
@@ -128,43 +107,23 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo ID mới!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 5. TẠO SALT, HASH PASS/PIN
-    let salt_user, hashedPass, hashedPin;
+    // 5. HASH PASS/PIN (dùng salt cố định từ env)
+    const salt = env.SALT_USER;
+    let hashedPass, hashedPin;
     try {
-      salt_user = randomBase62(50);
-      hashedPass = await sha256(password + salt_user);
-      hashedPin = await sha256(pin + salt_user);
+      hashedPass = await sha256(password + salt);
+      hashedPin = await sha256(pin + salt);
     } catch (err) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi hash password/pin!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 6. TẠO TOKEN MASTER (token cá nhân cho API)
-    let token_master, token_hash;
+    // 6. TẠO TOKEN (API token cá nhân, salt cố định)
+    let apiToken, hashedToken;
     try {
-      token_master = randomBase62(100);
-      const salt_token = env.SALT_TOKEN;
-      token_hash = await sha256(token_master + salt_token);
-      // Lưu vào KV Token (master)
-      await env.KHOAI_KV_TOKEN.put(
-        `KHOAI__token:user:${username}`,
-        JSON.stringify({ token_master, status: "live", type: "master", user: username, time: now, note: "Tạo tự động sau đăng ký" })
-      );
-      await env.KHOAI_KV_TOKEN.put(
-        `KHOAI__token:master:${token_hash}`,
-        JSON.stringify({
-          title: "Token cá nhân API",
-          status: "live",
-          type: "master",
-          ban_reason: "",
-          user: username,
-          note: "Tạo tự động sau đăng ký",
-          rate_limit: 0,
-          rate_window: "minute",
-          time: now
-        })
-      );
+      apiToken = randomBase62(100);
+      hashedToken = await sha256(apiToken + env.SALT_TOKEN);
     } catch (err) {
-      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo token master!", error: String(err), stack: err?.stack }), { status: 500 });
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo token!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
     // 7. GHI VÀO KV + Lưu ip_logged, ua_logged
@@ -177,7 +136,7 @@ export async function onRequestPost(context) {
       role: "user",
       verified_email: "false",
       email,
-      salt: salt_user,
+      salt,                 // vẫn lưu salt vào profile, nhưng giá trị lấy từ env
       pass: hashedPass,
       fullname,
       phone,
@@ -194,7 +153,8 @@ export async function onRequestPost(context) {
       purchased_mail: 0,
       mail_total_save: 0,
       time: now,
-      username, // để truy vấn ngược
+      token: hashedToken,
+      username, // nên bổ sung username để tiện các thao tác sau
     };
 
     try {
@@ -205,11 +165,22 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi profile vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 8. AUTO LOGIN: TẠO COOKIE, PROFILE_COOKIE
-    let cookie, cookieSalt;
+    // 8. GHI TOKEN API
+    try {
+      await env.KHOAI_KV_TOKEN.put(
+        `KHOAI__token__user:${hashedToken}`,
+        JSON.stringify({ status: "live", ban_reason: "", user: username, time: now })
+      );
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi token vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
+
+    // 9. AUTO LOGIN: TẠO COOKIE, PROFILE_COOKIE (dùng salt cố định)
+    let cookie;
     try {
       cookie = randomBase62(100);
-      cookieSalt = randomBase62(50);
+      // Không random salt, lấy env.SALT_COOKIE!
+      const cookieSalt = env.SALT_COOKIE;
       await env.KHOAI_KV_COOKIE.put(
         `KHOAI__cookie__salt:${username}`,
         JSON.stringify({ salt: cookieSalt, time: now })
@@ -229,24 +200,23 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo cookie!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 9. TẠO PROFILE_COOKIE
+    // 10. TẠO PROFILE_COOKIE (dùng SALT_PROFILE_COOKIE)
     let profile_cookie;
     try {
-      const salt_profile_cookie = env.SALT_PROFILE_COOKIE;
+      const salt_profile = env.SALT_PROFILE_COOKIE;
       const userAgent = context.request.headers.get("User-Agent") || "";
-      profile_cookie = await sha256(username + email + userAgent + salt_profile_cookie + cookie);
+      profile_cookie = await sha256(username + email + userAgent + salt_profile + cookie);
     } catch (err) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo profile_cookie!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 10. TRẢ VỀ CHO CLIENT (set-cookie và dữ liệu)
+    // 11. TRẢ VỀ CHO CLIENT (set-cookie và dữ liệu)
     return new Response(
       JSON.stringify({
         success: true,
         redirect: "/overview",
         cookie,
-        profile_cookie,
-        token_master,
+        profile_cookie
       }),
       {
         headers: {
@@ -260,7 +230,6 @@ export async function onRequestPost(context) {
       }
     );
   } catch (err) {
-    // Trả lỗi cuối cùng nếu mọi thứ còn lại fail bất ngờ
     return new Response(
       JSON.stringify({ success: false, message: "Lỗi hệ thống ngoài dự kiến!", error: String(err), stack: err?.stack }),
       { status: 500, headers: { "Content-Type": "application/json" } }
