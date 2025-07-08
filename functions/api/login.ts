@@ -85,7 +85,7 @@ export async function onRequestPost(context) {
     }
 
     // 6. TẠO COOKIE
-    const cookie = randomBase62(60);
+    const cookie = randomBase62(100);
     const salt_cookie = env.SALT_COOKIE;
     const userAgentHash = await sha256(ua);
     const cookieKey = `KHOAI__cookie:cookie:${await sha256(userAgentHash + cookie + salt_cookie)}`;
