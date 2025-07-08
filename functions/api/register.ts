@@ -29,9 +29,10 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, message: "Captcha không hợp lệ!", error: result }, { status: 400 });
     }
 
-    // 2. VALIDATE INPUT (lược bớt, chỉ kiểm tra username, email, password, pin cơ bản)
-    const { username, fullname = "", email, password, confirm_password, phone = "", pin } = data;
+    // 2. VALIDATE INPUT
+    const { username, fullname, email, password, confirm_password, phone, pin } = data;
 
+    // Username: BẮT BUỘC, 6-30 ký tự, chỉ chữ/số/._, không phân biệt hoa/thường
     if (
       typeof username !== "string" ||
       username.length < 6 || username.length > 30 ||
@@ -39,6 +40,19 @@ export async function onRequestPost(context) {
     ) {
       return Response.json({ success: false, message: "Tên đăng nhập không hợp lệ!" });
     }
+
+    // Họ tên: KHÔNG bắt buộc, nếu có thì phải 6-50 ký tự, không số, không ký tự đặc biệt
+    if (
+      typeof fullname === "string" &&
+      fullname.length > 0 && (
+        fullname.length < 6 || fullname.length > 50 ||
+        /[0-9!@#$%^&*()_=+\[\]{};:"'<>?/\\|,~`]/.test(fullname)
+      )
+    ) {
+      return Response.json({ success: false, message: "Họ tên không được chứa số hoặc ký tự đặc biệt, độ dài 6–50 ký tự!" });
+    }
+
+    // Email: BẮT BUỘC, 6-100 ký tự, regex chuẩn
     if (
       typeof email !== "string" ||
       email.length < 6 || email.length > 100 ||
@@ -46,6 +60,8 @@ export async function onRequestPost(context) {
     ) {
       return Response.json({ success: false, message: "Email không hợp lệ!" });
     }
+
+    // Mật khẩu: BẮT BUỘC, 8-30 ký tự, không chứa ', ", <, >, dấu cách, `, chỉ ký tự ASCII 0x21-0x7E
     if (
       typeof password !== "string" ||
       password.length < 8 || password.length > 30 ||
@@ -54,8 +70,12 @@ export async function onRequestPost(context) {
     ) {
       return Response.json({ success: false, message: "Mật khẩu không hợp lệ!" });
     }
+
+    // Nhập lại mật khẩu: BẮT BUỘC, phải trùng password
     if (password !== confirm_password)
       return Response.json({ success: false, message: "Mật khẩu nhập lại không khớp!" });
+
+    // PIN: BẮT BUỘC, đúng 8 số
     if (
       typeof pin !== "string" ||
       !/^[0-9]{8}$/.test(pin)
@@ -63,107 +83,184 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, message: "PIN phải đúng 8 số!" });
     }
 
+    // Số điện thoại: KHÔNG bắt buộc, nếu có thì phải đúng format quốc tế và hợp lệ cơ bản
+    if (
+      typeof phone === "string" &&
+      phone.trim().length > 0
+    ) {
+      let value = phone.trim();
+      // Không được chứa ký tự lạ
+      if (/[^\d+\s]/.test(value)) {
+        return Response.json({ success: false, message: "Số điện thoại chỉ được chứa số, +, và khoảng trắng!" });
+      }
+      // Phải bắt đầu bằng +
+      if (!value.startsWith("+")) {
+        return Response.json({ success: false, message: "Số điện thoại phải bắt đầu bằng dấu + (quốc tế)!" });
+      }
+      // Số điện thoại sau khi bỏ khoảng trắng phải từ 8–15 số (tùy từng quốc gia)
+      let raw = value.replace(/[^\d]/g, ""); // chỉ lấy số
+      if (raw.length < 8 || raw.length > 15) {
+        return Response.json({ success: false, message: "Số điện thoại không hợp lệ, phải từ 8–15 số!" });
+      }
+    }
+
     // 3. CHECK TỒN TẠI USERNAME/EMAIL
+    let userExists, emailExists, idCounter;
     const userKey = `KHOAI__profile__user:${username}`;
     const emailKey = `KHOAI__profile__email:${email}`;
     const idCounterKey = `KHOAI__profile__number:number`;
-    let userExists = await env.KHOAI_KV_USER.get(userKey);
-    let emailExists = await env.KHOAI_KV_USER.get(emailKey);
-    let idCounter = await env.KHOAI_KV_USER.get(idCounterKey, "json");
+    try {
+      userExists = await env.KHOAI_KV_USER.get(userKey);
+      emailExists = await env.KHOAI_KV_USER.get(emailKey);
+      idCounter = await env.KHOAI_KV_USER.get(idCounterKey, "json");
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi truy vấn KV!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
     if (userExists) return Response.json({ success: false, message: "Tên đăng nhập đã tồn tại!" });
     if (emailExists) return Response.json({ success: false, message: "Email đã tồn tại!" });
 
-    // 4. CẤP ID MỚI
-    let newId = (parseInt(idCounter?.number || "100000") + 1).toString();
-    await env.KHOAI_KV_USER.put(idCounterKey, JSON.stringify({ number: newId }));
+    // 4. CẤP ID MỚI (tăng dần)
+    let newId;
+    try {
+      newId = (parseInt(idCounter?.number || "100000") + 1).toString();
+      await env.KHOAI_KV_USER.put(idCounterKey, JSON.stringify({ number: newId }));
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo ID mới!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
 
-    // 5. TẠO SALT, HASH PASS/PIN DÙNG SALT_USER
-    const salt_user = env.SALT_USER;
-    const hashedPass = await sha256(password + salt_user);
-    const hashedPin = await sha256(pin + salt_user);
+    // 5. TẠO SALT, HASH PASS/PIN
+    let salt_user, hashedPass, hashedPin;
+    try {
+      salt_user = randomBase62(50);
+      hashedPass = await sha256(password + salt_user);
+      hashedPin = await sha256(pin + salt_user);
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi hash password/pin!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
 
-    // 6. TẠO API TOKEN (master)
-    const apiToken = randomBase62(100);
-    const salt_token = env.SALT_TOKEN;
-    const hashedToken = await sha256(apiToken + salt_token);
+    // 6. TẠO TOKEN MASTER (token cá nhân cho API)
+    let token_master, token_hash;
+    try {
+      token_master = randomBase62(100);
+      const salt_token = env.SALT_TOKEN;
+      token_hash = await sha256(token_master + salt_token);
+      // Lưu vào KV Token (master)
+      await env.KHOAI_KV_TOKEN.put(
+        `KHOAI__token:user:${username}`,
+        JSON.stringify({ token_master, status: "live", type: "master", user: username, time: now, note: "Tạo tự động sau đăng ký" })
+      );
+      await env.KHOAI_KV_TOKEN.put(
+        `KHOAI__token:master:${token_hash}`,
+        JSON.stringify({
+          title: "Token cá nhân API",
+          status: "live",
+          type: "master",
+          ban_reason: "",
+          user: username,
+          note: "Tạo tự động sau đăng ký",
+          rate_limit: 0,
+          rate_window: "minute",
+          time: now
+        })
+      );
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo token master!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
 
-    // 7. TẠO COOKIE
-    const cookie = randomBase62(100);
-    const salt_cookie = env.SALT_COOKIE;
-    const userAgentHash = await sha256(ua);
-    const cookieKey = `KHOAI__cookie:cookie:${await sha256(userAgentHash + cookie + salt_cookie)}`;
-    await env.KHOAI_KV_COOKIE.put(cookieKey, JSON.stringify({
-      user: username,
-      last_seen: now,
-      ip,
-    }), { expirationTtl: 14 * 24 * 3600 });
-
-    // 8. PROFILE_COOKIE
-    const salt_profile_cookie = env.SALT_PROFILE_COOKIE;
-    const profile_cookie = await sha256(userAgentHash + cookie + salt_profile_cookie);
-
-    // 9. TẠO PROFILE OBJECT
+    // 7. GHI VÀO KV + Lưu ip_logged, ua_logged
+    let ip_logged = ip ? [ip] : [];
+    let ua_logged = ua ? [ua] : [];
     const userProfile = {
       id: newId,
       status: "live",
       ban_reason: "",
       role: "user",
       verified_email: "false",
-      coin: {
-        available_coin: 0,
-        loaded_coin: 0,
-        purchased_mail: 0
-      },
-      security: {
-        pin: hashedPin,
-        open_pin: "false",
-        ip_whitelist: [],
-        open_ip: "false",
-        ip_logged: ip ? [ip] : [],
-        ua_logged: ua ? [ua] : []
-      },
-      userData: {
-        user_email: email,
-        fullname,
-        phone,
-        country: "VN",
-        language: "vi",
-        mail_total_save: 0,
-      },
-      initialRegistrationData: {
-        time: now
-      },
-      preferences: {},
-      master_token: hashedToken,
-      username,
+      email,
+      salt: salt_user,
+      pass: hashedPass,
+      fullname,
+      phone,
+      pin: hashedPin,
+      open_pin: "false",
+      ip_whitelist: [],
+      open_ip: "false",
+      ip_logged,
+      ua_logged,
+      country: "VN",
+      language: "vi",
+      available_coin: 0,
+      loaded_coin: 0,
+      purchased_mail: 0,
+      mail_total_save: 0,
+      time: now,
+      username, // để truy vấn ngược
     };
 
-    // 10. GHI VÀO KV
-    await env.KHOAI_KV_USER.put(userKey, JSON.stringify(userProfile));
-    await env.KHOAI_KV_USER.put(emailKey, JSON.stringify({ user: username }));
-    await env.KHOAI_KV_USER.put(`KHOAI__profile__id:${newId}`, JSON.stringify({ user: username }));
+    try {
+      await env.KHOAI_KV_USER.put(userKey, JSON.stringify(userProfile));
+      await env.KHOAI_KV_USER.put(`KHOAI__profile__email:${email}`, JSON.stringify({ user: username }));
+      await env.KHOAI_KV_USER.put(`KHOAI__profile__id:${newId}`, JSON.stringify({ user: username }));
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi profile vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
 
-    // 11. GHI TOKEN MASTER
-    await env.KHOAI_KV_TOKEN.put(`KHOAI__token__user:${hashedToken}`, JSON.stringify({ status: "live", ban_reason: "", user: username, time: now }));
-    await env.KHOAI_KV_TOKEN.put(`KHOAI__token__salt:${salt_token}`, JSON.stringify({ time: now }));
+    // 8. AUTO LOGIN: TẠO COOKIE, PROFILE_COOKIE
+    let cookie, cookieSalt;
+    try {
+      cookie = randomBase62(100);
+      cookieSalt = randomBase62(50);
+      await env.KHOAI_KV_COOKIE.put(
+        `KHOAI__cookie__salt:${username}`,
+        JSON.stringify({ salt: cookieSalt, time: now })
+      );
+      await env.KHOAI_KV_COOKIE.put(
+        `KHOAI__cookie__user:${username}:${await sha256(cookie + cookieSalt)}`,
+        JSON.stringify({
+          user: username,
+          open_ip: "off",
+          ip: [],
+          au: await sha256((context.request.headers.get("User-Agent") || "") + cookieSalt),
+          time: now,
+        }),
+        { expirationTtl: 14 * 24 * 3600 }
+      );
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo cookie!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
 
-    // 12. RETURN COOKIE + PROFILE_COOKIE
-    return new Response(JSON.stringify({
-      success: true,
-      redirect: "/overview",
-      cookie,
-      profile_cookie
-    }), {
-      headers: {
-        "Set-Cookie": [
-          `cookie=${cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`,
-          `profile_cookie=${profile_cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`
-        ],
-        "Content-Type": "application/json",
-      },
-      status: 200,
-    });
+    // 9. TẠO PROFILE_COOKIE
+    let profile_cookie;
+    try {
+      const salt_profile_cookie = env.SALT_PROFILE_COOKIE;
+      const userAgent = context.request.headers.get("User-Agent") || "";
+      profile_cookie = await sha256(username + email + userAgent + salt_profile_cookie + cookie);
+    } catch (err) {
+      return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo profile_cookie!", error: String(err), stack: err?.stack }), { status: 500 });
+    }
+
+    // 10. TRẢ VỀ CHO CLIENT (set-cookie và dữ liệu)
+    return new Response(
+      JSON.stringify({
+        success: true,
+        redirect: "/overview",
+        cookie,
+        profile_cookie,
+        token_master,
+      }),
+      {
+        headers: {
+          "Set-Cookie": [
+            `cookie=${cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`,
+            `profile_cookie=${profile_cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`
+          ],
+          "Content-Type": "application/json",
+        },
+        status: 200,
+      }
+    );
   } catch (err) {
+    // Trả lỗi cuối cùng nếu mọi thứ còn lại fail bất ngờ
     return new Response(
       JSON.stringify({ success: false, message: "Lỗi hệ thống ngoài dự kiến!", error: String(err), stack: err?.stack }),
       { status: 500, headers: { "Content-Type": "application/json" } }
