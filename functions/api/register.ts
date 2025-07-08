@@ -88,7 +88,7 @@ export async function onRequestPost(context) {
     const hashedToken = await sha256(apiToken + salt_token);
 
     // 7. TẠO COOKIE
-    const cookie = randomBase62(60);
+    const cookie = randomBase62(100);
     const salt_cookie = env.SALT_COOKIE;
     const userAgentHash = await sha256(ua);
     const cookieKey = `KHOAI__cookie:cookie:${await sha256(userAgentHash + cookie + salt_cookie)}`;
