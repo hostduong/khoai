@@ -215,11 +215,11 @@
                 <div class="d-flex align-items-center">
                   <div class="flex-shrink-0 me-2">
                     <div class="avatar avatar-online">
-                      <img src="{{ user.avatar or 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&s=200' }}" alt="" class="rounded-circle">
+                      <img src="{{ user.avatar or '/images/avatar.jpg' }}" ... >
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <h6 class="mb-0">{{ user.fullname or user.username or 'User' }}</h6>
+                    <h6 class="mb-0">{{ user.full_name or user.username or 'User' }}</h6>
                   </div>
                 </div>
               </a>
