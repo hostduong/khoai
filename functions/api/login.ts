@@ -7,6 +7,9 @@ export async function onRequestPost(context) {
     const data = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("x-forwarded-for") || "";
     const ua = request.headers.get("User-Agent") || "";
+    const device_name = request.headers.get("Sec-CH-UA-Platform") || "";
+    const city = request.cf?.city || "";
+    const country = request.cf?.country || request.headers.get("CF-IPCountry") || "VN";
 
     // 1. VALIDATE CAPTCHA
     const captchaToken = data["cf-turnstile-response"];
@@ -40,83 +43,156 @@ export async function onRequestPost(context) {
       const emailMap = await env.KHOAI_KV_USER.get(`KHOAI__profile:email:${username}`, "json");
       if (emailMap?.user) {
         userProfile = await env.KHOAI_KV_USER.get(`KHOAI__profile:user:${emailMap.user}`, "json");
+        username = emailMap.user;
       }
     }
     if (!userProfile) {
+      // Log login failed (user not found)
+      const loggerKey = `KHOAI__logger:login:${username}:${now}`;
+      const logData = {
+        user: username,
+        ip: ip,
+        ua: ua,
+        device_name: device_name,
+        location: { city, country },
+        success: false,
+        fail_reason: "Tài khoản không tồn tại",
+        method: "login",
+        origin_url: "/api/login",
+        time: now
+      };
+      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
       return Response.json({ success: false, message: "Tài khoản không tồn tại!" }, { status: 400 });
     }
     if (userProfile.status === "lock") {
+      // Log login failed (account locked)
+      const loggerKey = `KHOAI__logger:login:${username}:${now}`;
+      const logData = {
+        user: username,
+        ip: ip,
+        ua: ua,
+        device_name: device_name,
+        location: { city, country },
+        success: false,
+        fail_reason: "Tài khoản đã bị khóa",
+        method: "login",
+        origin_url: "/api/login",
+        time: now
+      };
+      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
       return Response.json({ success: false, message: "Tài khoản đã bị khóa!" }, { status: 403 });
     }
 
-    // 4. KIỂM TRA PASSWORD ĐÚNG CHUẨN HỆ THỐNG
-    const hashedInputPass = await sha256(password + userProfile.security.salt_user);
+    // 4. KIỂM TRA PASSWORD (hash với salt_user riêng từng user)
+    const salt_user = userProfile.security?.salt_user || "";
+    const hashedInputPass = await sha256(password + salt_user);
     if (hashedInputPass !== userProfile.security.user_password) {
+      // Log login failed (wrong password)
+      const loggerKey = `KHOAI__logger:login:${username}:${now}`;
+      const logData = {
+        user: username,
+        ip: ip,
+        ua: ua,
+        device_name: device_name,
+        location: { city, country },
+        success: false,
+        fail_reason: "Sai mật khẩu",
+        method: "login",
+        origin_url: "/api/login",
+        time: now
+      };
+      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
       return Response.json({ success: false, message: "Sai mật khẩu!" }, { status: 400 });
     }
 
     // 5. Nếu bật open_pin thì bắt buộc phải kiểm tra PIN
     if (userProfile.security.open_pin === true) {
       if (!pin || typeof pin !== "string" || !/^[0-9]{8}$/.test(pin)) {
+        // Log login failed (missing/wrong pin)
+        const loggerKey = `KHOAI__logger:login:${username}:${now}`;
+        const logData = {
+          user: username,
+          ip: ip,
+          ua: ua,
+          device_name: device_name,
+          location: { city, country },
+          success: false,
+          fail_reason: "PIN không hợp lệ",
+          method: "login",
+          origin_url: "/api/login",
+          time: now
+        };
+        await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
         return Response.json({ success: false, message: "Vui lòng nhập đúng mã PIN (8 số)!" }, { status: 400 });
       }
-      const hashedPin = await sha256(pin + userProfile.security.salt_user);
+      const hashedPin = await sha256(pin + salt_user);
       if (hashedPin !== userProfile.security.pin) {
+        // Log login failed (wrong pin)
+        const loggerKey = `KHOAI__logger:login:${username}:${now}`;
+        const logData = {
+          user: username,
+          ip: ip,
+          ua: ua,
+          device_name: device_name,
+          location: { city, country },
+          success: false,
+          fail_reason: "Mã PIN không đúng",
+          method: "login",
+          origin_url: "/api/login",
+          time: now
+        };
+        await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
         return Response.json({ success: false, message: "Mã PIN không đúng!" }, { status: 400 });
       }
     }
 
-    // 6. Cập nhật ip_logged/ua_logged
-    let ip_logged = Array.isArray(userProfile.security.ip_logged) ? [...userProfile.security.ip_logged] : [];
-    let ua_logged = Array.isArray(userProfile.security.ua_logged) ? [...userProfile.security.ua_logged] : [];
-    if (ip && !ip_logged.includes(ip)) {
-      ip_logged.unshift(ip);
-      if (ip_logged.length > 20) ip_logged = ip_logged.slice(0, 20);
-    }
-    if (ua && !ua_logged.includes(ua)) {
-      ua_logged.unshift(ua);
-      if (ua_logged.length > 20) ua_logged = ua_logged.slice(0, 20);
-    }
-    userProfile.security.ip_logged = ip_logged;
-    userProfile.security.ua_logged = ua_logged;
-    await env.KHOAI_KV_USER.put(`KHOAI__profile:user:${userProfile.username}`, JSON.stringify(userProfile));
-
-    // 7. TẠO COOKIE, PROFILE_COOKIE (dùng SALT_COOKIE, SALT_PROFILE_COOKIE)
+    // 6. TẠO COOKIE, PROFILE_COOKIE (dùng SALT_COOKIE, SALT_PROFILE_COOKIE)
     const cookie = randomBase62(100);
     const salt_cookie = env.SALT_COOKIE;
     const salt_profile_cookie = env.SALT_PROFILE_COOKIE;
-
-    // Hash UA
     const ua_hash = await sha256(ua);
-
-    // COOKIE_ID
     const cookie_id = await sha256(ua_hash + cookie + salt_cookie);
 
-    // Lưu vào KV
     await env.KHOAI_KV_COOKIE.put(
       `KHOAI__cookie:cookie:${cookie_id}`,
-      JSON.stringify({ user: userProfile.username, last_seen: now }),
+      JSON.stringify({ user: username, last_seen: now }),
       { expirationTtl: 14 * 24 * 3600 }
     );
     await env.KHOAI_KV_COOKIE.put(
-      `KHOAI__cookie:user:${userProfile.username}:${ua_hash}`,
+      `KHOAI__cookie:user:${username}:${ua_hash}`,
       JSON.stringify({
         cookie_id: cookie_id,
         ua: ua_hash,
-        device_name: request.headers.get("Sec-CH-UA-Platform") || "",
+        device_name: device_name,
         ip_created: ip,
-        country: userProfile.userData?.country || "VN",
-        city: userProfile.userData?.city || "",
+        country: country, // City/country thực tế hiện tại!
+        city: city,
         login_time: now,
         last_seen: now,
       }),
       { expirationTtl: 14 * 24 * 3600 }
     );
 
-    // profile_cookie
+    // 7. Tạo profile_cookie chuẩn
     const profile_cookie = await sha256(ua_hash + cookie + salt_profile_cookie);
 
-    // 8. Set-Cookie trả về cho client
+    // 8. GHI LOG LOGIN THÀNH CÔNG với location thực tế
+    const loggerKey = `KHOAI__logger:login:${username}:${now}`;
+    const logData = {
+      user: username,
+      ip: ip,
+      ua: ua,
+      device_name: device_name,
+      location: { city, country },
+      success: true,
+      fail_reason: "",
+      method: "login",
+      origin_url: "/api/login",
+      time: now
+    };
+    await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
+
+    // 9. Set-Cookie trả về cho client
     return new Response(
       JSON.stringify({
         success: true,
@@ -136,6 +212,7 @@ export async function onRequestPost(context) {
       }
     );
   } catch (err) {
+    // Nếu muốn log cả lỗi ngoài dự kiến, bạn có thể log thêm ở đây
     return new Response(
       JSON.stringify({ success: false, message: "Lỗi hệ thống ngoài dự kiến!", error: String(err), stack: err?.stack }),
       { status: 500, headers: { "Content-Type": "application/json" } }
