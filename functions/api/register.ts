@@ -11,7 +11,7 @@ export async function onRequestPost(context) {
     const country = request.headers.get("CF-IPCountry") || "VN";
     let city = "";
     try {
-      const geo = request.cf?.city; // Cloudflare Workers hỗ trợ request.cf.city/country
+      const geo = request.cf?.city;
       if (geo && typeof geo === "string") city = geo;
     } catch (e) {
       city = "";
@@ -137,7 +137,6 @@ export async function onRequestPost(context) {
     const profile = {
       id: newId,
       status: "live",
-      userPassword: hashedPass,
       role: ["user"],
       ban_reason: "",
       coin: {
@@ -150,6 +149,7 @@ export async function onRequestPost(context) {
         open_pin: false,
         pin: hashedPin,
         salt_user: salt_user, // <-- Quan trọng: lưu vào đây!
+        user_password: hashedPass, // <-- PHẢI THÊM CHUẨN DÒNG NÀY
         open_ip: false,
         ip_whitelist: [],
         open_twofa: false,
