@@ -4,6 +4,11 @@
 {% set page_url = "/overview/" %}
 {% set og_image = "/img/logo.png" %}
 {% set scripts_footer = '<script type="module" src="{{ domain }}/js/overview.js"></script>' %}
+{% set user = {
+  username: data.username,
+  full_name: data.full_name,
+  avatar: data.avatar or '/images/avatar.jpg'
+} %}
 {% include "head.njk" %}
 {% include "navbar.njk" %}
 
@@ -21,7 +26,7 @@
                                     <div class="d-flex">
                                         <div class="flex-grow-1">
                                             <p class="fw-medium">Tổng tiền hiện có</p>
-                                            <h4 class="mb-0">0 coin</h4>
+                                            <h4 class="mb-0">{{ data.available_coin or 0 }} coin</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -33,7 +38,7 @@
                                     <div class="d-flex">
                                         <div class="flex-grow-1">
                                             <p class="fw-medium">Email đang lưu trữ</p>
-                                            <h4 class="mb-0">0</h4>
+                                            <h4 class="mb-0">{{ data.mail_total_save or 0 }}</h4>
                                         </div>
                                     </div>
                                 </div>
