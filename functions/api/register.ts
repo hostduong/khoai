@@ -7,6 +7,17 @@ export async function onRequestPost(context) {
     const data = await request.json();
     const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("x-forwarded-for") || "";
     const ua = request.headers.get("User-Agent") || "";
+    const device_name = request.headers.get("Sec-CH-UA-Platform") || "";
+    const country = request.headers.get("CF-IPCountry") || "VN";
+    let city = "";
+    try {
+      const geo = request.cf?.city; // Cloudflare Workers hỗ trợ request.cf.city/country
+      if (geo && typeof geo === "string") city = geo;
+    } catch (e) {
+      city = "";
+    }
+
+    const language = "vi";
 
     // 1. VALIDATE CAPTCHA
     const captchaToken = data["cf-turnstile-response"];
@@ -107,8 +118,10 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo ID mới!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 5. TẠO SALT_USER, hash password & pin (dùng salt_user riêng cho mỗi user)
-    const salt_user = randomBase62(20);
+    // 5. SALT_USER riêng cho mỗi user (nếu bạn vẫn muốn, còn đúng chuẩn là SALT_USER global đặt trong wrangler.toml)
+    const salt_user = randomBase62(50);
+
+    // 6. Hash password và PIN
     let hashedPass, hashedPin;
     try {
       hashedPass = await sha256(password + salt_user);
@@ -117,39 +130,53 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi hash password/pin!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 6. TẠO token_master (100 ký tự) và key KV tương ứng
+    // 7. Tạo token_master (100 ký tự) - phần này chuẩn
     const token_master = randomBase62(100);
 
-    // 7. Lưu profile ĐÚNG CHUẨN hệ thống:
+    // 8. **TẠO PROFILE USER CHUẨN**
     const profile = {
-      user_id: newId,
-      user_status: "live",
-      user_role: "user",
-      user_email: email,
-      user_fullname: fullname,
-      user_phone: phone,
-      user_country: "VN",
-      user_language: "vi",
-      user_time_created: now,
-      available_coin: 0,
-      loaded_coin: 0,
-      purchased_mail: 0,
-      mail_total_save: 0,
-      username: username,
-      security: {
-        salt_user,
-        user_password: hashedPass,
-        pin: hashedPin,
-        open_pin: false,
-        ip_whitelist: [],
-        open_ip: false,
-        ip_logged: ip ? [ip] : [],
-        ua_logged: ua ? [ua] : [],
+      id: newId,
+      status: "live",
+      userPassword: hashedPass,
+      role: ["user"],
+      ban_reason: "",
+      coin: {
+        available_coin: 0,
+        loaded_coin: 0,
+        purchased_mail: 0,
+        mail_total_save: 0
       },
-      token_master,
-      // token_tiktok, extend_time_tiktok, v.v. thêm sau khi mua dịch vụ
+      security: {
+        open_pin: false,
+        pin: hashedPin,
+        open_ip: false,
+        ip_whitelist: [],
+        open_twofa: false,
+        twofa_secret: ""
+      },
+      userData: {
+        full_name: fullname,
+        phone_number: phone,
+        user_email: email,
+        birthDate: "",
+        verified_user_email: true
+      },
+      initialRegistrationData: {
+        created_at: now,
+        ip_created: ip,
+        city: city,
+        country: country,
+        device_name: device_name,
+        ua: await sha256(ua),
+        language: language
+      },
+      preferences: {
+        theme: "dark",
+        language: language
+      }
     };
 
+    // 9. GHI PROFILE vào KV ĐÚNG CHUẨN
     try {
       await env.KHOAI_KV_USER.put(userKey, JSON.stringify(profile));
       await env.KHOAI_KV_USER.put(emailKey, JSON.stringify({ user: username }));
@@ -158,7 +185,7 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi profile vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 8. GHI TOKEN API cá nhân
+    // 10. GHI TOKEN API cá nhân
     try {
       await env.KHOAI_KV_TOKEN.put(
         `KHOAI__token:token:${token_master}`,
@@ -178,14 +205,13 @@ export async function onRequestPost(context) {
         `KHOAI__token:user:${username}`,
         JSON.stringify({
           token_master,
-          // token_tiktok, ... để sau nếu có mua thêm
         })
       );
     } catch (err) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi token vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 9. TẠO COOKIE chuẩn hệ thống (100 ký tự base62)
+    // 11. TẠO COOKIE chuẩn hệ thống (100 ký tự base62)
     const cookie = randomBase62(100);
     const salt_cookie = env.SALT_COOKIE;
     const salt_profile_cookie = env.SALT_PROFILE_COOKIE;
@@ -203,20 +229,20 @@ export async function onRequestPost(context) {
       JSON.stringify({
         cookie_id: cookie_id,
         ua: ua_hash,
-        device_name: request.headers.get("Sec-CH-UA-Platform") || "",
+        device_name: device_name,
         ip_created: ip,
-        country: "VN",
-        city: "",
+        country: country,
+        city: city,
         login_time: now,
         last_seen: now,
       }),
       { expirationTtl: 14 * 24 * 3600 }
     );
 
-    // 10. TẠO PROFILE_COOKIE chuẩn
+    // 12. TẠO PROFILE_COOKIE chuẩn
     const profile_cookie = await sha256(ua_hash + cookie + salt_profile_cookie);
 
-    // 11. TRẢ VỀ CHO CLIENT (set-cookie và dữ liệu)
+    // 13. TRẢ VỀ CHO CLIENT (set-cookie và dữ liệu)
     return new Response(
       JSON.stringify({
         success: true,
