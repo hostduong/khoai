@@ -1,3 +1,5 @@
+// overview.js
+
 fetch('/api/overview', { credentials: 'include' })
   .then(res => res.json())
   .then(data => {
@@ -5,10 +7,25 @@ fetch('/api/overview', { credentials: 'include' })
       window.location.href = "/login";
       return;
     }
+
+    // Hiển thị số dư coin và email đã mua
+    const coinEl = document.getElementById('overviewCoin');
+    if (coinEl) coinEl.innerText = (data.available_coin || 0) + ' coin';
+
+    const mailEl = document.getElementById('overviewMailSave');
+    if (mailEl) mailEl.innerText = data.mail_total_save || 0;
+
+    // Đồng bộ avatar nếu có (tùy bạn dùng selector nào)
+    if (data.avatar) {
+      document.querySelectorAll('.avatar img').forEach(img => {
+        img.src = data.avatar;
+      });
+    }
+
+    // Hiển thị token list
     const tokenListDiv = document.getElementById('tokenList');
     tokenListDiv.innerHTML = ""; // Clear old tokens
 
-    // Lọc các trường token_
     Object.keys(data).forEach(key => {
       if (key.startsWith("token_")) {
         let type = key.replace("token_", "");
@@ -17,7 +34,6 @@ fetch('/api/overview', { credentials: 'include' })
         let status = data["status_" + type] || "";
         let expire = data["extend_time_" + type] || "";
 
-        // Label cho token (có thể format đẹp hơn nếu muốn)
         let label = "Token " + (type.charAt(0).toUpperCase() + type.slice(1));
         let statusBadge = status
           ? `<span class="badge bg-${status === "live" ? "success" : "danger"} ms-2">${status}</span>` : "";
@@ -25,13 +41,13 @@ fetch('/api/overview', { credentials: 'include' })
 
         tokenListDiv.innerHTML += `
           <div class="card mb-3">
-            <form class="card-body">
+            <form class="card-body" onsubmit="return false;">
               <div class="row align-items-end">
                 <div class="col-md-8 form-password-toggle">
                   <label class="form-label">${label} ${statusBadge} ${expireText}</label>
                   <div class="input-group input-group-merge">
-                    <input type="password" readonly class="form-control" value="${value}" placeholder="············" aria-describedby="api-token-${type}">
-                    <span class="input-group-text cursor-pointer" onclick="toggleToken('apiToken${type}', this)">
+                    <input type="password" readonly class="form-control" value="${value}" id="apiToken_${type}" placeholder="············">
+                    <span class="input-group-text cursor-pointer" onclick="toggleToken('apiToken_${type}', this)">
                       <i class="ti ti-eye-off"></i>
                     </span>
                   </div>
@@ -40,7 +56,6 @@ fetch('/api/overview', { credentials: 'include' })
                   <button class="btn btn-primary waves-effect waves-light" type="button" onclick="navigator.clipboard.writeText('${value}')">
                     <i class="fa-regular fa-copy"></i> Sao chép
                   </button>
-                  <!-- Nếu cần nút Làm mới thì thêm ở đây -->
                 </div>
               </div>
             </form>
@@ -48,4 +63,22 @@ fetch('/api/overview', { credentials: 'include' })
         `;
       }
     });
+  })
+  .catch(err => {
+    alert("Lỗi khi tải dữ liệu, vui lòng thử lại!\n" + err);
+    window.location.href = "/login";
   });
+
+// Hàm show/hide token
+function toggleToken(id, btn) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const icon = btn.querySelector('i');
+  if (input.type === "password") {
+    input.type = "text";
+    if (icon) icon.className = "ti ti-eye";
+  } else {
+    input.type = "password";
+    if (icon) icon.className = "ti ti-eye-off";
+  }
+}
