@@ -10,6 +10,7 @@ kv_namespaces = [
   { binding = "KHOAI_KV_GMAIL", id = "08b95e1748744c80b9f797d3c0d4fe4b" },
   { binding = "KHOAI_KV_COIN", id = "44498515d40948d7b12072b677cf5cb7" },
   { binding = "KHOAI_KV_LOGGER_COIN", id = "852f904fc9384926be284eefacf15cd2" },
+  { binding = "KHOAI_KV_LOGGER", id = "056e31b4339648ecae8ccc88e4cbfa6a" },
   { binding = "KHOAI_KV_SETTING", id = "852f904fc9384926be284eefacf15cd2" },
 ]
 
