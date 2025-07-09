@@ -61,7 +61,7 @@ export async function onRequestPost(context) {
         origin_url: "/api/login",
         time: now
       };
-      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
+      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData, null, 2), { expirationTtl: 90 * 24 * 3600 });
       return Response.json({ success: false, message: "Tài khoản không tồn tại!" }, { status: 400 });
     }
     if (userProfile.status === "lock") {
@@ -79,7 +79,7 @@ export async function onRequestPost(context) {
         origin_url: "/api/login",
         time: now
       };
-      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
+      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData, null, 2), { expirationTtl: 90 * 24 * 3600 });
       return Response.json({ success: false, message: "Tài khoản đã bị khóa!" }, { status: 403 });
     }
 
@@ -101,7 +101,7 @@ export async function onRequestPost(context) {
         origin_url: "/api/login",
         time: now
       };
-      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
+      await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData, null, 2), { expirationTtl: 90 * 24 * 3600 });
       return Response.json({ success: false, message: "Sai mật khẩu!" }, { status: 400 });
     }
 
@@ -122,7 +122,7 @@ export async function onRequestPost(context) {
           origin_url: "/api/login",
           time: now
         };
-        await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
+        await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData, null, 2), { expirationTtl: 90 * 24 * 3600 });
         return Response.json({ success: false, message: "Vui lòng nhập đúng mã PIN (8 số)!" }, { status: 400 });
       }
       const hashedPin = await sha256(pin + salt_user);
@@ -141,7 +141,7 @@ export async function onRequestPost(context) {
           origin_url: "/api/login",
           time: now
         };
-        await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
+        await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData, null, 2), { expirationTtl: 90 * 24 * 3600 });
         return Response.json({ success: false, message: "Mã PIN không đúng!" }, { status: 400 });
       }
     }
@@ -155,7 +155,7 @@ export async function onRequestPost(context) {
 
     await env.KHOAI_KV_COOKIE.put(
       `KHOAI__cookie:cookie:${cookie_id}`,
-      JSON.stringify({ user: username, last_seen: now }),
+      JSON.stringify({ user: username, last_seen: now }, null, 2),
       { expirationTtl: 14 * 24 * 3600 }
     );
     await env.KHOAI_KV_COOKIE.put(
@@ -165,11 +165,11 @@ export async function onRequestPost(context) {
         ua: ua_hash,
         device_name: device_name,
         ip_created: ip,
-        country: country, // City/country thực tế hiện tại!
+        country: country,
         city: city,
         login_time: now,
         last_seen: now,
-      }),
+      }, null, 2),
       { expirationTtl: 14 * 24 * 3600 }
     );
 
@@ -190,7 +190,7 @@ export async function onRequestPost(context) {
       origin_url: "/api/login",
       time: now
     };
-    await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData), { expirationTtl: 90 * 24 * 3600 });
+    await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData, null, 2), { expirationTtl: 90 * 24 * 3600 });
 
     // 9. Set-Cookie trả về cho client
     return new Response(
@@ -212,7 +212,6 @@ export async function onRequestPost(context) {
       }
     );
   } catch (err) {
-    // Nếu muốn log cả lỗi ngoài dự kiến, bạn có thể log thêm ở đây
     return new Response(
       JSON.stringify({ success: false, message: "Lỗi hệ thống ngoài dự kiến!", error: String(err), stack: err?.stack }),
       { status: 500, headers: { "Content-Type": "application/json" } }
