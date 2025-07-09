@@ -29,7 +29,7 @@ export async function onRequestGet(context) {
     const username = cookieKV.user;
 
     // Bước 3: Lấy thông tin user từ KV
-    const profileKey = `KHOAI__profile__user:${username}`;
+    const profileKey = `KHOAI__profile:user:${username}`;
     const userProfile = await env.KHOAI_KV_USER.get(profileKey, "json");
     if (!userProfile) {
       return Response.json({ success: false, message: "Không tìm thấy user!" }, { status: 404 });
@@ -39,28 +39,39 @@ export async function onRequestGet(context) {
     const tokenKey = `KHOAI__token:user:${username}`;
     const userTokens = await env.KHOAI_KV_TOKEN.get(tokenKey, "json") || {};
 
-    // Gom tất cả token có dạng token_*
+    // Gom tất cả token có dạng token_*, extend_time_*, auto_renewed_*, status_*
     const allTokens = {};
     Object.keys(userTokens).forEach(k => {
-      if (k.startsWith("token_")) allTokens[k] = userTokens[k];
-      if (k.startsWith("extend_time_")) allTokens[k] = userTokens[k];
-      if (k.startsWith("auto_renewed_")) allTokens[k] = userTokens[k];
-      if (k.startsWith("status_")) allTokens[k] = userTokens[k];
+      if (
+        k.startsWith("token_") ||
+        k.startsWith("extend_time_") ||
+        k.startsWith("auto_renewed_") ||
+        k.startsWith("status_")
+      ) {
+        allTokens[k] = userTokens[k];
+      }
     });
 
-    // Bước 5: Trả về thông tin tổng hợp
+    // Lấy đúng các field từ profile mới
+    const coin = userProfile.coin || {};
+    const userData = userProfile.userData || {};
+
+    // Trả về đúng chuẩn, avatar mặc định nếu chưa có
     return Response.json({
       success: true,
-      username: userProfile.username,
+      username: username,
       id: userProfile.id,
-      fullname: userProfile.fullname,
-      email: userProfile.email,
-      available_coin: userProfile.available_coin,
-      loaded_coin: userProfile.loaded_coin,
-      mail_total_save: userProfile.mail_total_save,
-      purchased_mail: userProfile.purchased_mail,
-      avatar: userProfile.avatar || "",
-      ...allTokens // tất cả token_..., extend_time_... v.v
+      full_name: userData.full_name,
+      email: userData.user_email,
+      available_coin: coin.available_coin,
+      loaded_coin: coin.loaded_coin,
+      mail_total_save: coin.mail_total_save,
+      purchased_mail: coin.purchased_mail,
+      status: userProfile.status,
+      role: userProfile.role,
+      verified_user_email: userData.verified_user_email,
+      avatar: userProfile.avatar || "/images/avatar.jpg",
+      ...allTokens
     }, { status: 200 });
   } catch (err) {
     return Response.json({ success: false, message: "Lỗi hệ thống!", error: String(err), stack: err?.stack }, { status: 500 });
