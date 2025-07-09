@@ -118,10 +118,10 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo ID mới!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 5. SALT_USER riêng cho mỗi user (nếu bạn vẫn muốn, còn đúng chuẩn là SALT_USER global đặt trong wrangler.toml)
+    // 5. SALT_USER riêng biệt cho mỗi user
     const salt_user = randomBase62(50);
 
-    // 6. Hash password và PIN
+    // 6. Hash password và PIN với salt_user riêng
     let hashedPass, hashedPin;
     try {
       hashedPass = await sha256(password + salt_user);
@@ -130,10 +130,10 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi hash password/pin!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 7. Tạo token_master (100 ký tự) - phần này chuẩn
+    // 7. Tạo token_master (100 ký tự)
     const token_master = randomBase62(100);
 
-    // 8. **TẠO PROFILE USER CHUẨN**
+    // 8. **TẠO PROFILE USER CHUẨN với salt_user lưu trong security**
     const profile = {
       id: newId,
       status: "live",
@@ -149,6 +149,7 @@ export async function onRequestPost(context) {
       security: {
         open_pin: false,
         pin: hashedPin,
+        salt_user: salt_user, // <-- Quan trọng: lưu vào đây!
         open_ip: false,
         ip_whitelist: [],
         open_twofa: false,
@@ -176,7 +177,7 @@ export async function onRequestPost(context) {
       }
     };
 
-    // 9. GHI PROFILE vào KV ĐÚNG CHUẨN
+    // 9. GHI PROFILE vào KV
     try {
       await env.KHOAI_KV_USER.put(userKey, JSON.stringify(profile));
       await env.KHOAI_KV_USER.put(emailKey, JSON.stringify({ user: username }));
