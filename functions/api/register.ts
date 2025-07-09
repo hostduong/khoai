@@ -160,7 +160,7 @@ export async function onRequestPost(context) {
         phone_number: phone,
         user_email: email,
         birthDate: "",
-        verified_user_email: true
+        verified_user_email: false
       },
       initialRegistrationData: {
         created_at: now,
