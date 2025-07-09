@@ -16,7 +16,7 @@ fetch('/api/overview', { credentials: 'include' })
     // Hiển thị/hàm đồng bộ tên user cho navbar
     if (data.fullname || data.username) {
       document.querySelectorAll('.navbar-user-fullname').forEach(el => {
-        el.innerText = data.fullname || data.username || 'User';
+        el.innerText = data.full_name || data.username || 'User';
       });
     }
 
