@@ -113,7 +113,7 @@ export async function onRequestPost(context) {
     let newId;
     try {
       newId = (parseInt(idCounter?.number || "100000") + 1).toString();
-      await env.KHOAI_KV_USER.put(idCounterKey, JSON.stringify({ number: newId }));
+      await env.KHOAI_KV_USER.put(idCounterKey, JSON.stringify({ number: newId }, null, 2));
     } catch (err) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi tạo ID mới!", error: String(err), stack: err?.stack }), { status: 500 });
     }
@@ -133,7 +133,7 @@ export async function onRequestPost(context) {
     // 7. Tạo token_master (100 ký tự)
     const token_master = randomBase62(100);
 
-    // 8. **TẠO PROFILE USER CHUẨN với salt_user lưu trong security**
+    // 8. TẠO PROFILE USER CHUẨN với salt_user lưu trong security
     const profile = {
       id: newId,
       status: "live",
@@ -148,8 +148,8 @@ export async function onRequestPost(context) {
       security: {
         open_pin: false,
         pin: hashedPin,
-        salt_user: salt_user, // <-- Quan trọng: lưu vào đây!
-        user_password: hashedPass, // <-- PHẢI THÊM CHUẨN DÒNG NÀY
+        salt_user: salt_user,
+        user_password: hashedPass,
         open_ip: false,
         ip_whitelist: [],
         open_twofa: false,
@@ -177,16 +177,16 @@ export async function onRequestPost(context) {
       }
     };
 
-    // 9. GHI PROFILE vào KV
+    // 9. GHI PROFILE vào KV (xuống dòng, thụt lề 2 space)
     try {
-      await env.KHOAI_KV_USER.put(userKey, JSON.stringify(profile));
-      await env.KHOAI_KV_USER.put(emailKey, JSON.stringify({ user: username }));
-      await env.KHOAI_KV_USER.put(`KHOAI__profile:id:${newId}`, JSON.stringify({ user: username }));
+      await env.KHOAI_KV_USER.put(userKey, JSON.stringify(profile, null, 2));
+      await env.KHOAI_KV_USER.put(emailKey, JSON.stringify({ user: username }, null, 2));
+      await env.KHOAI_KV_USER.put(`KHOAI__profile:id:${newId}`, JSON.stringify({ user: username }, null, 2));
     } catch (err) {
       return new Response(JSON.stringify({ success: false, message: "Lỗi khi ghi profile vào KV!", error: String(err), stack: err?.stack }), { status: 500 });
     }
 
-    // 10. GHI TOKEN API cá nhân
+    // 10. GHI TOKEN API cá nhân (giữ minify cho tiết kiệm dung lượng)
     try {
       await env.KHOAI_KV_TOKEN.put(
         `KHOAI__token:token:${token_master}`,
