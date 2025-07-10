@@ -13,19 +13,17 @@ fetch('/api/overview', { credentials: 'include' })
     const mailEl = document.getElementById('overviewMailSave');
     if (mailEl) mailEl.innerText = data.mail_total_save || 0;
 
-    // Hiển thị/hàm đồng bộ tên user cho navbar
-    if (data.fullname || data.username) {
-      document.querySelectorAll('.navbar-user-fullname').forEach(el => {
-        el.innerText = data.full_name || data.username || 'User';
-      });
-    }
+    // Cập nhật tên user trên navbar - LUÔN chạy (không cần điều kiện)
+    document.querySelectorAll('.navbar-user-fullname').forEach(el => {
+      el.innerText = data.full_name || data.username || 'User';
+    });
 
-    // Đồng bộ avatar cho navbar (và các nơi khác)
+    // Cập nhật avatar trên navbar (và các nơi khác)
     if (data.avatar) {
       document.querySelectorAll('.navbar-user-avatar').forEach(img => {
         img.src = data.avatar;
       });
-      // Cập nhật avatar cho dropdown hoặc các nơi khác nếu cần
+      // Nếu còn vị trí khác dùng class .avatar img thì cũng cập nhật luôn
       document.querySelectorAll('.avatar img').forEach(img => {
         img.src = data.avatar;
       });
