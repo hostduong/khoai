@@ -18,7 +18,7 @@ fetch('/api/overview', { credentials: 'include' })
       el.innerText = data.full_name || data.username || 'User';
     });
 
-    // Đồng bộ avatar cho navbar (avatar mặc định đã xử lý ở backend)
+    // Đồng bộ avatar cho navbar
     if (data.avatar) {
       document.querySelectorAll('.navbar-user-avatar').forEach(img => {
         img.src = data.avatar;
@@ -28,10 +28,10 @@ fetch('/api/overview', { credentials: 'include' })
       });
     }
 
-    // Hiển thị token list
+    // Hiển thị token list động (hỗ trợ nhiều loại token)
     const tokenListDiv = document.getElementById('tokenList');
     if (tokenListDiv) {
-      tokenListDiv.innerHTML = ""; // Clear old tokens
+      tokenListDiv.innerHTML = "";
 
       Object.keys(data).forEach(key => {
         if (key.startsWith("token_")) {
@@ -59,9 +59,15 @@ fetch('/api/overview', { credentials: 'include' })
                       </span>
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-4 d-flex gap-2">
                     <button class="btn btn-primary waves-effect waves-light" type="button" onclick="navigator.clipboard.writeText('${value}')">
                       <i class="fa-regular fa-copy"></i> Sao chép
+                    </button>
+                    <button type="button"
+                      class="btn btn-success waves-effect"
+                      data-token-type="${type}"
+                      onclick="refreshToken(this)">
+                      <i class="fa-solid fa-rotate-right"></i> Làm mới Token
                     </button>
                   </div>
                 </div>
@@ -77,20 +83,33 @@ fetch('/api/overview', { credentials: 'include' })
     window.location.href = "/login";
   });
 
-document.getElementById('btnCreateNewToken').onclick = function() {
-  if (!confirm('Bạn chắc chắn muốn làm mới token?')) return;
-  fetch('/api/change_token?type=master', { method: 'POST', credentials: 'include' })
+// Làm mới token (bất kỳ loại nào)
+window.refreshToken = function(btn) {
+  const type = btn.getAttribute('data-token-type') || 'master';
+  if (!confirm(`Bạn chắc chắn muốn làm mới token ${type}?`)) return;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...`;
+
+  fetch(`/api/change_token?type=${type}`, { method: 'POST', credentials: 'include' })
     .then(res => res.json()).then(data => {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
       if (data.success && data.token) {
-        document.getElementById('apiToken_master').value = data.token;
-        alert('Đã làm mới token!');
+        // Cập nhật giá trị mới ngay
+        const input = document.getElementById(`apiToken_${type}`);
+        if (input) input.value = data.token;
+        alert(`Đã làm mới token ${type}!`);
       } else {
         alert(data.message || "Có lỗi xảy ra!");
       }
+    }).catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
+      alert("Lỗi hệ thống, thử lại sau!");
     });
 };
 
-
+// Toggle hiển thị token (show/hide)
 window.toggleToken = function(id, btn) {
   const input = document.getElementById(id);
   if (!input) return;
@@ -102,5 +121,4 @@ window.toggleToken = function(id, btn) {
     input.type = "password";
     if (icon) icon.className = "ti ti-eye-off";
   }
-}
-
+};
