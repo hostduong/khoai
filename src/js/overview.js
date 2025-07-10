@@ -77,6 +77,20 @@ fetch('/api/overview', { credentials: 'include' })
     window.location.href = "/login";
   });
 
+document.getElementById('btnCreateNewToken').onclick = function() {
+  if (!confirm('Bạn chắc chắn muốn làm mới token?')) return;
+  fetch('/api/change_token?type=master', { method: 'POST', credentials: 'include' })
+    .then(res => res.json()).then(data => {
+      if (data.success && data.token) {
+        document.getElementById('apiToken_master').value = data.token;
+        alert('Đã làm mới token!');
+      } else {
+        alert(data.message || "Có lỗi xảy ra!");
+      }
+    });
+};
+
+
 window.toggleToken = function(id, btn) {
   const input = document.getElementById(id);
   if (!input) return;
