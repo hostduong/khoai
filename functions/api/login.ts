@@ -146,11 +146,21 @@ export async function onRequestPost(context) {
       }
     }
 
-    // 6. TẠO COOKIE, PROFILE_COOKIE (dùng SALT_COOKIE, SALT_PROFILE_COOKIE)
-    const cookie = randomBase62(100);
+    // ======== BỔ SUNG XOÁ SESSION CŨ (logic mới duy nhất bạn yêu cầu) ========
     const salt_cookie = env.SALT_COOKIE;
     const salt_profile_cookie = env.SALT_PROFILE_COOKIE;
     const ua_hash = await sha256(ua);
+    const userCookieKey = `KHOAI__cookie:user:${username}:${ua_hash}`;
+    // Xoá session cũ (nếu có)
+    const oldUserKV = await env.KHOAI_KV_COOKIE.get(userCookieKey, "json");
+    if (oldUserKV && oldUserKV.cookie_id) {
+      const oldCookieKey = `KHOAI__cookie:cookie:${oldUserKV.cookie_id}`;
+      await env.KHOAI_KV_COOKIE.delete(oldCookieKey);
+      await env.KHOAI_KV_COOKIE.delete(userCookieKey);
+    }
+
+    // 6. TẠO COOKIE, PROFILE_COOKIE (dùng SALT_COOKIE, SALT_PROFILE_COOKIE)
+    const cookie = randomBase62(100);
     const cookie_id = await sha256(ua_hash + cookie + salt_cookie);
 
     await env.KHOAI_KV_COOKIE.put(
