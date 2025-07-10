@@ -1,10 +1,10 @@
-fetch('/api/overview', { credentials: 'include' })
+fetch("/api/overview", { credentials: 'include' })
   .then(res => res.json())
   .then(data => {
-    if (!data.success) {
-      window.location.href = "/login";
-      return;
-    }
+    if(data.success) window.location.href = "/overview";
+    else setTimeout(() => window.location.href = "/login", 500);
+  });
+
 
     // Hiển thị số dư coin và email đã mua
     const coinEl = document.getElementById('overviewCoin');
