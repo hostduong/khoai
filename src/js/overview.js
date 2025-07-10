@@ -89,3 +89,4 @@ window.toggleToken = function(id, btn) {
     if (icon) icon.className = "ti ti-eye-off";
   }
 }
+
