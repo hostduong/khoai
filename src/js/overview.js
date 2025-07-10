@@ -77,16 +77,3 @@ fetch('/api/overview', { credentials: 'include' })
     window.location.href = "/login";
   });
 
-// Hàm show/hide token
-function toggleToken(id, btn) {
-  const input = document.getElementById(id);
-  if (!input) return;
-  const icon = btn.querySelector('i');
-  if (input.type === "password") {
-    input.type = "text";
-    if (icon) icon.className = "ti ti-eye";
-  } else {
-    input.type = "password";
-    if (icon) icon.className = "ti ti-eye-off";
-  }
-}
