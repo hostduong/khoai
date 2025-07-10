@@ -202,25 +202,21 @@ export async function onRequestPost(context) {
     };
     await env.KHOAI_KV_LOGGER.put(loggerKey, JSON.stringify(logData, null, 2), { expirationTtl: 90 * 24 * 3600 });
 
-    // 9. Set-Cookie trả về cho client
-    return new Response(
+    // 9. Set-Cookie trả về cho client (CÁCH ĐÚNG cho Cloudflare Workers/Pages)
+    const res = new Response(
       JSON.stringify({
         success: true,
         redirect: "/overview",
         cookie,
         profile_cookie
       }),
-      {
-        headers: {
-          "Set-Cookie": [
-            `cookie=${cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`,
-            `profile_cookie=${profile_cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`
-          ],
-          "Content-Type": "application/json",
-        },
-        status: 200,
-      }
+      { status: 200 }
     );
+    res.headers.append("Set-Cookie", `cookie=${cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`);
+    res.headers.append("Set-Cookie", `profile_cookie=${profile_cookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=1209600`);
+    res.headers.set("Content-Type", "application/json");
+    return res;
+
   } catch (err) {
     return new Response(
       JSON.stringify({ success: false, message: "Lỗi hệ thống ngoài dự kiến!", error: String(err), stack: err?.stack }),
