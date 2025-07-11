@@ -46,33 +46,32 @@ fetch('/api/overview', { credentials: 'include' })
             ? `<span class="badge bg-${status === "live" ? "success" : "danger"} ms-2">${status}</span>` : "";
           let expireText = expire ? `<span class="text-muted ms-2">(HSD: ${expire})</span>` : "";
 
-tokenListDiv.innerHTML += `
-  <div class="card mb-3">
-    <form class="card-body changeApiToken" action="/api/change_token?type=${type}" method="POST" onsubmit="return false;">
-      <div class="row align-items-end">
-        <div class="col-md-8 form-password-toggle">
-          <label class="form-label">${label} ${statusBadge} ${expireText}</label>
-          <div class="input-group input-group-merge">
-            <input type="password" readonly class="form-control" value="${value}" id="apiToken_${type}" placeholder="············">
-            <span class="input-group-text cursor-pointer" onclick="window.toggleToken('apiToken_${type}', this)">
-              <i class="ti ti-eye-off"></i>
-            </span>
-          </div>
-        </div>
-        <div class="col-md-4 d-flex gap-2">
-          <button type="button" class="btn btn-primary waves-effect waves-light"
-            onclick="navigator.clipboard.writeText('${value}').then(()=>toastr.success('Đã sao chép token thành công!'))">
-            <i class="fa-regular fa-copy"></i> Sao chép
-          </button>
-          <button type="submit" class="btn btn-success waves-effect">
-            <i class="fa-solid fa-rotate-right"></i> Làm mới Token
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
-`;
-
+          tokenListDiv.innerHTML += `
+            <div class="card mb-3">
+              <form class="card-body changeApiToken" action="/api/change_token?type=${type}" method="POST" autocomplete="off">
+                <div class="row align-items-end">
+                  <div class="col-md-8 form-password-toggle">
+                    <label class="form-label">${label} ${statusBadge} ${expireText}</label>
+                    <div class="input-group input-group-merge">
+                      <input type="password" readonly class="form-control" value="${value}" id="apiToken_${type}" placeholder="············">
+                      <span class="input-group-text cursor-pointer" onclick="window.toggleToken('apiToken_${type}', this)">
+                        <i class="ti ti-eye-off"></i>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-md-4 d-flex gap-2">
+                    <button type="button" class="btn btn-primary waves-effect waves-light"
+                      onclick="navigator.clipboard.writeText('${value}').then(()=>toastr.success('Đã sao chép token thành công!'))">
+                      <i class="fa-regular fa-copy"></i> Sao chép
+                    </button>
+                    <button type="submit" class="btn btn-success waves-effect">
+                      <i class="fa-solid fa-rotate-right"></i> Làm mới Token
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          `;
         }
       });
     }
@@ -96,9 +95,10 @@ window.toggleToken = function(id, btn) {
   }
 };
 
-// Làm mới token chuẩn SweetAlert2 + toastr
-window.refreshToken = function(btn) {
-  const type = btn.getAttribute('data-token-type') || 'master';
+// **XỬ LÝ LÀM MỚI TOKEN ĐÚNG CHUẨN UNLIMITMAIL**
+$(document).on('submit', 'form.changeApiToken', function (e) {
+  e.preventDefault();
+  const $form = $(this);
   Swal.fire({
     title: 'Xác nhận thay đổi token?',
     text: "Bạn sẽ không thể huỷ sau khi đồng ý!",
@@ -110,26 +110,26 @@ window.refreshToken = function(btn) {
     cancelButtonText: 'Huỷ'
   }).then((result) => {
     if (result.isConfirmed) {
-      btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...`;
-
-      fetch(`/api/change_token?type=${type}`, { method: 'POST', credentials: 'include' })
-        .then(res => res.json()).then(data => {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
+      let btn = $form.find('button[type=submit]');
+      btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...');
+      $.ajax({
+        type: "POST",
+        url: $form.attr("action"),
+        data: $form.serialize(),
+        success: function (data) {
+          btn.prop('disabled', false).html('<i class="fa-solid fa-rotate-right"></i> Làm mới Token');
           if (data.success && data.token) {
-            // Cập nhật giá trị mới ngay
-            const input = document.getElementById(`apiToken_${type}`);
-            if (input) input.value = data.token;
+            $form.find('input[id^="apiToken_"]').val(data.token);
             toastr.success('Làm mới token thành công!');
           } else {
-            toastr.error(data.message || "Có lỗi xảy ra!");
+            toastr.error(data.message || 'Có lỗi xảy ra!');
           }
-        }).catch(() => {
-          btn.disabled = false;
-          btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
-          toastr.error("Lỗi hệ thống, thử lại sau!");
-        });
+        },
+        error: function () {
+          btn.prop('disabled', false).html('<i class="fa-solid fa-rotate-right"></i> Làm mới Token');
+          toastr.error('Lỗi hệ thống!');
+        }
+      });
     }
   });
-};
+});
