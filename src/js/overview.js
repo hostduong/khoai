@@ -46,35 +46,33 @@ fetch('/api/overview', { credentials: 'include' })
             ? `<span class="badge bg-${status === "live" ? "success" : "danger"} ms-2">${status}</span>` : "";
           let expireText = expire ? `<span class="text-muted ms-2">(HSD: ${expire})</span>` : "";
 
-          tokenListDiv.innerHTML += `
-            <div class="card mb-3">
-              <form class="card-body" onsubmit="return false;">
-                <div class="row align-items-end">
-                  <div class="col-md-8 form-password-toggle">
-                    <label class="form-label">${label} ${statusBadge} ${expireText}</label>
-                    <div class="input-group input-group-merge">
-                      <input type="password" readonly class="form-control" value="${value}" id="apiToken_${type}" placeholder="············">
-                      <span class="input-group-text cursor-pointer" onclick="window.toggleToken('apiToken_${type}', this)">
-                        <i class="ti ti-eye-off"></i>
-                      </span>
-                    </div>
-                  </div>
-                  <div class="col-md-4 d-flex gap-2">
-                    <button type="button" class="btn btn-primary waves-effect waves-light"
-                      onclick="navigator.clipboard.writeText('${value}').then(()=>toastr.success('Đã sao chép token thành công!'))">
-                      <i class="fa-regular fa-copy"></i> Sao chép
-                    </button>
-                    <button type="button"
-                      class="btn btn-success waves-effect"
-                      data-token-type="${type}"
-                      onclick="window.refreshToken(this)">
-                      <i class="fa-solid fa-rotate-right"></i> Làm mới Token
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          `;
+tokenListDiv.innerHTML += `
+  <div class="card mb-3">
+    <form class="card-body changeApiToken" action="/api/change_token?type=${type}" method="POST" onsubmit="return false;">
+      <div class="row align-items-end">
+        <div class="col-md-8 form-password-toggle">
+          <label class="form-label">${label} ${statusBadge} ${expireText}</label>
+          <div class="input-group input-group-merge">
+            <input type="password" readonly class="form-control" value="${value}" id="apiToken_${type}" placeholder="············">
+            <span class="input-group-text cursor-pointer" onclick="window.toggleToken('apiToken_${type}', this)">
+              <i class="ti ti-eye-off"></i>
+            </span>
+          </div>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+          <button type="button" class="btn btn-primary waves-effect waves-light"
+            onclick="navigator.clipboard.writeText('${value}').then(()=>toastr.success('Đã sao chép token thành công!'))">
+            <i class="fa-regular fa-copy"></i> Sao chép
+          </button>
+          <button type="submit" class="btn btn-success waves-effect">
+            <i class="fa-solid fa-rotate-right"></i> Làm mới Token
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+`;
+
         }
       });
     }
