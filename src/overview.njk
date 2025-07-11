@@ -3,7 +3,153 @@
 {% set keywords = "mua hotmail, mua gmail, mail domain giá rẻ, email cho MMO, dịch vụ email uy tín, gem.id.vn" %}
 {% set page_url = "/overview/" %}
 {% set og_image = "/img/logo.png" %}
-{% set scripts_footer = '<script src="' ~ domain ~ '/js/overview.js"></script>' %}
+{% set scripts_footer = '<script src="' ~ domain ~ '/js/overview.js"></script>
+<script aria-hidden="true">
+    $(function () {
+            callGetQuantity();
+            localStorage.setItem('timeCallApi', Date.now());
+
+            const interval = setInterval(() => {
+                let startTime = localStorage.getItem('timeCallApi');
+                let currentTime = Date.now();
+                let elapsedTime = (currentTime - startTime) / 1000;
+
+                if (elapsedTime >= 600) {
+                    clearInterval(interval);
+                    localStorage.removeItem('timeCallApi');
+                } else {
+                    callGetQuantity();
+                }
+            }, 20000);
+
+            function callGetQuantity() {
+                var parent = $('.product-data')
+                $.ajax({
+                    url: '/product/quantity',
+                    type: 'GET',
+                    success: function (res) {
+                        if (res.status) {
+                            let data = res.data;
+
+                            Object.entries(data).forEach(([productId, quantity]) => {
+                                var productQuantity = $('.product-quantity-' + productId);
+                                var formattedQuantity = number_format(quantity);
+                                var btnBuyHotmail = $('.btnBuyHotmail-' + productId);
+
+                                if (formattedQuantity === "0") {
+                                    btnBuyHotmail.prop('disabled', true)
+                                        .removeClass('btn-primary')
+                                        .addClass('btn-danger')
+                                        .text('Hết hàng');
+                                } else {
+                                    btnBuyHotmail.prop('disabled', false)
+                                        .removeClass('btn-danger')
+                                        .addClass('btn-primary')
+                                        .html('<i class="fa-solid fa-cart-shopping me-2"></i> Mua ngay');
+                                }
+
+                                productQuantity.text(formattedQuantity);
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr);
+                    }
+                });
+            }
+
+            function number_format(number, decimals = 0, decPoint = '.', thousandsSep = ',') {
+                // Make sure the number is a float
+                number = parseFloat(number);
+
+                if (!isFinite(number)) {
+                    return '0';
+                }
+
+                // Fix the number to the specified decimal places
+                let fixedNumber = number.toFixed(decimals);
+
+                // Split the number into integer and decimal parts
+                let parts = fixedNumber.split('.');
+
+                // Format the integer part with the thousands separator
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+
+                // Join integer and decimal parts with the custom decimal point
+                return parts.join(decPoint);
+            }
+
+            $('#buttonCopy').on('click', function () {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($('#apiTokenUser').val()).select();
+                document.execCommand("copy");
+                $temp.remove();
+                toastr.success('Đã sao chép token thành công', 'Thành công');
+            });
+
+            $('.buttonCopyHotmail').on('click', function () {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($('#dataBuyHotmail').val()).select();
+                document.execCommand("copy");
+                $temp.remove();
+                toastr.success('Đã sao chép dữ liệu hotmail thành công', 'Thành công');
+            });
+
+            $('.buttonDownloadHotMail').on('click', function () {
+                const link = document.createElement('a');
+                var data = $('#dataBuyHotmail').val();
+                var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+                link.href = window.URL.createObjectURL(blob);
+                const date = new Date();
+                const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+                link.download = "data_hotmail_" + formattedDate + ".txt";
+                link.click();
+                window.URL.revokeObjectURL(link.href);
+            });
+
+            $('.buttonCopyOther').on('click', function () {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($('#dataBuyOther').val()).select();
+                document.execCommand("copy");
+                $temp.remove();
+                toastr.success('Đã sao chép dữ liệu tài khoản thành công', 'Thành công');
+            });
+
+            $('.buttonDownloadOther').on('click', function () {
+                const link = document.createElement('a');
+                var data = $('#dataBuyOther').val();
+                var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+                link.href = window.URL.createObjectURL(blob);
+                const date = new Date();
+                const formattedDate = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+                link.download = "data_hotmail_" + formattedDate + ".txt";
+                link.click();
+                window.URL.revokeObjectURL(link.href);
+            });
+
+            $('#copySDT').on('click', function () {
+                var sdt = $(this).data('sdt');
+
+                if (!navigator.clipboard) {
+                    var $temp = $("<input>");
+                    $("body").append($temp);
+                    $temp.val(sdt).select();
+                    document.execCommand("copy");
+                    $temp.remove();
+                } else {
+                    navigator.clipboard.writeText(sdt).then(function () {
+                        toastr.success('Đã sao chép số điện thoại thành công', 'Thành công');
+                    }).catch(function (err) {
+                        toastr.error('Không thể sao chép. Vui lòng thử lại!', 'Lỗi');
+                    });
+                }
+            });
+
+        });
+</script>' %}
 {% set user = {
   username: data.username,
   full_name: data.full_name,
