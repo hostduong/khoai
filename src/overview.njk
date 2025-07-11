@@ -3,7 +3,8 @@
 {% set keywords = "mua hotmail, mua gmail, mail domain giá rẻ, email cho MMO, dịch vụ email uy tín, gem.id.vn" %}
 {% set page_url = "/overview/" %}
 {% set og_image = "/img/logo.png" %}
-{% set scripts_footer = '<script src="' ~ domain ~ '/js/overview.js?v={{ random() }}"></script>' %}
+{% set cache_bust = ("" + (range(100000, 999999) | random)) %}
+{% set scripts_footer = '<script src="' ~ domain ~ '/js/overview.js?v=' ~ cache_bust ~ '"></script>' %}
 {% set user = {
   username: data.username,
   full_name: data.full_name,
