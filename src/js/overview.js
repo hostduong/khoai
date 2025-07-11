@@ -146,3 +146,43 @@ window.refreshToken = function(btn) {
     }
   });
 };
+
+$('form.changeApiToken').submit(function (e) {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Xác nhận thay đổi token?',
+        text: "Bạn sẽ không thể huỷ sau khi đồng ý!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#27ae60',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Đồng ý',
+        cancelButtonText: 'Huỷ'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var formData = new FormData($(this)[0]);
+            $.ajax({
+                type: "POST",
+                url: $(this).attr("action"),
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    if (data.status) {
+                        $('#apiTokenUser').val(data.token);
+                        toastr.success('Làm mới token thành công!');
+                    } else {
+                        toastr.error(data.message || 'Có lỗi xảy ra!');
+                    }
+                },
+                error: function () {
+                    toastr.error('Lỗi hệ thống!');
+                }
+            });
+        }
+    });
+    return false;
+});
+
