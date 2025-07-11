@@ -1,5 +1,3 @@
-// overview.js
-
 fetch('/api/overview', { credentials: 'include' })
   .then(res => res.json())
   .then(data => {
@@ -30,7 +28,7 @@ fetch('/api/overview', { credentials: 'include' })
       });
     }
 
-    // Hiển thị token list động (hỗ trợ nhiều loại token)
+    // Hiển thị danh sách token
     const tokenListDiv = document.getElementById('tokenList');
     if (tokenListDiv) {
       tokenListDiv.innerHTML = "";
@@ -56,19 +54,20 @@ fetch('/api/overview', { credentials: 'include' })
                     <label class="form-label">${label} ${statusBadge} ${expireText}</label>
                     <div class="input-group input-group-merge">
                       <input type="password" readonly class="form-control" value="${value}" id="apiToken_${type}" placeholder="············">
-                      <span class="input-group-text cursor-pointer" onclick="toggleToken('apiToken_${type}', this)">
+                      <span class="input-group-text cursor-pointer" onclick="window.toggleToken('apiToken_${type}', this)">
                         <i class="ti ti-eye-off"></i>
                       </span>
                     </div>
                   </div>
                   <div class="col-md-4 d-flex gap-2">
-                    <button class="btn btn-primary waves-effect waves-light" type="button" onclick="navigator.clipboard.writeText('${value}')">
+                    <button type="button" class="btn btn-primary waves-effect waves-light"
+                      onclick="navigator.clipboard.writeText('${value}').then(()=>toastr.success('Đã sao chép token thành công!'))">
                       <i class="fa-regular fa-copy"></i> Sao chép
                     </button>
                     <button type="button"
                       class="btn btn-success waves-effect"
                       data-token-type="${type}"
-                      onclick="refreshToken(this)">
+                      onclick="window.refreshToken(this)">
                       <i class="fa-solid fa-rotate-right"></i> Làm mới Token
                     </button>
                   </div>
@@ -81,7 +80,7 @@ fetch('/api/overview', { credentials: 'include' })
     }
   })
   .catch(err => {
-    alert("Lỗi khi tải dữ liệu, vui lòng thử lại!\n" + err);
+    toastr.error("Lỗi khi tải dữ liệu, vui lòng thử lại!");
     window.location.href = "/login";
   });
 
@@ -99,16 +98,18 @@ window.toggleToken = function(id, btn) {
   }
 };
 
-// Làm mới token
+// Làm mới token chuẩn SweetAlert2 + toastr
 window.refreshToken = function(btn) {
   const type = btn.getAttribute('data-token-type') || 'master';
   Swal.fire({
-    title: 'Xác nhận',
-    text: `Bạn chắc chắn muốn làm mới token ${type}?`,
+    title: 'Xác nhận thay đổi token?',
+    text: "Bạn sẽ không thể huỷ sau khi đồng ý!",
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: 'Làm mới',
-    cancelButtonText: 'Hủy'
+    confirmButtonColor: '#27ae60',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Đồng ý',
+    cancelButtonText: 'Huỷ'
   }).then((result) => {
     if (result.isConfirmed) {
       btn.disabled = true;
@@ -122,67 +123,15 @@ window.refreshToken = function(btn) {
             // Cập nhật giá trị mới ngay
             const input = document.getElementById(`apiToken_${type}`);
             if (input) input.value = data.token;
-            Swal.fire({
-              title: 'Thành công!',
-              text: `Đã làm mới token ${type}!`,
-              icon: 'success'
-            });
+            toastr.success('Làm mới token thành công!');
           } else {
-            Swal.fire({
-              title: 'Lỗi',
-              text: data.message || "Có lỗi xảy ra!",
-              icon: 'error'
-            });
+            toastr.error(data.message || "Có lỗi xảy ra!");
           }
         }).catch(() => {
           btn.disabled = false;
           btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
-          Swal.fire({
-            title: 'Lỗi hệ thống',
-            text: 'Vui lòng thử lại sau!',
-            icon: 'error'
-          });
+          toastr.error("Lỗi hệ thống, thử lại sau!");
         });
     }
   });
 };
-
-$('form.changeApiToken').submit(function (e) {
-    e.preventDefault();
-
-    Swal.fire({
-        title: 'Xác nhận thay đổi token?',
-        text: "Bạn sẽ không thể huỷ sau khi đồng ý!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#27ae60',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Đồng ý',
-        cancelButtonText: 'Huỷ'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var formData = new FormData($(this)[0]);
-            $.ajax({
-                type: "POST",
-                url: $(this).attr("action"),
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (data) {
-                    if (data.status) {
-                        $('#apiTokenUser').val(data.token);
-                        toastr.success('Làm mới token thành công!');
-                    } else {
-                        toastr.error(data.message || 'Có lỗi xảy ra!');
-                    }
-                },
-                error: function () {
-                    toastr.error('Lỗi hệ thống!');
-                }
-            });
-        }
-    });
-    return false;
-});
-
