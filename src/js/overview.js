@@ -1,3 +1,5 @@
+// overview.js
+
 fetch('/api/overview', { credentials: 'include' })
   .then(res => res.json())
   .then(data => {
@@ -13,7 +15,7 @@ fetch('/api/overview', { credentials: 'include' })
     const mailEl = document.getElementById('overviewMailSave');
     if (mailEl) mailEl.innerText = data.mail_total_save || 0;
 
-    // Hiển thị tên user cho navbar (CHUẨN)
+    // Hiển thị tên user cho navbar
     document.querySelectorAll('.navbar-user-fullname').forEach(el => {
       el.innerText = data.full_name || data.username || 'User';
     });
@@ -83,33 +85,7 @@ fetch('/api/overview', { credentials: 'include' })
     window.location.href = "/login";
   });
 
-// Làm mới token (bất kỳ loại nào)
-window.refreshToken = function(btn) {
-  const type = btn.getAttribute('data-token-type') || 'master';
-  if (!confirm(`Bạn chắc chắn muốn làm mới token ${type}?`)) return;
-  btn.disabled = true;
-  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...`;
-
-  fetch(`/api/change_token?type=${type}`, { method: 'POST', credentials: 'include' })
-    .then(res => res.json()).then(data => {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
-      if (data.success && data.token) {
-        // Cập nhật giá trị mới ngay
-        const input = document.getElementById(`apiToken_${type}`);
-        if (input) input.value = data.token;
-        alert(`Đã làm mới token ${type}!`);
-      } else {
-        alert(data.message || "Có lỗi xảy ra!");
-      }
-    }).catch(() => {
-      btn.disabled = false;
-      btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
-      alert("Lỗi hệ thống, thử lại sau!");
-    });
-};
-
-// Toggle hiển thị token (show/hide)
+// Toggle show/hide token
 window.toggleToken = function(id, btn) {
   const input = document.getElementById(id);
   if (!input) return;
@@ -121,4 +97,52 @@ window.toggleToken = function(id, btn) {
     input.type = "password";
     if (icon) icon.className = "ti ti-eye-off";
   }
+};
+
+// Làm mới token
+window.refreshToken = function(btn) {
+  const type = btn.getAttribute('data-token-type') || 'master';
+  Swal.fire({
+    title: 'Xác nhận',
+    text: `Bạn chắc chắn muốn làm mới token ${type}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Làm mới',
+    cancelButtonText: 'Hủy'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...`;
+
+      fetch(`/api/change_token?type=${type}`, { method: 'POST', credentials: 'include' })
+        .then(res => res.json()).then(data => {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
+          if (data.success && data.token) {
+            // Cập nhật giá trị mới ngay
+            const input = document.getElementById(`apiToken_${type}`);
+            if (input) input.value = data.token;
+            Swal.fire({
+              title: 'Thành công!',
+              text: `Đã làm mới token ${type}!`,
+              icon: 'success'
+            });
+          } else {
+            Swal.fire({
+              title: 'Lỗi',
+              text: data.message || "Có lỗi xảy ra!",
+              icon: 'error'
+            });
+          }
+        }).catch(() => {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Làm mới Token`;
+          Swal.fire({
+            title: 'Lỗi hệ thống',
+            text: 'Vui lòng thử lại sau!',
+            icon: 'error'
+          });
+        });
+    }
+  });
 };
